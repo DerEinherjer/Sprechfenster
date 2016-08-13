@@ -1,0 +1,81 @@
+-------------------------------------------------------
+# Anforderungsanalyse 7 Schwerter Turnieranwendung
+# Datum: 9.7.2016
+# Anwesend: Michael, Steffen, Stefan, Tanja, Sascha    
+-------------------------------------------------------
+
+
+-------------------------------------------------------
+Turnierablauf (Problemdomäne):
+-------------------------------------------------------
+-Wer kommt mit der Anwendung in Berührung (Rollen):
+--Turnierorganisator/Ausrichter
+--Kampfrichter
+--Fechter
+--Zuschauer
+
+-Turnierablauf:
+--Planung des Turniers (vor dem Turniertag):
+---Anzahl der Fechtplätze
+---Ungefähre Anzahl der Teilnehmer (durch Voranmeldung)
+---Anzahl der Vorgruppen (Es gibt immer zunächst Qualifikationsgruppen und dann einen Turnierbaum mit K.O.-System)
+
+--Anmeldung der Fechter (am Turniertag selbst):
+---Erfassung der anwesenden Fechter:
+----Vor+Nachname
+----Foto
+----Fechtschule (+Logo)
+----Nationalität (+Flagge)
+----Alter
+---Check der Fechter:
+----Startgeld bezahlt?
+----Equipmentcheck durchgeführt?
+
+--Erstellung des Turnierplans:
+---Vorgruppen mischen
+----Gleichmäßige Gruppengrößen
+----Fechter sollten gegen möglichst wenig Fechter der eigenen Fechtschule antreten
+----Manuelle Änderungen müssen möglich sein
+
+--Während dem Turnier:
+---Darstellung für das Publikum und für Fechter (über Beamer/zweiten Bildschirm):
+----Welche Gefechte finden gerade auf welchem Platz statt
+----Welche Gefechte kommen danach
+----Aktuelle Rangliste/Punktestand
+----(Einblendungen f. Werbung)
+
+---Gefechtsdurchführung:
+----Zeit/Rundenlimit (nachträgliche Veränderung muss möglich sein)
+----Pausenzeit (nachträgliche Veränderung muss möglich sein)
+----Anzahl Treffer gegeben (nachträgliche Veränderung muss möglich sein)
+----Anzahl Treffer erhalten (nachträgliche Veränderung muss möglich sein)
+----Anzahl Verwarnungen/Strafkarten (nachträgliche Veränderung muss möglich sein)
+----Auszeichnungen (z.B. Sportlichkeit)/Notizen
+----Gefechtsende: Gefecht geht in Wertung ein, nächstes Gefecht auf dem selben Fechtplatz kann beginnen
+
+---Anpassungen im Ablauf wg. ausgeschiedener Fechter (Verletzung, Disqualifikation, ...)
+
+---Ranglistenwertung:
+----Priorität 1: Siege
+----Priorität 2: Trefferdifferenz (Treffer gegeben - Treffer erhalten)
+----Priorität 3: ? unbekannt ?
+
+---Wechsel der Turnierphase (Qualifikationsgruppen -> K.O.-System)
+----Die besten n Spieler aus jeder Qualifikationsgruppe sind für das K.O.-System qualifiziert
+
+--Nach dem Turnier:
+---Anzeige der Sieger (Platz 1-3) mit gesonderter Darstellung
+---Anzeige der Rangliste
+---Speichern der Fechter in einer Datenbank zur Verwendung bei weiteren Turnieren
+---Verknüpfung der Fechter mit dem Turnier, an dem sie teilgenommen haben (Fechterpass)
+
+-------------------------------------------------------
+Technische Anforderungen/Überlegungen:
+-------------------------------------------------------
+-Die Anwendung soll auf möglichst vielen Plattformen laufen und möglichst zukunftsicher sein.
+--Programmiersprache: Java
+--Darstellungsansicht evtl. über HTML zur leichten Anpassung
+-Die Anwendung soll leicht umzuziehen/zu installieren sein
+--Soll nur aus möglichst wenig Dateien bestehen (1x Anwedung, 1xDatenbankdatei?)
+-Datenbank soll getrennt von Programm gespeichert werden, um Datenbank weitergeben zu können
+
