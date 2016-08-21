@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<FlowPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="768.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <MenuBar prefHeight="25.0" prefWidth="1024.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Close" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Delete" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <ToolBar prefHeight="48.0" prefWidth="1024.0">
+         <items>
+            <Button mnemonicParsing="false" text="Übersicht" />
+            <Button mnemonicParsing="false" text="Neues Turnier" />
+            <Button mnemonicParsing="false" text="Turnier laden" />
+            <Button mnemonicParsing="false" text="Neuer Fechter" />
+         </items>
+      </ToolBar>
+      <SplitPane dividerPositions="0.4178082191780822" prefHeight="700.0" prefWidth="1024.0">
+         <items>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="688.0" prefWidth="421.0">
+               <children>
+                  <TableView layoutX="7.0" layoutY="6.0" prefHeight="682.0" prefWidth="506.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columns>
+                        <TableColumn prefWidth="155.0" text="Turnier" />
+                        <TableColumn minWidth="9.0" prefWidth="85.0" text="Datum" />
+                        <TableColumn prefWidth="101.0" text="Teilnehmer" />
+                        <TableColumn prefWidth="82.0" text="Gefechte" />
+                     </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="655.0" prefWidth="592.0">
+               <children>
+                  <TableView layoutX="155.0" layoutY="62.0" prefHeight="682.0" prefWidth="510.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columns>
+                        <TableColumn prefWidth="204.0" text="Fechter" />
+                        <TableColumn prefWidth="147.0" text="Bild" />
+                        <TableColumn prefWidth="102.0" text="Fechtschule" />
+                        <TableColumn prefWidth="75.0" text="Gefechte" />
+                        <TableColumn prefWidth="63.0" text="Alter" />
+                     </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+         </items>
+      </SplitPane>
+   </children>
+</FlowPane>
