@@ -5,14 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Tournament 
+public class Tournament //TODO Singelton 
 {
-	private int ID;
+	protected static int ID;
 	private Connection con; //Static?
 	
 	protected Tournament(int ID, Connection con)
 	{
-		this.ID = ID;
+		Tournament.ID = ID;
 		this.con = con;
 	}
 	
@@ -163,6 +163,26 @@ public class Tournament
 	
 	private void createVorrundenBegegnungen(Fencer fencer)
 	{
-		
+		String sql = "SELECT FechterID FROM Teilnehmer WHERE TurnierID = "+ID+" AND FechterID != "+fencer.getID()
+					+" AND Gruppe = "+fencer.getGroup()+";";
+		PreparedStatement stmt;
+		try 
+		{
+			stmt = con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			sql ="INSER INTO Vorrunde (TurnierID, Gruppe, TerminID, Teilnehmer1, Teilnehmer2)"
+					+ "VALUES ("+ID+", "+fencer.getGroup()+", -1, "+fencer.getID()+", ?);";
+			stmt = con.prepareStatement(sql);
+			while(rs.next())
+			{
+				stmt.setInt(1, rs.getInt("FechterID"));
+				stmt.executeUpdate();
+			}
+		} 
+		catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

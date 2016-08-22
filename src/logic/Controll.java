@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controll 
 {
@@ -69,7 +71,7 @@ public class Controll
 			sql = "CREATE TABLE Vorrunden( ID int,"
 										+ "TurnierID int,"
 										+ "Gruppe int,"
-										+ "Nummer int,"
+										+ "TerminID int,"
 										+ "Teilnehmer1 int,"
 										+ "Teilnehmer2 int,)";
 			stmt = con.prepareStatement(sql);
@@ -128,6 +130,35 @@ public class Controll
 			//Handle Exeption
 		}
 		
+		return null;
+	}
+	
+	public List<String> getTournaments() throws SQLException
+	{
+		List<String> ret = new ArrayList<String>();
+		String sql = "SELECT ID, Name, Datum FROM Turniere";
+		PreparedStatement stmt = con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next())
+		{
+			String tmp ="";
+			tmp = rs.getString("ID")+" | ";
+			tmp += rs.getString("Name")+" | ";
+			tmp += rs.getString("Datum");
+			ret.add(tmp);
+		}
+		return ret;
+	}
+	
+	public Tournament getTournament(int ID) throws SQLException
+	{
+		String sql = "SELECT COUNT(*) AS Count FROM Turniere WHERE ID = "+ID+";";
+		PreparedStatement stmt = con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		if(rs.getInt("Count")==1)
+		{
+			return new Tournament(ID, con);
+		}
 		return null;
 	}
 }
