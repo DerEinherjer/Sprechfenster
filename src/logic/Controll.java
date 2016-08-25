@@ -13,7 +13,7 @@ public class Controll
 {
 	private static String url = "jdbc:h2:~/SprechfensterData";
 	
-	private Connection con = null;
+	protected static Connection con = null;
 	
 	public Controll()
 	{
@@ -41,92 +41,98 @@ public class Controll
 		String sql = null;
 		try 
 		{
-			sql = "CREATE TABELE Turniere (ID int,"
+			sql = "CREATE TABLE Turniere (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 					   + "Name varchar(255),"
 					   + "Datum varchar(11),"
 					   + "Gruppen int,"
 					   + "Finalrunden int,"
 					   + "Bahnen int);";
 			stmt = con.prepareStatement(sql);
-			stmt.executeQuery();
+			stmt.executeUpdate();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException e) {if(e.getErrorCode()!=42101)e.printStackTrace();}//42101 -> Table exists
 		
 		
 		try 
 		{
-			sql = "CREATE TABELE Fechter (ID int,"
+			sql = "CREATE TABLE Fechter (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 					   + "Vorname varchar(255),"
 					   + "Nachname varchar(255),"
-					   + "Geburtstag verchar(255),"
+					   + "Geburtstag varchar(255),"
 					   + "Fechtschule varchar(255),"
 					   + "Nationalitaet varchar(255));";
 			stmt = con.prepareStatement(sql);
-			stmt.executeQuery();
+			stmt.executeUpdate();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException e) {if(e.getErrorCode()!=42101)e.printStackTrace();}
 		
 		try
 		{
-			sql = "CREATE TABLE Vorrunden( ID int,"
+			sql = "CREATE TABLE Vorrunden( ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 										+ "TurnierID int,"
 										+ "Gruppe int,"
 										+ "TerminID int,"
 										+ "Teilnehmer1 int,"
 										+ "Teilnehmer2 int,)";
 			stmt = con.prepareStatement(sql);
-			stmt.executeQuery();
+			stmt.executeUpdate();
 		}
-		catch (SQLException e){}
+		catch (SQLException e){if(e.getErrorCode()!=42101)e.printStackTrace();}
 		
 		try
 		{
-			sql = "CREATE TABLE Finalrunden(ID int,"
+			sql = "CREATE TABLE Finalrunden(ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 										 + "Teilnehmer1 int,"
 										 + "Teilnehmer2 int,"
 										 + "FolgeBegegnung int,"
 										 + "Vorbegegnung1 int,"
 										 + "Vorbegegnung2 int)";
 			stmt = con.prepareStatement(sql);
-			stmt.executeQuery();
+			stmt.executeUpdate();
 		}
-		catch (SQLException e){}
+		catch (SQLException e){if(e.getErrorCode()!=42101)e.printStackTrace();}
 		
 		try
 		{
-			sql = "CREATE TABLE Teilnahme(TurnierID int,"
+			sql = "CREATE TABLE Teilnahme(TurnierID int NOT NULL AUTO_INCREMENT UNIQUE,"
 										 + "FechterID int,"
 										 + "Gruppe int)";
 			stmt = con.prepareStatement(sql);
-			stmt.executeQuery();
+			stmt.executeUpdate();
 		}
-		catch (SQLException e){}
+		catch (SQLException e){if(e.getErrorCode()!=42101)e.printStackTrace();}
 	}
 	
-	public Tournament createTournament(String Name, String Datum)
+	public Tournament createTournament(String name, String datum)
 	{
 		PreparedStatement stmt = null;
 		
-		String sql = "SELECT COUNT(*) FROM Turnire WHERE Name = ? OR Datum = ?;";
+		String sql = "SELECT COUNT(*) FROM Turniere WHERE Name = ? OR Datum = ?;";
 		try 
 		{
 			stmt = con.prepareStatement(sql);
-			stmt.setString(0, Name);
-			stmt.setString(1, Datum);
+			stmt.setString(1, name);
+			stmt.setString(2, datum);
 			ResultSet rs = stmt.executeQuery();
-			if(rs.getInt(0)<1)
+			rs.next();
+			if(rs.getInt(1)<1)
 			{
-				sql = "INSER INTO Turniere (Name, Datum, Gruppen, Teilnehmer, Finalrunden, Bahnen)"
-						+ " VALUES (?, ?, 2, 8, 2, 2);";
-				
+				sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen)"
+						+ " VALUES (?, ?, 2, 2, 2);";
+				stmt = con.prepareStatement(sql);
+				stmt.setString(1, name);
+				stmt.setString(2, datum);
+				stmt.executeUpdate();
 			}
 			else
 			{
-				//Existiert bereits (Mit diesem Namen ODER an diesem Tag)
+				System.out.println("Existiert Bereits");
+				//TODO Existiert bereits (Mit diesem Namen ODER an diesem Tag)
 			}
 		} 
 		catch (SQLException e) 
 		{
+			e.printStackTrace();
 			//Handle Exeption
 		}
 		
