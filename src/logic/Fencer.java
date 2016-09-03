@@ -20,24 +20,6 @@ public class Fencer
 		return ID;
 	}
 	
-	public int getGroup()
-	{
-		String sql = "SELECT Gruppe FROM Teilnahme WHERE TurnierID = "+Tournament.ID+" AND FechterID = "+ID+";";
-		PreparedStatement stmt;
-		try 
-		{
-			stmt = Controll.con.prepareStatement(sql);
-			ResultSet rs = stmt.executeQuery();
-			return rs.getInt("Gruppe");
-		} 
-		catch (SQLException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return -1;
-	}
-	
 	public static Fencer getFencer(String vorname, String nachname) throws SQLException
 	{
 		if(vorname==null && nachname==null)
@@ -76,8 +58,10 @@ public class Fencer
 			PreparedStatement stmt = Controll.con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, vorname);
 			stmt.setString(2, nachname);
-			int id = stmt.executeUpdate();
-			return new Fencer(id);
+			stmt.execute();
+			ResultSet rs = stmt.getGeneratedKeys();
+			rs.next();
+			return new Fencer(rs.getInt(1));
 		}
 		return null;
 	}
@@ -99,5 +83,23 @@ public class Fencer
 		
 		return "";
 		
+	}
+	
+	public String getName() throws SQLException
+	{
+		String sql = "SELECT Vorname FROM Fechter WHERE ID = "+ID+";";
+		PreparedStatement stmt = Controll.con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		rs.next();
+		return rs.getString("Vorname");
+	}
+	
+	public String getFamilyName() throws SQLException
+	{
+		String sql = "SELECT Nachname FROM Fechter WHERE ID = "+ID+";";
+		PreparedStatement stmt = Controll.con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		rs.next();
+		return rs.getString("Nachname");
 	}
 }

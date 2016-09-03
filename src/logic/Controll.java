@@ -94,7 +94,7 @@ public class Controll
 		
 		try
 		{
-			sql = "CREATE TABLE Teilnahme(TurnierID int NOT NULL AUTO_INCREMENT UNIQUE,"
+			sql = "CREATE TABLE Teilnahme(TurnierID int,"
 										 + "FechterID int,"
 										 + "Gruppe int)";
 			stmt = con.prepareStatement(sql);
@@ -119,10 +119,11 @@ public class Controll
 			{
 				sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen)"
 						+ " VALUES (?, ?, 2, 2, 2);";
-				stmt = con.prepareStatement(sql);
+				stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				stmt.setString(1, name);
 				stmt.setString(2, datum);
-				stmt.executeUpdate();
+				return new Tournament(stmt.executeUpdate());
+				
 			}
 			else
 			{
@@ -163,7 +164,7 @@ public class Controll
 		ResultSet rs = stmt.executeQuery();
 		if(rs.getInt("Count")==1)
 		{
-			return new Tournament(ID, con);
+			return new Tournament(ID);
 		}
 		return null;
 	}

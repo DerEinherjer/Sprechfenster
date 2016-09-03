@@ -4,16 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tournament //TODO Singelton 
 {
 	protected static int ID;
-	private Connection con; //Static?
 	
-	protected Tournament(int ID, Connection con)
+	protected Tournament(int ID)
 	{
 		Tournament.ID = ID;
-		this.con = con;
 	}
 	
 	public void addParticipant(Fencer fencer)
@@ -21,20 +21,25 @@ public class Tournament //TODO Singelton
 		if(!isParticipant(fencer))
 		{//SELECT OrderID, COUNT(OrderID) AS Count FROM OrderDetails WHERE Quantity >=10 GROUP BY OrderID ORDER BY Count ASC, OrderID ASC;
 			int group = 1;
-			String sql = "SELECT Gruppe, COUNT(Gruppe) AS Count FROM Teilnahme WHERE TurnierID ="+ID+" GROUPE BY Gruppe ORDER BY Count ASC, Gruppe ASC;";
+			String sql = "SELECT Gruppe, COUNT(Gruppe) AS Count FROM Teilnahme WHERE TurnierID ="+ID+" GROUP BY Gruppe ORDER BY Count ASC, Gruppe ASC;";
 			PreparedStatement stmt;
 			try 
 			{
-				stmt = con.prepareStatement(sql);
+				stmt = Controll.con.prepareStatement(sql);
 				ResultSet rs = stmt.executeQuery();
-				group = rs.getInt("Gruppe"); 
 
 				boolean groups[] = new boolean[getGruppen()];
-				do
+				for(int i=0;i<groups.length;i++)groups[i]=false;
+				if(rs.next())
 				{
-					groups[rs.getInt("Gruppe")] = true;
+					group = rs.getInt("Gruppe");			//Bestimmt die Gruppen mit den Wenigsten teilnehmer aus der Mengen Teilnehmer >0
+					do
+					{
+						groups[rs.getInt("Gruppe")-1] = true;
+					}
+					while(rs.next());
 				}
-				while(rs.next());
+				
 				for(int i=0;i<getGruppen();i++)
 				{
 					if(!groups[i])
@@ -48,18 +53,18 @@ public class Tournament //TODO Singelton
 			{
 				e.printStackTrace();
 			}
-			sql = "INSER INTO Teilnehmer (TurnierID, FechterID, Gruppe) VALUES ("+ID+", "+fencer.getID()+", "+group+");";
+			sql = "INSERT INTO Teilnahme (TurnierID, FechterID, Gruppe) VALUES ("+ID+", "+fencer.getID()+", "+group+");";
 			try 
 			{
-				stmt = con.prepareStatement(sql);
+				stmt = Controll.con.prepareStatement(sql);
 				stmt.executeUpdate();
 			} 
 			catch (SQLException e) 
 			{
 				e.printStackTrace();
 			}
+			createVorrundenBegegnungen(fencer);
 		}
-		createVorrundenBegegnungen(fencer);
 	}
 	
 	public void addParticipant(Fencer fencer, int group)
@@ -81,11 +86,11 @@ public class Tournament //TODO Singelton
 					                                                 +"Teilnehmer2 = "+fencerID+");";
 			try 
 			{
-				stmt= con.prepareStatement(sql);
+				stmt= Controll.con.prepareStatement(sql);
 				stmt.executeUpdate();
 				
 				sql = "UPDATE Teilnahme SET Gruppe = "+group+" WHERE TurnierID = "+ID+" AND FechterID = "+fencerID+";";
-				stmt = con.prepareStatement(sql);
+				stmt = Controll.con.prepareStatement(sql);
 				stmt.executeUpdate();
 			} 
 			catch (SQLException e) 
@@ -99,7 +104,7 @@ public class Tournament //TODO Singelton
 			sql = "INSER INTO Teilnehmer (TurnierID, FechterID, Gruppe) VALUES ("+ID+", "+fencer.getID()+", "+group+");";
 			try 
 			{
-				stmt = con.prepareStatement(sql);
+				stmt = Controll.con.prepareStatement(sql);
 				stmt.executeUpdate();
 			} 
 			catch (SQLException e) 
@@ -112,13 +117,14 @@ public class Tournament //TODO Singelton
 	
 	public boolean isParticipant(Fencer fencer)
 	{
-		String sql = "SELECT COUNT(*) FROM Teilnahme WHERE Turniere = "+ID+" AND Fechter = "+fencer.getID()+";";
+		String sql = "SELECT COUNT(*) AS Count FROM Teilnahme WHERE TurnierID = "+ID+" AND FechterID = "+fencer.getID()+";";
 		PreparedStatement stmt;
 		try 
 		{
-			stmt = con.prepareStatement(sql);
+			stmt = Controll.con.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
-			if(rs.getInt(0)==0)
+			rs.next();
+			if(rs.getInt("Count")==0)
 				return false;
 			else
 				return true;
@@ -137,8 +143,9 @@ public class Tournament //TODO Singelton
 		PreparedStatement stmt;
 		try 
 		{
-			stmt = con.prepareStatement(sql);
+			stmt = Controll.con.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
+			rs.next();
 			return rs.getInt("Gruppe");
 		} 
 		catch (SQLException e) 
@@ -153,8 +160,9 @@ public class Tournament //TODO Singelton
 		String sql = "SELECT Gruppen FROM Turniere WHERE ID ="+ID+";";
 		try
 		{
-			PreparedStatement stmt = con.prepareStatement(sql);
+			PreparedStatement stmt = Controll.con.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
+			rs.next();
 			return rs.getInt("Gruppen");
 		}
 		catch(SQLException e){}
@@ -163,16 +171,16 @@ public class Tournament //TODO Singelton
 	
 	private void createVorrundenBegegnungen(Fencer fencer)
 	{
-		String sql = "SELECT FechterID FROM Teilnehmer WHERE TurnierID = "+ID+" AND FechterID != "+fencer.getID()
-					+" AND Gruppe = "+fencer.getGroup()+";";
+		String sql = "SELECT FechterID FROM Teilnahme WHERE TurnierID = "+ID+" AND FechterID != "+fencer.getID()
+					+" AND Gruppe = "+getGroup(fencer)+";";
 		PreparedStatement stmt;
 		try 
 		{
-			stmt = con.prepareStatement(sql);
+			stmt = Controll.con.prepareStatement(sql);
 			ResultSet rs = stmt.executeQuery();
-			sql ="INSER INTO Vorrunde (TurnierID, Gruppe, TerminID, Teilnehmer1, Teilnehmer2)"
-					+ "VALUES ("+ID+", "+fencer.getGroup()+", -1, "+fencer.getID()+", ?);";
-			stmt = con.prepareStatement(sql);
+			sql ="INSERT INTO Vorrunden (TurnierID, Gruppe, TerminID, Teilnehmer1, Teilnehmer2)"
+					+ "VALUES ("+ID+", "+getGroup(fencer)+", -1, "+fencer.getID()+", ?);";
+			stmt = Controll.con.prepareStatement(sql);
 			while(rs.next())
 			{
 				stmt.setInt(1, rs.getInt("FechterID"));
@@ -183,6 +191,60 @@ public class Tournament //TODO Singelton
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public int getGroup(Fencer fencer)
+	{
+		String sql = "SELECT Gruppe FROM Teilnahme WHERE TurnierID = "+ID+" AND FechterID = "+fencer.getID()+";";
+		PreparedStatement stmt;
+		try 
+		{
+			stmt = Controll.con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next())
+			return rs.getInt("Gruppe");
+		} 
+		catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
+	public String getVorrunden() throws SQLException
+	{
+		String ret = "";
+		String sql = "SELECT * FROM Vorrunden WHERE TurnierID = "+ID+";";
+		PreparedStatement stmt = Controll.con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next())
+		{
+			ret+=rs.getString("Teilnehmer1")+" : "+rs.getString("Teilnehmer2")+"\n";
+		}
+		return ret;
+	}
+	
+	public List<Fencer> getFencer() throws SQLException
+	{
+		List<Fencer> ret = new ArrayList<Fencer>();
+		String sql = "SELECT FechterID FROM Teilnahme WHERE TurnierID ="+ID+";";
+		PreparedStatement stmt = Controll.con.prepareStatement(sql);
+		ResultSet rs = stmt.executeQuery();
+		while(rs.next())
+		{
+			ret.add(new Fencer(rs.getInt("FechterID")));
+		}
+		return ret;
+	}
+	
+	public void printFencerInfo() throws SQLException
+	{
+		List<Fencer> fencers = getFencer();
+		for(Fencer fencer : fencers)
+		{
+			System.out.println(getGroup(fencer)+"\t"+fencer.getName()+" "+fencer.getFamilyName());
 		}
 	}
 }
