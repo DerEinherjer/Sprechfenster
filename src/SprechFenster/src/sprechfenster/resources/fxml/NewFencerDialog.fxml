@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="419.0" prefWidth="553.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.NewFencerDialogController">
+   <children>
+      <DatePicker layoutX="27.0" layoutY="241.0" promptText="TT.MM.JJJJ" />
+      <TextField layoutX="28.0" layoutY="54.0" prefHeight="25.0" prefWidth="174.0" />
+      <TextField layoutX="28.0" layoutY="117.0" prefHeight="25.0" prefWidth="174.0" />
+      <PrefixSelectionComboBox layoutX="27.0" layoutY="175.0" prefHeight="25.0" prefWidth="174.0" />
+      <Label layoutX="28.0" layoutY="27.0" text="Vorname">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="28.0" layoutY="90.0" text="Nachname">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="28.0" layoutY="148.0" text="Fechtschule">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="28.0" layoutY="214.0" text="Geburtstag">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <PrefixSelectionComboBox layoutX="27.0" layoutY="307.0" prefHeight="25.0" prefWidth="174.0" />
+      <Label layoutX="26.0" layoutY="280.0" text="Nationalität">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="273.0" fitWidth="338.0" layoutX="244.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/FencerDefaultPicture.png" />
+         </image>
+      </ImageView>
+      <Button layoutX="244.0" layoutY="307.0" mnemonicParsing="false" text="Bild ändern..." />
+      <Button layoutX="28.0" layoutY="374.0" mnemonicParsing="false" text="Fertig" />
+      <Button layoutX="465.0" layoutY="374.0" mnemonicParsing="false" text="Abbrechen" />
+      <Separator layoutX="3.0" layoutY="348.0" prefHeight="3.0" prefWidth="546.0" />
+   </children>
+</AnchorPane>
