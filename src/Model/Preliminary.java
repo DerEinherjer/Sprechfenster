@@ -36,5 +36,10 @@ public class Preliminary implements iPreliminary
 	
 	public int getGroup(){return group;}
 	public List<Fencer> getFencer(){List<Fencer> ret = new ArrayList<>();ret.add(fencer1);ret.add(fencer2);return ret;}
+	
+	public String toString()
+	{
+		return group + " | " + fencer1.getFamilyName() + " | " + fencer2.getFamilyName();
+	}
 
 }

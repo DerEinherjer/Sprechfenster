@@ -82,8 +82,9 @@ public class Tournament implements iTournament
 		return ID+" | "+name;
 	}
 	
-	public void addParticipant(Fencer f) throws SQLException
+	public void addParticipant(iFencer f) throws SQLException
 	{
+		if(!(f instanceof Fencer)) return;
 		int counts[] = con.getGroupsMemberCount(this); 
 		int index = 0;
 		for(int i = 1; i< counts.length; i++)
@@ -92,10 +93,10 @@ public class Tournament implements iTournament
 		addParticipant(f, index+1);
 	}
 	
-	public void addParticipant(Fencer f, int group) throws SQLException
+	public void addParticipant(iFencer f, int group) throws SQLException
 	{
-		con.addParticipant(this, f, group);
-		
+		if(!(f instanceof Fencer)) return;
+		con.addParticipant(this, (Fencer)f, group);
 	}
 
 	private Map<Integer, Preliminary> preliminarys = new HashMap<>();
@@ -111,6 +112,10 @@ public class Tournament implements iTournament
 		return ret;
 	}
 	
-	
+	public boolean isParticipant(iFencer f) throws SQLException
+	{
+		if(!(f instanceof Fencer)) return false;
+		return con.isFencerParticipant(this, (Fencer)f);
+	}
 }
 

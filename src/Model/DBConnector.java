@@ -86,7 +86,11 @@ public class DBConnector
 		
 		cfStmt.setString(1, firstname);
 		cfStmt.setString(2, familyname);
-		return cfStmt.executeUpdate();
+		cfStmt.executeUpdate();
+		ResultSet rs = cfStmt.getGeneratedKeys();
+		rs.next();//TODO
+		System.out.println("New Fencer ID: "+rs.getInt(1));
+		return rs.getInt(1);
 	}
 	
 	private PreparedStatement gfvStmt = null;
@@ -206,7 +210,7 @@ public class DBConnector
 			return -1;
 		if(ctStmt == null)
 		{
-			String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen) VALUES (?, '', 0, 0, 0);";
+			String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen) VALUES (?, '', 2, 2, 2);";
 			ctStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		}
 		
@@ -329,15 +333,15 @@ public class DBConnector
 	{
 		if(ifpStmt == null)
 		{
-			String sql = "SELECT COUNT(FechterID) AS Count FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			String sql = "SELECT COUNT(FechterID) AS Anzahl FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
 			ifpStmt = con.prepareStatement(sql);
 		}
-		
+		System.out.println(f.getID());
 		ifpStmt.setInt(1, t.getID());
 		ifpStmt.setInt(2, f.getID());
 		ResultSet rs = ifpStmt.executeQuery();
 		rs.next(); //TODO
-		if(rs.getInt("Count")>0)
+		if(rs.getInt("Anzahl")>0)
 			return true;
 		return false;
 	}
@@ -348,7 +352,7 @@ public class DBConnector
 	{
 		if(ap1Stmt == null)
 		{
-			String sql = "SELECT Gruppen FROM Turnier WHERE ID = ?;";
+			String sql = "SELECT Gruppen FROM Turniere WHERE ID = ?;";
 			ap1Stmt = con.prepareStatement(sql);
 			
 			
@@ -359,11 +363,9 @@ public class DBConnector
 		{
 			ap1Stmt.setInt(1, t.getID());
 			ResultSet rs = ap1Stmt.executeQuery();
-			
 			rs.next();
 			if(group<1||group>rs.getInt("Gruppen"))
 				return; //TODO
-			
 			ap2Stmt.setInt(1, t.getID());
 			ap2Stmt.setInt(2, f.getID());
 			ap2Stmt.setInt(3, group);
@@ -385,6 +387,7 @@ public class DBConnector
 			sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
 			cp2Stmt = con.prepareStatement(sql);
 		}
+		System.out.println("Vorrunden wird erstellt");
 		
 		cp1Stmt.setInt(1, t.getID());
 		cp1Stmt.setInt(2, group);
@@ -396,8 +399,10 @@ public class DBConnector
 		cp2Stmt.setInt(2, group);
 		cp2Stmt.setInt(3, f.getID());
 		
+		int count = 0;
 		while(rs.next())
 		{
+			System.out.println(++count);
 			cp2Stmt.setInt(4, rs.getInt("FechterID"));
 			cp2Stmt.executeUpdate();
 		}
@@ -433,7 +438,7 @@ public class DBConnector
 			String sql = "SELECT Gruppen FROM Turniere WHERE ID = ?";
 			ggmc1Stmt = con.prepareStatement(sql);
 			
-			sql = "SELECT Gruppe FROM Teilnahme WHERE TrunierID = ?;";
+			sql = "SELECT Gruppe FROM Teilnahme WHERE TurnierID = ?;";
 			ggmc2Stmt = con.prepareStatement(sql);
 		}
 		
@@ -486,6 +491,7 @@ public class DBConnector
 		
 		lpStmt.setInt(1, id);
 		ResultSet rs = lpStmt.executeQuery();
+		rs.next();//TODO
 		
 		Preliminary ret = new Preliminary(id, this);
 		ret.initTurnamentID(rs.getInt("TurnierID"));

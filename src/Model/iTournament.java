@@ -17,8 +17,10 @@ public interface iTournament
 	public void setFinalRounds(int rounds) throws SQLException;
 	public void setLanes(int lanes) throws SQLException;
 	
-	public void addParticipant(Fencer f) throws SQLException;
-	public void addParticipant(Fencer f, int group) throws SQLException;
+	public void addParticipant(iFencer f) throws SQLException;
+	public void addParticipant(iFencer f, int group) throws SQLException;
+	public boolean isParticipant(iFencer f) throws SQLException;
 	
 	public List<Preliminary> getAllPreliminary() throws SQLException;
+	
 }

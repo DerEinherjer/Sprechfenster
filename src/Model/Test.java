@@ -28,6 +28,23 @@ public class Test
 			
 			for(iTournament tournament : tlist)
 				System.out.println(tournament.toString());
+			
+			System.out.println(t1.isParticipant(f1));
+			t1.addParticipant(f1);
+			System.out.println(t1.isParticipant(f1));
+			System.out.println(t1.isParticipant(f2));
+			t1.addParticipant(f2);
+			System.out.println(t1.isParticipant(f2));
+			System.out.println(t1.isParticipant(f3));
+			t1.addParticipant(f3);
+			System.out.println(t1.isParticipant(f3));
+			System.out.println(t1.isParticipant(f4));
+			t1.addParticipant(f4);
+			System.out.println(t1.isParticipant(f4));
+			
+			for(Preliminary preliminary : t1.getAllPreliminary())
+				System.out.println(preliminary.toString());
+			
 
 		} 
 		catch (SQLException e) 
