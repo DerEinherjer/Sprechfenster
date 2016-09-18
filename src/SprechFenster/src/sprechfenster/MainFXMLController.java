@@ -6,9 +6,7 @@
 package sprechfenster;
 
 import Model.Sync;
-import Model.iFencer;
 import Model.iSync;
-import Model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -104,8 +102,8 @@ public class MainFXMLController implements Initializable {
         FencingSchoolColumn.setCellValueFactory(new PropertyValueFactory<>("fencingSchool"));
         AgeColumn.setCellValueFactory(new PropertyValueFactory<>("birthday"));
         
-        TournamentColumn.setCellFactory(new PropertyValueFactory<>("name"));
-        DateColumn.setCellFactory(new PropertyValueFactory<>("date"));
+        TournamentColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        DateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         
         UpdateView();
         
