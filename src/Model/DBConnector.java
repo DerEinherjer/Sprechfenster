@@ -268,7 +268,7 @@ public class DBConnector
 	{
 		if(tsnStmt == null)
 		{
-			String sql = "UPDATE Turnier SET Name = ? WHERE ID = ?;";
+			String sql = "UPDATE Turniere SET Name = ? WHERE ID = ?;";
 			tsnStmt = con.prepareStatement(sql);
 		}
 		tsnStmt.setString(1, name);
@@ -281,7 +281,7 @@ public class DBConnector
 	{
 		if(tsdStmt == null)
 		{
-			String sql = "UPDATE Turnier SET Datum = ? WHERE ID = ?;";
+			String sql = "UPDATE Turniere SET Datum = ? WHERE ID = ?;";
 			tsdStmt = con.prepareStatement(sql);
 		}
 		tsdStmt.setString(1, date);
@@ -294,7 +294,7 @@ public class DBConnector
 	{
 		if(tsgStmt == null)
 		{
-			String sql = "UPDATE Turnier SET Gruppen = ? WHERE ID = ?;";
+			String sql = "UPDATE Turniere SET Gruppen = ? WHERE ID = ?;";
 			tsgStmt = con.prepareStatement(sql);
 		}
 		tsgStmt.setInt(1, groups);
@@ -307,7 +307,7 @@ public class DBConnector
 	{
 		if(tsfrStmt == null)
 		{
-			String sql = "UPDATE Turnier SET Finalrunden = ? WHERE ID = ?;";
+			String sql = "UPDATE Turniere SET Finalrunden = ? WHERE ID = ?;";
 			tsfrStmt = con.prepareStatement(sql);
 		}
 		tsfrStmt.setInt(1, rounds);
@@ -320,7 +320,7 @@ public class DBConnector
 	{
 		if(tslStmt == null)
 		{
-			String sql = "UPDATE Turnier SET Bahnen = ? WHERE ID = ?;";
+			String sql = "UPDATE Turniere SET Bahnen = ? WHERE ID = ?;";
 			tslStmt = con.prepareStatement(sql);
 		}
 		tslStmt.setInt(1, lanes);
