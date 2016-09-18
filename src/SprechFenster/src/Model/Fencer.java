@@ -38,6 +38,7 @@ public class Fencer implements iFencer
 	int getID(){return ID;}
 	public String getName(){return name;}
 	public String getFamilyName(){return familyName;}
+        public String getFullName() {return name+" "+familyName;}
 	public String getBirthday(){return birthday;}
 	public String getFencingSchool(){return fencingSchool;}
 	public String getNationality(){return nationality;}
