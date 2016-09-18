@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="MainDialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="553.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.NewTournamentDialogController">
+   <children>
+      <Separator layoutX="13.0" layoutY="358.0" prefHeight="3.0" prefWidth="546.0" />
+      <Button id="CancelButton" layoutX="465.0" layoutY="372.0" mnemonicParsing="false" onAction="#handleCanceledButtonAction" text="Abbrechen" />
+      <Button id="FinishedButton" fx:id="FinishedButton" layoutX="38.0" layoutY="372.0" mnemonicParsing="false" onAction="#handleFinishedButtonAction" text="Fertig" />
+      <Button fx:id="ChangeImageButton" layoutX="254.0" layoutY="317.0" mnemonicParsing="false" onAction="#handleChangeImageButtonAction" text="Bild ändern..." />
+      <ImageView fx:id="TournamentImageView" fitHeight="273.0" fitWidth="338.0" layoutX="254.0" layoutY="37.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/FencerDefaultPicture.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="38.0" layoutY="174.0" text="Vorgruppen">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="39.0" layoutY="103.0" text="Startdatum">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="38.0" layoutY="37.0" text="Turniername">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="GroupsComboBox" layoutX="38.0" layoutY="201.0" prefHeight="25.0" prefWidth="174.0" />
+      <DatePicker fx:id="StartingDatePicker" layoutX="38.0" layoutY="130.0" promptText="TT.MM.JJJJ" />
+      <TextField fx:id="NameTextField" layoutX="38.0" layoutY="64.0" prefHeight="25.0" prefWidth="174.0" />
+      <Label layoutX="38.0" layoutY="244.0" text="Finalrunden">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="FinalRoundsComboBox" layoutX="38.0" layoutY="271.0" prefHeight="25.0" prefWidth="174.0" />
+   </children>
+</AnchorPane>
