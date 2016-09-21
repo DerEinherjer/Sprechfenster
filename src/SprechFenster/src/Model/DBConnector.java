@@ -501,4 +501,30 @@ public class DBConnector
 		
 		return ret;
 	}
+	
+	private PreparedStatement stfp1Stmt = null;
+	private PreparedStatement stfp2Stmt = null;
+	public boolean setTimeForPreliminary(Preliminary p, int round, int lane) throws SQLException
+	{
+		if(stfp1Stmt == null)
+		{
+			String sql = "UPDATE Vorrunden Runde = ?, Bahn = ? WHERE ID = ?;";
+			stfp1Stmt = con.prepareStatement(sql);
+			
+			sql = "SELECT Bahnen FROM Turniere AS t, Vorrunden AS v WHERE v.TurnierID = t.ID AND v.ID = ?;";
+			stfp2Stmt = con.prepareStatement(sql);
+		}
+		
+		stfp2Stmt.setInt(1, p.getID());
+		ResultSet rs = stfp2Stmt.executeQuery();
+		rs.next(); //TODO
+		if(lane<1||lane>rs.getInt("Bahnen")) return false;
+		
+		
+		stfp1Stmt.setInt(1, round);
+		stfp1Stmt.setInt(2, lane);
+		stfp1Stmt.setInt(3, p.getID());
+		stfp1Stmt.executeUpdate();
+		return true;
+	}
 }

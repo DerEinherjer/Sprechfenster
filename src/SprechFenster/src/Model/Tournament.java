@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Tournament implements iTournament
 {
@@ -100,9 +101,9 @@ public class Tournament implements iTournament
 	}
 
 	private Map<Integer, Preliminary> preliminarys = new HashMap<>();
-	public List<Preliminary> getAllPreliminary() throws SQLException 
+	public List<iPreliminary> getAllPreliminary() throws SQLException 
 	{
-		List<Preliminary> ret = new ArrayList<>();
+		List<iPreliminary> ret = new ArrayList<>();
 		for(Integer integer : con.getTournamentPreliminarys(this))
 		{
 			if(!preliminarys.containsKey(integer))
@@ -117,5 +118,58 @@ public class Tournament implements iTournament
 		if(!(f instanceof Fencer)) return false;
 		return con.isFencerParticipant(this, (Fencer)f);
 	}
+	
+	private void createPreliminaryTiming() throws SQLException
+	{
+		List<iPreliminary> prelim = getAllPreliminary();
+		Map<iPreliminary, Integer> lastForPrelim = new HashMap<>();
+		
+		for(iPreliminary p : prelim)
+		{
+			lastForPrelim.put(p, 0);
+		}
+		
+		for(int i = 0;!prelim.isEmpty(); i++)
+		{
+			iPreliminary next = prelim.get(0);
+			for(iPreliminary p : prelim)
+			{
+				if(lastForPrelim.get(next)>lastForPrelim.get(p))
+				{
+					next = p;
+				}
+			}
+			
+			if(lastForPrelim.get(next)==i/3) continue;
+			
+			next.setTime(i/3+1, i%3);
+			
+			prelim.remove(next);
+			for(iPreliminary p : prelim)
+			{
+				if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(0)))
+					lastForPrelim.put(p, i/3);
+			}
+			
+			
+		}
+	}
+	
+	public iPreliminary[][] getPreliminarySchedule() throws SQLException
+	{
+		List<iPreliminary> list = getAllPreliminary();
+		int last = 0;
+		for(iPreliminary p: list)
+			if(p.getRound()>last)
+				last = p.getRound();
+		
+		iPreliminary[][] ret = new iPreliminary[last][lanes];
+		
+		for(iPreliminary p: list)
+		{
+			ret[p.getRound()-1][p.getLane()-1]=p;
+		}
+		
+		return ret;
+	}
 }
-
