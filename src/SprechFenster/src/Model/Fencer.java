@@ -2,7 +2,7 @@ package Model;
 
 import java.sql.SQLException;
 
-public class Fencer implements iFencer
+class Fencer implements iFencer
 {
 	private int ID;
 	private DBConnector con;
@@ -38,7 +38,7 @@ public class Fencer implements iFencer
 	int getID(){return ID;}
 	public String getName(){return name;}
 	public String getFamilyName(){return familyName;}
-        public String getFullName() {return name+" "+familyName;}
+    public String getFullName() {return name+" "+familyName;}
 	public String getBirthday(){return birthday;}
 	public String getFencingSchool(){return fencingSchool;}
 	public String getNationality(){return nationality;}

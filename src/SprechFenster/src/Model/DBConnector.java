@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+//TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
+
 public class DBConnector 
 {
 	private static String url = "jdbc:h2:~/SprechfensterData";
@@ -89,7 +91,6 @@ public class DBConnector
 		cfStmt.executeUpdate();
 		ResultSet rs = cfStmt.getGeneratedKeys();
 		rs.next();//TODO
-		System.out.println("New Fencer ID: "+rs.getInt(1));
 		return rs.getInt(1);
 	}
 	
@@ -336,7 +337,6 @@ public class DBConnector
 			String sql = "SELECT COUNT(FechterID) AS Anzahl FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
 			ifpStmt = con.prepareStatement(sql);
 		}
-		System.out.println(f.getID());
 		ifpStmt.setInt(1, t.getID());
 		ifpStmt.setInt(2, f.getID());
 		ResultSet rs = ifpStmt.executeQuery();
@@ -387,7 +387,6 @@ public class DBConnector
 			sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
 			cp2Stmt = con.prepareStatement(sql);
 		}
-		System.out.println("Vorrunden wird erstellt");
 		
 		cp1Stmt.setInt(1, t.getID());
 		cp1Stmt.setInt(2, group);
@@ -402,7 +401,6 @@ public class DBConnector
 		int count = 0;
 		while(rs.next())
 		{
-			System.out.println(++count);
 			cp2Stmt.setInt(4, rs.getInt("FechterID"));
 			cp2Stmt.executeUpdate();
 		}
@@ -496,6 +494,8 @@ public class DBConnector
 		Preliminary ret = new Preliminary(id, this);
 		ret.initTurnamentID(rs.getInt("TurnierID"));
 		ret.initGroup(rs.getInt("Gruppe"));
+		ret.initRound(rs.getInt("Runde"));
+		ret.initLane(rs.getInt("Bahn"));
 		ret.initFencer1(Sync.getInstance().getFencer(rs.getInt("Teilnehmer1")));
 		ret.initFencer2(Sync.getInstance().getFencer(rs.getInt("Teilnehmer2")));
 		
@@ -508,7 +508,7 @@ public class DBConnector
 	{
 		if(stfp1Stmt == null)
 		{
-			String sql = "UPDATE Vorrunden Runde = ?, Bahn = ? WHERE ID = ?;";
+			String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
 			stfp1Stmt = con.prepareStatement(sql);
 			
 			sql = "SELECT Bahnen FROM Turniere AS t, Vorrunden AS v WHERE v.TurnierID = t.ID AND v.ID = ?;";

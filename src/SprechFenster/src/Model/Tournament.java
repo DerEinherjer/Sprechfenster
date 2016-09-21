@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class Tournament implements iTournament
+class Tournament implements iTournament
 {
 	
 	private int ID;
@@ -119,14 +119,14 @@ public class Tournament implements iTournament
 		return con.isFencerParticipant(this, (Fencer)f);
 	}
 	
-	private void createPreliminaryTiming() throws SQLException
+	public void createPreliminaryTiming() throws SQLException
 	{
 		List<iPreliminary> prelim = getAllPreliminary();
 		Map<iPreliminary, Integer> lastForPrelim = new HashMap<>();
 		
 		for(iPreliminary p : prelim)
 		{
-			lastForPrelim.put(p, 0);
+			lastForPrelim.put(p, -1);
 		}
 		
 		for(int i = 0;!prelim.isEmpty(); i++)
@@ -140,15 +140,15 @@ public class Tournament implements iTournament
 				}
 			}
 			
-			if(lastForPrelim.get(next)==i/3) continue;
+			if(lastForPrelim.get(next)==i/lanes) continue;
 			
-			next.setTime(i/3+1, i%3);
+			next.setTime((i/lanes)+1, (i%lanes)+1);
 			
 			prelim.remove(next);
 			for(iPreliminary p : prelim)
 			{
-				if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(0)))
-					lastForPrelim.put(p, i/3);
+				if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(1)))
+					lastForPrelim.put(p, i/lanes);
 			}
 			
 			

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Preliminary implements iPreliminary
+class Preliminary implements iPreliminary
 {
 	private int ID;
 	private DBConnector con;
@@ -21,7 +21,7 @@ public class Preliminary implements iPreliminary
 		return "CREATE TABLE Vorrunden( ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 				+ "TurnierID int,"
 				+ "Gruppe int,"
-				+ "Rounde int,"
+				+ "Runde int,"
 				+ "Bahn int,"
 				+ "Teilnehmer1 int,"
 				+ "Teilnehmer2 int,)";

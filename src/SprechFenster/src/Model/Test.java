@@ -9,7 +9,7 @@ public class Test
 	{
 		try 
 		{
-			Sync sync = Sync.getInstance();
+			/*Sync sync = Sync.getInstance();
 			
 			iFencer f1 = sync.createFencer("Setsuna", "Seiei");
 			iFencer f2 = sync.createFencer("Tieria", "Erde");
@@ -42,8 +42,36 @@ public class Test
 			t1.addParticipant(f4);
 			System.out.println(t1.isParticipant(f4));
 			
-			for(Preliminary preliminary : t1.getAllPreliminary())
-				System.out.println(preliminary.toString());
+			for(iPreliminary preliminary : t1.getAllPreliminary())
+				System.out.println(preliminary.toString());*/
+			
+			Sync sync = Sync.getInstance();
+			iTournament t = sync.createTournament("ZeitPlan Test");
+			t.setLanes(3);
+			
+			for(char i = 'A'; i<='Z'; i++)
+				t.addParticipant(sync.createFencer(i+"", i+""));
+			
+			t.createPreliminaryTiming();
+			
+			iPreliminary[][] s = t.getPreliminarySchedule();
+			
+			for(int x = 0; x <s.length;x++)
+			{
+				String line = "";
+				for(int y = 0; y<s[0].length;y++)
+				{
+					if(line!="")
+						line+="|";
+					if(s[x][y]!=null)
+					{
+						line += " " + s[x][y].getFencer().get(0).getName()+" : "+ s[x][y].getFencer().get(1).getName() +" ";
+					}
+					else
+						line += " " + " " + "   " + " " + " ";  
+				}
+				System.out.println(line);
+			}
 			
 
 		} 

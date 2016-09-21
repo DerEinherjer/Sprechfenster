@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Sync implements iSync
+class Sync implements iSync
 {
 	private DBConnector con;
 	private static Sync sync;

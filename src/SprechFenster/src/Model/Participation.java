@@ -1,6 +1,6 @@
 package Model;
 
-public class Participation 
+class Participation 
 {
 	static String getSQLString()
 	{
