@@ -527,4 +527,40 @@ public class DBConnector
 		stfp1Stmt.executeUpdate();
 		return true;
 	}
+	
+	private PreparedStatement gapStmt = null;
+	List<Integer> getAllParticipants(Tournament t) throws SQLException
+	{
+		if(gapStmt == null)
+		{
+			String sql = "SELECT FechterID FROM Teilnahme WHERE TurnierID = ?;";
+			gapStmt = con.prepareStatement(sql);
+		}
+		
+		List<Integer> ret = new ArrayList<>();
+		
+		gapStmt.setInt(1, t.getID());
+		ResultSet rs = gapStmt.executeQuery();
+		
+		while(rs.next())
+			ret.add(rs.getInt("FechterID"));
+		
+		return ret;
+	}
+	
+	private PreparedStatement gpgStmt = null;
+	int getParticipantGroup(Tournament t, Fencer f) throws SQLException
+	{
+		if(gpgStmt == null)
+		{
+			String sql = "SELECT Gruppe FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			gpgStmt = con.prepareStatement(sql); 
+		}
+		
+		gpgStmt.setInt(1, t.getID());
+		gpgStmt.setInt(2, f.getID());
+		ResultSet rs = gpgStmt.executeQuery();
+		rs.next();//TODO
+		return rs.getInt("Gruppe");
+	}
 }

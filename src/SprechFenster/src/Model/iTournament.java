@@ -20,6 +20,9 @@ public interface iTournament
 	public void addParticipant(iFencer f) throws SQLException;
 	public void addParticipant(iFencer f, int group) throws SQLException;
 	public boolean isParticipant(iFencer f) throws SQLException;
+	public List<iFencer> getAllParticipants() throws SQLException;
+	public int getParticipantGroup(iFencer f) throws SQLException;
+	public void removeParticipant(iFencer f) throws SQLException;
 	
 	public List<iPreliminary> getAllPreliminary() throws SQLException;
 	public void createPreliminaryTiming() throws SQLException;

@@ -62,8 +62,21 @@ class Tournament implements iTournament
 	
 	public void setGroups(int groups) throws SQLException
 	{
+		List<iFencer> tmp = new ArrayList<>();
+		for(iFencer f : getAllParticipants())
+		{
+			if(getParticipantGroup(f)>groups)
+			{
+				tmp.add(f);
+				removeParticipant(f);
+			}
+		}
+		
 		con.tournamentSetGroups(groups, ID);
 		this.groups = groups;
+		
+		for(iFencer f : tmp)
+			addParticipant(f);
 	}
 	
 	public void setFinalRounds(int rounds) throws SQLException
@@ -74,6 +87,11 @@ class Tournament implements iTournament
 	
 	public void setLanes(int lanes) throws SQLException
 	{
+		for(Preliminary p : preliminarys.values())
+		{
+			if(p.getLane()>lanes)
+				p.setTime(0, 0);
+		}
 		con.tournamentSetLanes(lanes, ID);
 		this.lanes = lanes;
 	}
@@ -167,9 +185,28 @@ class Tournament implements iTournament
 		
 		for(iPreliminary p: list)
 		{
+			if(p.getRound()<1||p.getLane()<1) continue; //Noch nicht angesetzte begegnungen werden ignoriert
 			ret[p.getRound()-1][p.getLane()-1]=p;
 		}
 		
 		return ret;
+	}
+	
+	public List<iFencer> getAllParticipants() throws SQLException
+	{
+		List<iFencer> ret = new ArrayList<>();
+		for(Integer i : con.getAllParticipants(this))
+			ret.add(Sync.getInstance().getFencer(i));
+		return ret;
+	}
+	
+	public int getParticipantGroup(iFencer f) throws SQLException
+	{
+		return con.getParticipantGroup(this, (Fencer)f);
+	}
+	
+	public void removeParticipant(iFencer f) throws SQLException
+	{
+		con.removeParticipant((Fencer)f);
 	}
 }

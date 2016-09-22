@@ -47,7 +47,7 @@ public class Test
 			
 			Sync sync = Sync.getInstance();
 			iTournament t = sync.createTournament("ZeitPlan Test");
-			t.setLanes(3);
+			t.setLanes(5);
 			
 			for(char i = 'A'; i<='Z'; i++)
 				t.addParticipant(sync.createFencer(i+"", i+""));
