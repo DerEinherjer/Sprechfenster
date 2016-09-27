@@ -3,11 +3,22 @@ package Model;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface iSync 
+public abstract class iSync 
 {
-	public iFencer createFencer(String name, String familyName) throws SQLException;
-	public List<iFencer> getAllFencer() throws SQLException;
+	private static Sync sync = null;
 	
-	public iTournament createTournament(String name) throws SQLException;
-	public List<iTournament> getAllTournaments() throws SQLException;
+	public static iSync getInstance()
+	{
+		if(sync==null)
+			sync = new Sync();
+		return sync;
+	}
+	
+	public iFencer createFencer(String name, String familyName) throws SQLException{return null;}
+	public List<iFencer> getAllFencer() throws SQLException{return null;}
+	
+	public iTournament createTournament(String name) throws SQLException{return null;}
+	public List<iTournament> getAllTournaments() throws SQLException{return null;}
+	
+	Fencer getFencer(int id) throws SQLException{return null;}
 }

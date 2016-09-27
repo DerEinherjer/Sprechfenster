@@ -6,6 +6,8 @@ class Participation
 	{
 		return "CREATE TABLE Teilnahme(TurnierID int,"
 				 + "FechterID int,"
-				 + "Gruppe int)";
+				 + "Gruppe int,"
+				 + "Startgeld boolean,"
+				 + "Ausruestungskontrolle boolean)";
 	}
 }

@@ -563,4 +563,35 @@ public class DBConnector
 		rs.next();//TODO
 		return rs.getInt("Gruppe");
 	}
+	
+	private PreparedStatement sefStmt = null;
+	void setEntryFee(Tournament t,Fencer f, boolean paided) throws SQLException
+	{
+		if(sefStmt == null)
+		{
+			String sql = "UPDATE Teilnahme SET Startgeld = ? WHERE TurnierID = ? AND FechterID = ?;";
+			sefStmt = con.prepareStatement(sql);
+		}
+		
+		sefStmt.setBoolean(1, paided);
+		sefStmt.setInt(2, t.getID());
+		sefStmt.setInt(3, f.getID());
+		sefStmt.executeUpdate();
+	}
+	
+	private PreparedStatement secStmt = null;
+	void setEquipmentCheck(Tournament t, Fencer f, boolean checked) throws SQLException
+	{
+		if(secStmt == null)
+		{
+			String sql = "UPDATE Teilnahme SET Ausruestungskontrolle = ? WHERE  TurnierID = ? AND FechterID = ?;";
+			secStmt = con.prepareStatement(sql);
+		}
+
+		sefStmt.setBoolean(1, checked);
+		sefStmt.setInt(2, t.getID());
+		sefStmt.setInt(3, f.getID());
+		sefStmt.executeUpdate();
+		
+	}
 }

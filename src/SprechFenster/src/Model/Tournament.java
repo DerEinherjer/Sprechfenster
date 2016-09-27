@@ -196,7 +196,7 @@ class Tournament implements iTournament
 	{
 		List<iFencer> ret = new ArrayList<>();
 		for(Integer i : con.getAllParticipants(this))
-			ret.add(Sync.getInstance().getFencer(i));
+			ret.add(iSync.getInstance().getFencer(i));
 		return ret;
 	}
 	
@@ -208,5 +208,15 @@ class Tournament implements iTournament
 	public void removeParticipant(iFencer f) throws SQLException
 	{
 		con.removeParticipant((Fencer)f);
+	}
+	
+	public void setEntryFee(iFencer f, boolean paided)
+	{
+		
+	}
+	
+	public void setEquipmentCheck(iFencer f, boolean checked)
+	{
+		
 	}
 }

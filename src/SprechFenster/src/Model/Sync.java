@@ -6,27 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Sync implements iSync
+public class Sync extends iSync
 {
 	private DBConnector con;
 	private static Sync sync;
 	
-	private Sync()
+	Sync()
 	{
 		this.con = DBConnector.getInstants();
-	}
-	
-	public static Sync getInstance()
-	{
-		if(sync == null)
-			sync = new Sync();
-		return sync;
 	}
 	
 	// ----- Fencer -----
 	private Map<Integer, Fencer> fencers = new HashMap<>();
 
-	@Override
 	public iFencer createFencer(String name, String familyName) throws SQLException 
 	{
 		Fencer ret = con.loadFencer(con.createFencer(name, familyName));
@@ -34,7 +26,6 @@ class Sync implements iSync
 		return ret;
 	}
 	
-	@Override
 	public List<iFencer> getAllFencer() throws SQLException 
 	{
 		List<iFencer> ret = new ArrayList<>();

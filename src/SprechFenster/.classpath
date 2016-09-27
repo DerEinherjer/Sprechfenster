@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="dist/lib/h2-1.4.192.jar"/>
 	<classpathentry kind="lib" path="dist/SprechFenster.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/deus/Git/Sprechfenster/lib/h2-1.4.192.jar"/>
+	<classpathentry kind="lib" path="/home/deus/Git/Sprechfenster/lib/controlsfx-8.40.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
