@@ -10,4 +10,7 @@ public interface iPreliminary
 	public int getRound();
 	public int getLane();
 	public boolean setTime(int round, int lane) throws SQLException;
+	
+	public void setPoints(iFencer f, int points) throws SQLException;
+	public int getPoints(iFencer f) throws SQLException;
 }

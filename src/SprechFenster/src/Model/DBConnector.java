@@ -496,8 +496,13 @@ public class DBConnector
 		ret.initGroup(rs.getInt("Gruppe"));
 		ret.initRound(rs.getInt("Runde"));
 		ret.initLane(rs.getInt("Bahn"));
-		ret.initFencer1(Sync.getInstance().getFencer(rs.getInt("Teilnehmer1")));
-		ret.initFencer2(Sync.getInstance().getFencer(rs.getInt("Teilnehmer2")));
+		Fencer f1 = Sync.getInstance().getFencer(rs.getInt("Teilnehmer1"));
+		Fencer f2 = Sync.getInstance().getFencer(rs.getInt("Teilnehmer2"));
+		ret.initFencer1(f1);
+		ret.initFencer2(f2);
+		ret.initPointsFor(f1, rs.getInt("PunkteVon1"));
+		ret.initPointsFor(f2, rs.getInt("PunkteVon2"));
+		
 		
 		return ret;
 	}
@@ -593,5 +598,39 @@ public class DBConnector
 		sefStmt.setInt(3, f.getID());
 		sefStmt.executeUpdate();
 		
+	}
+	
+	private PreparedStatement spStmt = null;
+	void setPoints(int prelimID, int fencerID, int points) throws SQLException
+	{
+		if(spStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET PunkteVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE PunkteVon1 END, "
+					                         +"PunkteVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE PunkteVon2 END WHERE ID = ?;";
+			spStmt = con.prepareStatement(sql);
+		}
+		
+		spStmt.setInt(1, fencerID);
+		spStmt.setInt(2, points);
+		spStmt.setInt(3, fencerID);
+		spStmt.setInt(4, points);
+		spStmt.setInt(5, prelimID);
+		spStmt.executeUpdate();
+	}
+	
+	private PreparedStatement gpStmt = null;
+	int getPoints(int prelimID, int fencerID) throws SQLException
+	{
+		if(gpStmt == null)
+		{
+			String sql = "SELECT CASE WHEN Teilnehmer1 = ? THEN PunkteVon1 ELSE PunkteVon2 END AS Punkte FROM Vorrunden WHERE ID = ?;";
+			gpStmt = con.prepareStatement(sql);
+		}
+		
+		gpStmt.setInt(1, fencerID);
+		gpStmt.setInt(2, prelimID);
+		ResultSet rs = gpStmt.executeQuery();
+		rs.next();//TODO
+		return rs.getInt("Punkte");
 	}
 }

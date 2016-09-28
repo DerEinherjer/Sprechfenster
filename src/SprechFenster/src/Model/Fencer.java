@@ -79,4 +79,14 @@ class Fencer implements iFencer
 		return ID+" | "+name+" | "+familyName; 
 	}
 	
+	@Override
+	public boolean equals(Object other){
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof Fencer))return false;
+	    if(((Fencer)other).getID()==ID)
+	    	return true;
+	    return false;
+	}
+	
 }
