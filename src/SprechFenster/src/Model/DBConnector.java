@@ -479,7 +479,7 @@ public class DBConnector
 	}
 	
 	private PreparedStatement lpStmt = null;
-	Preliminary loadPreliminary(int id, Tournament t) throws SQLException
+	Preliminary loadPreliminary(int id) throws SQLException
 	{
 		if(lpStmt == null)
 		{
@@ -632,5 +632,37 @@ public class DBConnector
 		ResultSet rs = gpStmt.executeQuery();
 		rs.next();//TODO
 		return rs.getInt("Punkte");
+	}
+	
+	private PreparedStatement gefStmt = null;
+	boolean getEntryFee(Tournament t, Fencer f) throws SQLException
+	{
+		if(gefStmt == null)
+		{
+			String sql = "SELECT Startgeld FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			gefStmt = con.prepareStatement(sql);
+		}
+		
+		gefStmt.setInt(1, t.getID());
+		gefStmt.setInt(2, f.getID());
+		ResultSet rs = gefStmt.executeQuery();
+		rs.next();//TODO
+		return rs.getBoolean("Startgeld");
+	}
+	
+	private PreparedStatement gecStmt = null;
+	boolean getEquipmentCheck(Tournament t, Fencer f) throws SQLException
+	{
+		if(gefStmt == null)
+		{
+			String sql = "SELECT Ausruestungskontrolle FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			gefStmt = con.prepareStatement(sql);
+		}
+		
+		gefStmt.setInt(1, t.getID());
+		gefStmt.setInt(2, f.getID());
+		ResultSet rs = gefStmt.executeQuery();
+		rs.next();//TODO
+		return rs.getBoolean("Ausruestungskontrolle");
 	}
 }

@@ -91,6 +91,15 @@ class Preliminary implements iPreliminary
 		return -1;
 	}
 	
+	public int getOpponentPoints(iFencer f) throws SQLException
+	{
+		if(fencer1.equals(f))
+			return pointsFor2;
+		if(fencer2.equals(f))
+			return pointsFor1;
+		return -1;
+	}
+	
 	@Override
 	public boolean equals(Object other){
 	    if (other == null) return false;

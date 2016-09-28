@@ -18,6 +18,8 @@ class Tournament implements iTournament
 	private Integer groups = null;
 	private Integer finalrounds = null;
 	private Integer lanes = null;
+	private Map<Fencer, Boolean> entryFee = new HashMap<>();
+	private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
 	
 	static String getSQLString()
 	{
@@ -33,6 +35,25 @@ class Tournament implements iTournament
 	{
 		this.ID = id;
 		this.con = con;
+		
+		
+		try 
+		{
+			updatePreliminarys();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private void updatePreliminarys() throws SQLException
+	{
+		for(Integer integer : con.getTournamentPreliminarys(this))
+		{
+			if(!preliminarys.containsKey(integer))
+				preliminarys.put(integer, con.loadPreliminary(integer));
+		}
 	}
 	
 	void initName(String name){if(this.name == null) this.name = name;}
@@ -116,6 +137,8 @@ class Tournament implements iTournament
 	{
 		if(!(f instanceof Fencer)) return;
 		con.addParticipant(this, (Fencer)f, group);
+		
+		updatePreliminarys();
 	}
 
 	private Map<Integer, Preliminary> preliminarys = new HashMap<>();
@@ -125,7 +148,7 @@ class Tournament implements iTournament
 		for(Integer integer : con.getTournamentPreliminarys(this))
 		{
 			if(!preliminarys.containsKey(integer))
-				preliminarys.put(integer, con.loadPreliminary(integer, this));
+				preliminarys.put(integer, con.loadPreliminary(integer));
 			ret.add(preliminarys.get(integer));
 		}
 		return ret;
@@ -168,8 +191,6 @@ class Tournament implements iTournament
 				if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(1)))
 					lastForPrelim.put(p, i/lanes);
 			}
-			
-			
 		}
 	}
 	
@@ -208,16 +229,36 @@ class Tournament implements iTournament
 	public void removeParticipant(iFencer f) throws SQLException
 	{
 		con.removeParticipant((Fencer)f);
+		
+		preliminarys = new HashMap<>();
+		updatePreliminarys();
 	}
 	
-	public void setEntryFee(iFencer f, boolean paided)
+	public void setEntryFee(iFencer f, boolean paid) throws SQLException
 	{
+		con.setEntryFee(this, (Fencer)f, paid);
+		entryFee.put((Fencer)f, paid);
 		
 	}
 	
-	public void setEquipmentCheck(iFencer f, boolean checked)
+	public void setEquipmentCheck(iFencer f, boolean checked) throws SQLException
 	{
-		
+		con.setEquipmentCheck(this, (Fencer) f, checked);
+		equipmentChecked.put((Fencer)f, checked);
+	}
+	
+	public boolean getEntryFee(iFencer f) throws SQLException 
+	{
+		if(!entryFee.containsKey((Fencer)f))
+			entryFee.put((Fencer)f, con.getEntryFee(this, (Fencer)f));
+		return entryFee.get((Fencer)f);
+	}
+	
+	public boolean getEquipmentCheck(iFencer f) throws SQLException
+	{
+		if(!equipmentChecked.containsKey((Fencer) f))
+			equipmentChecked.put((Fencer)f, con.getEquipmentCheck(this, (Fencer)f));
+		return equipmentChecked.get((Fencer)f);
 	}
 	
 	@Override

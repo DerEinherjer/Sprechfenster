@@ -13,4 +13,5 @@ public interface iPreliminary
 	
 	public void setPoints(iFencer f, int points) throws SQLException;
 	public int getPoints(iFencer f) throws SQLException;
+	public int getOpponentPoints(iFencer f) throws SQLException;
 }
