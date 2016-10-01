@@ -412,10 +412,10 @@ public class DBConnector
 	{
 		if(rp1Stmt == null)
 		{
-			String sql = "DELET FROM Teilnehmer WHERE FechterID = ?;";
+			String sql = "DELETE FROM Teilnahme WHERE FechterID = ?;";
 			rp1Stmt = con.prepareStatement(sql);
 			
-			sql = "DELET FROM Vorrunden WHERE Teilnehmer1 = ? OR Teilnehmer2 = ?;";
+			sql = "DELETE FROM Vorrunden WHERE Teilnehmer1 = ? OR Teilnehmer2 = ?;";
 			rp2Stmt = con.prepareStatement(sql);
 		}
 		

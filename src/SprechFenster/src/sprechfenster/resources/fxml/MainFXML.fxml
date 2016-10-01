@@ -6,9 +6,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="778.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.MainFXMLController">
+<AnchorPane id="MainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="778.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.MainFXMLController">
    <children>
-      <AnchorPane layoutY="-1.0" prefHeight="70.0" prefWidth="949.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="MenuAnchorPane" layoutY="-1.0" prefHeight="70.0" prefWidth="949.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <MenuBar prefHeight="25.0" prefWidth="832.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <menus>
@@ -39,11 +39,11 @@
             </ToolBar>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="275.0" layoutY="414.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="73.0">
+      <AnchorPane fx:id="ContentAnchorPane" layoutX="275.0" layoutY="414.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="73.0">
          <children>
-            <SplitPane dividerPositions="0.4178082191780822" prefHeight="483.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane fx:id="ContentSplitPane" dividerPositions="0.4178082191780822" prefHeight="483.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <items>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="688.0" prefWidth="421.0">
+                  <AnchorPane fx:id="LeftContentAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="688.0" prefWidth="421.0">
                      <children>
                         <TableView fx:id="TournamentTableView" layoutX="7.0" layoutY="6.0" prefHeight="682.0" prefWidth="506.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <columns>
@@ -55,7 +55,7 @@
                         </TableView>
                      </children>
                   </AnchorPane>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="655.0" prefWidth="592.0">
+                  <AnchorPane fx:id="RightContentAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="655.0" prefWidth="592.0">
                      <children>
                         <TableView fx:id="FencerTableView" layoutX="155.0" layoutY="62.0" prefHeight="682.0" prefWidth="510.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <columns>

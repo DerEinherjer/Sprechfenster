@@ -1,0 +1,33 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package sprechfenster;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+
+/**
+ *
+ * @author Stefan
+ */
+public class GUIUtilities {
+    static void FillNumberComboBox(ComboBox box, int maxNumber)
+    {
+        ArrayList<String> numbers = new ArrayList<>(maxNumber);
+        for(Integer i = 1; i <= maxNumber; i++)
+        {
+            numbers.add(i.toString());
+        }
+        box.getItems().clear();
+        box.getItems().addAll(numbers);
+    }
+    
+    static String GetDateStringFromDatePicker(DatePicker picker)
+    {
+        return picker.getValue().format(DateTimeFormatter.ISO_DATE);
+    }
+}
