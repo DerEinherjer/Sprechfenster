@@ -5,7 +5,6 @@
  */
 package sprechfenster;
 
-import Model.Sync;
 import Model.iFencer;
 import Model.iSync;
 import java.io.File;
@@ -90,7 +89,7 @@ public class NewFencerDialogController implements Initializable {
         }
         if(allFieldsFilled)
         {
-            iSync dataModel = Sync.getInstance();
+            iSync dataModel = iSync.getInstance();
             try { 
                 iFencer newFencer = dataModel.createFencer(FirstNameTextField.getText(), LastNameTextField.getText());
                 newFencer.setBirthday(BirthdayDatePicker.getValue().format(DateTimeFormatter.ISO_DATE));

@@ -5,14 +5,11 @@
  */
 package sprechfenster;
 
-import Model.Sync;
 import Model.iSync;
 import Model.iTournament;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,14 +44,8 @@ public class NewTournamentDialogController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        int maxRounds = 30;
-        ArrayList<String> numbers = new ArrayList<>(maxRounds);
-        for(Integer i = 1; i <= maxRounds; i++)
-        {
-            numbers.add(i.toString());
-        }
-        GroupsComboBox.getItems().addAll(numbers);
-        FinalRoundsComboBox.getItems().addAll(numbers);
+        GUIUtilities.FillNumberComboBox(GroupsComboBox, 20);
+        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 20);
     }    
     
     @FXML
@@ -94,12 +85,12 @@ public class NewTournamentDialogController implements Initializable {
         }
         if(allFieldsFilled)
         {
-            iSync dataModel = Sync.getInstance();
+            iSync dataModel = iSync.getInstance();
             try { 
                 iTournament newTournament = dataModel.createTournament(NameTextField.getText());
-                newTournament.setDate(StartingDatePicker.getValue().format(DateTimeFormatter.ISO_DATE));
-                newTournament.setGroups(Integer.parseInt(GroupsComboBox.getValue().toString()));
-                newTournament.setFinalRounds(Integer.parseInt(FinalRoundsComboBox.getValue().toString()));
+                newTournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartingDatePicker));
+                newTournament.setGroups(GroupsComboBox.getSelectionModel().getSelectedIndex());
+                newTournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex());
             } catch (SQLException ex) {
                 Logger.getLogger(NewFencerDialogController.class.getName()).log(Level.SEVERE, null, ex);
             }
