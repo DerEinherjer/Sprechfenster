@@ -45,7 +45,7 @@ public class Test
 			for(iPreliminary preliminary : t1.getAllPreliminary())
 				System.out.println(preliminary.toString());*/
 			
-			iSync sync = iSync.getInstance();
+			/*iSync sync = iSync.getInstance();
 			iTournament t = sync.createTournament("ZeitPlan Test");
 			t.setLanes(5);
 			
@@ -91,7 +91,35 @@ public class Test
 			if(p.getPoints(f2)==pf2)
 				System.out.println("Punkte von Fechter 2 stimmen.");
 			else
-				System.out.println("Punkte von Fechter 2 stimmen nicht.");
+				System.out.println("Punkte von Fechter 2 stimmen nicht.");*/
+			
+			iSync s = iSync.getInstance();
+			iTournament t = s.createTournament("Turnier");
+			t.setGroups(1);
+			
+			iFencer f1 = s.createFencer("A", "A");
+			iFencer f2 = s.createFencer("B", "B");
+			t.addParticipant(f1);
+			t.addParticipant(f2);
+			
+			List<iPreliminary> list = t.getAllPreliminary();
+			if(list.size()==1)
+				System.out.println("Test 1: +");
+			else
+				System.out.println("Test 1: -");
+			
+			iPreliminary p = list.get(0);
+			p.setPoints(f1,	2);
+			p.setPoints(f2, 3);
+			p.setFinisched(true);
+			p.setPoints(f1, 4);
+			p.setPoints(f2, 5);
+			
+			for(iScore tmp : t.getScores())
+			{
+				System.out.println(tmp.getFencer()+" | "+tmp.getWins()+" | "+tmp.getHits()+" | "+tmp.getGotHit());
+			}
+			
 
 		} 
 		catch (SQLException e) 

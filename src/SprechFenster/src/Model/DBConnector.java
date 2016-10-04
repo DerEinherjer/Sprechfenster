@@ -479,7 +479,7 @@ public class DBConnector
 	}
 	
 	private PreparedStatement lpStmt = null;
-	Preliminary loadPreliminary(int id) throws SQLException
+	Preliminary loadPreliminary(int id, Tournament t) throws SQLException
 	{
 		if(lpStmt == null)
 		{
@@ -492,7 +492,9 @@ public class DBConnector
 		rs.next();//TODO
 		
 		Preliminary ret = new Preliminary(id, this);
-		ret.initTurnamentID(rs.getInt("TurnierID"));
+		//ret.initTurnamentID(rs.getInt("TurnierID"));
+		if(t.getID()==rs.getInt("TurnierID"))
+			ret.initTournament(t);
 		ret.initGroup(rs.getInt("Gruppe"));
 		ret.initRound(rs.getInt("Runde"));
 		ret.initLane(rs.getInt("Bahn"));
@@ -502,7 +504,7 @@ public class DBConnector
 		ret.initFencer2(f2);
 		ret.initPointsFor(f1, rs.getInt("PunkteVon1"));
 		ret.initPointsFor(f2, rs.getInt("PunkteVon2"));
-		
+		ret.initFinished(rs.getBoolean("Beendet"));
 		
 		return ret;
 	}

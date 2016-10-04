@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import javax.xml.bind.SchemaOutputResolver;
+
 class Tournament implements iTournament
 {
 	
@@ -20,6 +22,7 @@ class Tournament implements iTournament
 	private Integer lanes = null;
 	private Map<Fencer, Boolean> entryFee = new HashMap<>();
 	private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
+	private Map<Fencer, Score> scores = new HashMap<>();
 	
 	static String getSQLString()
 	{
@@ -31,11 +34,15 @@ class Tournament implements iTournament
 				   + "Bahnen int);";
 	}
 	
-	Tournament(int id, DBConnector con)
+	Tournament(int id, DBConnector con) throws SQLException
 	{
 		this.ID = id;
 		this.con = con;
 		
+		for(iFencer f : getAllParticipants())
+		{
+			scores.put((Fencer)f, new Score((Fencer)f));
+		}
 		
 		try 
 		{
@@ -52,7 +59,11 @@ class Tournament implements iTournament
 		for(Integer integer : con.getTournamentPreliminarys(this))
 		{
 			if(!preliminarys.containsKey(integer))
-				preliminarys.put(integer, con.loadPreliminary(integer));
+			{
+				Preliminary tmp =  con.loadPreliminary(integer, this);
+				preliminarys.put(integer, tmp);
+				tmp.propagateScore();
+			}
 		}
 	}
 	
@@ -148,7 +159,7 @@ class Tournament implements iTournament
 		for(Integer integer : con.getTournamentPreliminarys(this))
 		{
 			if(!preliminarys.containsKey(integer))
-				preliminarys.put(integer, con.loadPreliminary(integer));
+				preliminarys.put(integer, con.loadPreliminary(integer, this));
 			ret.add(preliminarys.get(integer));
 		}
 		return ret;
@@ -231,6 +242,7 @@ class Tournament implements iTournament
 		con.removeParticipant((Fencer)f);
 		
 		preliminarys = new HashMap<>();
+		scores = new HashMap<>();
 		updatePreliminarys();
 	}
 	
@@ -259,6 +271,62 @@ class Tournament implements iTournament
 		if(!equipmentChecked.containsKey((Fencer) f))
 			equipmentChecked.put((Fencer)f, con.getEquipmentCheck(this, (Fencer)f));
 		return equipmentChecked.get((Fencer)f);
+	}
+	
+	void addWin(Fencer f) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scores.containsKey(f))
+				scores.put(f, new Score(f));
+			scores.get(f).addWin();
+		}
+	}
+	
+	void subWin(Fencer f) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scores.containsKey(f))
+				scores.put(f, new Score(f));
+			scores.get(f).subWin();
+		}
+	}
+	
+	void addHits(Fencer f, int points) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scores.containsKey(f))
+				scores.put(f, new Score(f));
+			scores.get(f).addHits(points);
+		}
+	}
+	
+	void addGotHit(Fencer f, int points) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scores.containsKey(f))
+				scores.put(f, new Score(f));
+			scores.get(f).addGotHit(points);
+		}
+	}
+	
+	public Score getScoreFrom(iFencer f)
+	{
+		return scores.get((Fencer)f);
+	}
+	
+	public List<iScore> getScores() throws SQLException
+	{
+		List<iScore> ret = new ArrayList<>();
+		for(iFencer f : getAllParticipants())
+		{
+			ret.add(scores.get((Fencer)f));
+		}
+		//ret.sort();//TODO
+		return ret;
 	}
 	
 	@Override

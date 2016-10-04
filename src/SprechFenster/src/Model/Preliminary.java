@@ -7,9 +7,10 @@ import java.util.List;
 class Preliminary implements iPreliminary
 {
 	private int ID;
+	private Tournament t;
 	private DBConnector con;
 	
-	private Integer tournamentID = null;
+	//private Integer tournamentID = null;
 	private Integer group = null;
 	private Integer round = null;
 	private Integer lane = null;
@@ -17,6 +18,9 @@ class Preliminary implements iPreliminary
 	private Fencer fencer2 = null;
 	private Integer pointsFor1 = null;
 	private Integer pointsFor2 = null;
+	private Boolean finished = null;
+	
+	private Boolean propagated = false;
 	
 	static String getSQLString()
 	{
@@ -28,7 +32,8 @@ class Preliminary implements iPreliminary
 				+ "Teilnehmer1 int,"
 				+ "Teilnehmer2 int,"
 				+ "PunkteVon1 int,"
-				+ "PunkteVon2 int);";
+				+ "PunkteVon2 int,"
+				+ "Beendet boolean);";
 	}
 	
 	public Preliminary(int id, DBConnector con) 
@@ -36,8 +41,8 @@ class Preliminary implements iPreliminary
 		this.ID = id;
 		this.con = con;
 	}
-
-	void initTurnamentID(int id) {if(this.tournamentID == null) this.tournamentID = id;}
+	void initTournament(Tournament t) {if(this.t == null) this.t= t;}
+	//void initTurnamentID(int id) {if(this.tournamentID == null) this.tournamentID = id;}
 	void initGroup(int group) {if(this.group == null) this.group = group;}
 	void initRound(int round) {if(this.round == null) this.round = round;}
 	void initLane(int lane) {if(this.lane == null) this.lane = lane;}
@@ -50,6 +55,7 @@ class Preliminary implements iPreliminary
 		else if(this.fencer2.equals(f)&&pointsFor2 == null)
 			pointsFor2=points;
 	}
+	void initFinished(boolean finished) {if(this.finished==null) this.finished=finished;}
 	
 	int getID(){return ID;}
 	public int getGroup(){return group;}
@@ -75,11 +81,14 @@ class Preliminary implements iPreliminary
 	
 	public void setPoints(iFencer f, int points) throws SQLException
 	{
-		con.setPoints(ID, ((Fencer)f).getID(), points);
-		if(fencer1.equals(f))
-			pointsFor1 = points;
-		if(fencer2.equals(f))
-			pointsFor2 = points;
+		if(!finished)
+		{
+			con.setPoints(ID, ((Fencer)f).getID(), points);
+			if(fencer1.equals(f))
+				pointsFor1 = points;
+			if(fencer2.equals(f))
+				pointsFor2 = points;
+		}
 	}
 	
 	public int getPoints(iFencer f) throws SQLException
@@ -98,6 +107,73 @@ class Preliminary implements iPreliminary
 		if(fencer2.equals(f))
 			return pointsFor1;
 		return -1;
+	}
+	
+	public iFencer getWinner()
+	{
+		if(finished)
+		{
+			if(pointsFor1>pointsFor2)
+				return fencer1;
+			if(pointsFor1<pointsFor2)
+				return fencer2;
+		}
+		return null;
+	}
+	
+	public void setFinisched(boolean finish) throws SQLException 
+	{
+		if(finish != finished)
+		{
+			finished=finish;
+			if(finished)
+			{
+				propagated = true;
+				
+				if(pointsFor1>pointsFor2)
+					t.addWin(fencer1);
+				else if(pointsFor1 < pointsFor2)
+					t.addWin(fencer2);
+				
+				t.addHits(fencer1, pointsFor1);
+				t.addHits(fencer2, pointsFor2);
+				t.addGotHit(fencer1, pointsFor2);
+				t.addGotHit(fencer2, pointsFor1);
+			}
+			else
+			{
+				if(propagated)
+				{
+					if(pointsFor1>pointsFor2)
+						t.subWin(fencer1);
+					else if(pointsFor1 < pointsFor2)
+						t.subWin(fencer2);
+					
+					t.addHits(fencer1, -pointsFor1);
+					t.addHits(fencer2, -pointsFor2);
+					t.addGotHit(fencer1, -pointsFor2);
+					t.addGotHit(fencer2, -pointsFor1);
+				}
+			}
+		}
+	}
+	
+	void propagateScore() throws SQLException
+	{
+		propagated = true;
+		
+		if(finished)
+		{
+			if(pointsFor1>pointsFor2)
+				t.addWin(fencer1);
+			else if(pointsFor1 < pointsFor2)
+				t.addWin(fencer2);
+			
+			t.addHits(fencer1, pointsFor1);
+			t.addHits(fencer2, pointsFor2);
+			t.addGotHit(fencer1, pointsFor2);
+			t.addGotHit(fencer2, pointsFor1);
+		}
 	}
 	
 	@Override

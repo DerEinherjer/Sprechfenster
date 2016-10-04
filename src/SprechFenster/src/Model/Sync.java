@@ -70,6 +70,11 @@ public class Sync extends iSync
 		return ret;
 	}
 	
-	
+	Tournament getTournament(int id) throws SQLException
+	{
+		if(!tournaments.containsKey(id))
+			tournaments.put(id, con.loadTournament(id));
+		return tournaments.get(id);
+	}
 	
 }

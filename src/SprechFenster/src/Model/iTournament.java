@@ -33,4 +33,7 @@ public interface iTournament
 	public void createPreliminaryTiming() throws SQLException;
 	public iPreliminary[][] getPreliminarySchedule() throws SQLException;
 	
+	public iScore getScoreFrom(iFencer f);
+	public List<iScore> getScores() throws SQLException;
+	
 }
