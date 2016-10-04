@@ -16,8 +16,38 @@ public class TournamentPresenter {
     private iTournament Tournament;
     
     public TournamentPresenter(iTournament tournamentToPresent)
-    {
+    { 
+        if(tournamentToPresent == null)
+        {
+            throw new IllegalArgumentException("tournamentToPresent must not be null");
+        }
         this.Tournament = tournamentToPresent;
+    }
+    
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == this)
+        {
+            return true;
+        }
+        else
+        {
+            if(!(other instanceof TournamentPresenter))
+            {
+                return false;
+            }
+            else
+            {
+                return Tournament.equals(((TournamentPresenter)other).Tournament);
+            }
+        }
+    }
+    
+    @Override 
+    public int hashCode()
+    {
+        return Tournament.hashCode();
     }
     
     public iTournament getTournament()

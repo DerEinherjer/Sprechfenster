@@ -20,7 +20,37 @@ public class FencerPresenter {
     
     public FencerPresenter(iFencer fencerToPresent)
     {
+        if(fencerToPresent == null)
+        {
+            throw new IllegalArgumentException("fencerToPresent must not be null");
+        }
         Fencer = fencerToPresent;
+    }
+    
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == this)
+        {
+            return true;
+        }
+        else
+        {
+            if(!(other instanceof FencerPresenter))
+            {
+                return false;
+            }
+            else
+            {
+                return Fencer.equals(((FencerPresenter)other).Fencer);
+            }
+        }
+    }
+    
+    @Override 
+    public int hashCode()
+    {
+        return Fencer.hashCode();
     }
     
     public iFencer getFencer()

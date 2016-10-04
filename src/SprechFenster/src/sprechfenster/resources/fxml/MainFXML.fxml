@@ -29,12 +29,15 @@
                   </Menu>
                </menus>
             </MenuBar>
-            <ToolBar layoutY="25.0" prefHeight="48.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+            <ToolBar fx:id="MainToolBar" layoutY="25.0" prefHeight="48.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                <items>
-                  <Button fx:id="SummaryButton" mnemonicParsing="false" onAction="#handleSummaryButtonAction" text="Übersicht" />
+                  <Button fx:id="OverviewButton" mnemonicParsing="false" onAction="#handleSummaryButtonAction" text="Übersicht" />
                   <Button fx:id="NewTournamentButton" mnemonicParsing="false" onAction="#handleNewTournamentButtonAction" text="Neues Turnier" />
                   <Button fx:id="LoadTournamentButton" mnemonicParsing="false" onAction="#handleLoadTournamentButtonAction" text="Turnier laden" />
                   <Button fx:id="NewFencerButton" mnemonicParsing="false" onAction="#handleNewFencerButtonAction" text="Neuer Fechter" />
+                  <Button fx:id="ShowParticipantsButton" mnemonicParsing="false" onAction="#handleShowParticipantsButtonAction" text="Teilnehmer" />
+                  <Button fx:id="ShowGroupsButton" mnemonicParsing="false" onAction="#handleShowGroupsButtonAction" text="Vorgruppen" />
+                  <Button fx:id="ShowFinalRoundsButton" mnemonicParsing="false" onAction="#handleShowFinalRoundsButtonAction" text="Finalrunden" />
                </items>
             </ToolBar>
          </children>

@@ -6,7 +6,7 @@ import java.util.List;
 public interface iPreliminary 
 {		
 	public int getGroup();
-	public List<Fencer> getFencer();
+	public List<iFencer> getFencer();
 	public int getRound();
 	public int getLane();
 	public boolean setTime(int round, int lane) throws SQLException;

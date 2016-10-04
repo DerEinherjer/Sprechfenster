@@ -34,7 +34,7 @@ import sprechfenster.Presenters.FencerPresenter;
  *
  * @author Stefan
  */
-public class TournamentPlanningController implements Initializable {
+public class TournamentParticipantsController implements Initializable {
 
     
     @FXML TextField NameTextField;
@@ -95,7 +95,7 @@ public class TournamentPlanningController implements Initializable {
                 }
                 ParticipantsTableView.getItems().setAll(presenters);
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -118,7 +118,7 @@ public class TournamentPlanningController implements Initializable {
             {
                 Tournament.setName(NameTextField.getText());
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -132,7 +132,7 @@ public class TournamentPlanningController implements Initializable {
             {
                 Tournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartDatePicker));
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -145,7 +145,7 @@ public class TournamentPlanningController implements Initializable {
             try {
                 Tournament.setLanes(FencingLanesComboBox.getSelectionModel().getSelectedIndex());
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -159,7 +159,7 @@ public class TournamentPlanningController implements Initializable {
             {
                 Tournament.setGroups(QualificationGroupsComboBox.getSelectionModel().getSelectedIndex());
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -173,7 +173,7 @@ public class TournamentPlanningController implements Initializable {
             {
                 Tournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex());
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -199,7 +199,7 @@ public class TournamentPlanningController implements Initializable {
                     UpdateParticipantsList();
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -223,7 +223,7 @@ public class TournamentPlanningController implements Initializable {
                 }
                 UpdateParticipantsList();
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentPlanningController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

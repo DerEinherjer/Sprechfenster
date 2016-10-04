@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/NewTournamentDialogController.java</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/iFencerSelection.java</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/GUIUtilities.java</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/resources/fxml/TournamentPlanning.fxml</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/TournamentPlanningController.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/TournamentQualificationPhaseController.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/Model/Tournament.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/Model/Participation.java</file>
         </group>
     </open-files>
 </project-private>

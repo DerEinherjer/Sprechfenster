@@ -61,7 +61,7 @@ class Preliminary implements iPreliminary
 	public int getGroup(){return group;}
 	public int getRound(){return round;}
 	public int getLane(){return lane;}
-	public List<Fencer> getFencer(){List<Fencer> ret = new ArrayList<>();ret.add(fencer1);ret.add(fencer2);return ret;}
+	public List<iFencer> getFencer(){List<iFencer> ret = new ArrayList<>();ret.add(fencer1);ret.add(fencer2);return ret;}
 	
 	public String toString()
 	{
