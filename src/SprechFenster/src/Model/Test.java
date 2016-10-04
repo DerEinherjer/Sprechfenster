@@ -99,25 +99,25 @@ public class Test
 			
 			iFencer f1 = s.createFencer("A", "A");
 			iFencer f2 = s.createFencer("B", "B");
+			iFencer f3 = s.createFencer("C", "C");
+			iFencer f4 = s.createFencer("D", "D");
 			t.addParticipant(f1);
 			t.addParticipant(f2);
+			t.addParticipant(f3);
+			t.addParticipant(f4);
 			
 			List<iPreliminary> list = t.getAllPreliminary();
-			if(list.size()==1)
-				System.out.println("Test 1: +");
-			else
-				System.out.println("Test 1: -");
 			
-			iPreliminary p = list.get(0);
-			p.setPoints(f1,	2);
-			p.setPoints(f2, 3);
-			p.setFinisched(true);
-			p.setPoints(f1, 4);
-			p.setPoints(f2, 5);
-			
-			for(iScore tmp : t.getScores())
+			for(iPreliminary p : list)
 			{
-				System.out.println(tmp.getFencer()+" | "+tmp.getWins()+" | "+tmp.getHits()+" | "+tmp.getGotHit());
+				p.setPoints(p.getFencer().get(0),	(int)(Math.random()*16+1));
+				p.setPoints(p.getFencer().get(1),	(int)(Math.random()*16+1));
+				p.setFinisched(true);
+			}
+			List<iScore> scores = t.getScores();
+			for(int i = 0;i<scores.size();i++)
+			{
+				System.out.println(scores.get(i).getFencer()+" | "+scores.get(i).getWins()+" | "+scores.get(i).getHits()+" | "+scores.get(i).getGotHit());
 			}
 			
 

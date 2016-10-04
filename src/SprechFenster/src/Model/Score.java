@@ -52,4 +52,29 @@ public class Score implements iScore
 	{
 		return gotHit;
 	}
+
+	@Override
+	public int compareTo(iScore o) 
+	{
+		if(wins<o.getWins())
+			return 1;
+		else if(wins > o.getWins())
+			return -1;
+		else
+		{
+			if(hits<o.getHits())
+				return 1;
+			else if(hits>o.getHits())
+				return -1;
+			else
+			{
+				if(hits/gotHit<o.getHits()/o.getGotHit())
+					return 1;
+				else if(hits/gotHit>o.getHits()/o.getGotHit())
+					return -1;
+				else
+					return 0;
+			}
+		}
+	}
 }

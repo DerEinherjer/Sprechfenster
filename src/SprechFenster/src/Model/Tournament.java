@@ -2,12 +2,10 @@ package Model;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-
-import javax.xml.bind.SchemaOutputResolver;
 
 class Tournament implements iTournament
 {
@@ -325,7 +323,9 @@ class Tournament implements iTournament
 		{
 			ret.add(scores.get((Fencer)f));
 		}
-		//ret.sort();//TODO
+		if(ret==null)
+			System.out.println("DOCH NULL");
+		Collections.sort(ret);
 		return ret;
 	}
 	
