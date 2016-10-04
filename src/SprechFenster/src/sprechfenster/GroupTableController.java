@@ -48,7 +48,7 @@ public class GroupTableController implements Initializable
     {
         FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         //PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Points"));
-        FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
     }   
     
     public void SetGroupName(String groupName)

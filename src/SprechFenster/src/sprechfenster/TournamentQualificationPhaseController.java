@@ -92,7 +92,7 @@ public class TournamentQualificationPhaseController implements Initializable
                     for(iPreliminary qualificationFight : qualificationFights)
                     {
                         int groupNumber = qualificationFight.getGroup();
-                        if(groupNumber < GroupControllers.size())
+                        if(groupNumber <= GroupControllers.size())
                         {
                            GroupTableController controller = GroupControllers.get(groupNumber-1);
                            controller.AddFencer(qualificationFight.getFencer());
