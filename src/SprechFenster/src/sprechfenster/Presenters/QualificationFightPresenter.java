@@ -52,34 +52,34 @@ public class QualificationFightPresenter
         return Fight.hashCode();
     }
     
-    public String GetFirstFencerName()
+    public String getFirstFencerName()
     {
         iFencer fencer = GetFencer(0);
-        return GetFencerName(fencer);
+        return getFencerName(fencer);
     }
     
-    public String GetSecondFencerName()
+    public String getSecondFencerName()
     {
         iFencer fencer = GetFencer(1);
-        return GetFencerName(fencer);
+        return getFencerName(fencer);
     }
     
-    public String GetLane()
+    public String getLane()
     {
         return Integer.toString(Fight.getLane());
     }
     
-    public String GetRound()
+    public String getRound()
     {
         return Integer.toString(Fight.getRound());
     }
     
-    public String GetGroup()
+    public String getGroup()
     {
         return Integer.toString(Fight.getGroup());
     }
     
-    private String GetFencerName(iFencer fencer)
+    private String getFencerName(iFencer fencer)
     {
         if(fencer != null)
         {

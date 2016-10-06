@@ -34,7 +34,7 @@ public class TournamentQualificationPhaseController implements Initializable
 {
 
     @FXML FlowPane GroupsPane;
-    @FXML TableView FightsTableView;
+    @FXML TableView<QualificationFightPresenter> FightsTableView;
     @FXML TableColumn RoundTableColumn;
     @FXML TableColumn LaneTableColumn;
     @FXML TableColumn FirstFencerTableColumn;
@@ -51,8 +51,8 @@ public class TournamentQualificationPhaseController implements Initializable
     {
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
-        FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencer"));
-        SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencer"));
+        FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
+        SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
     }    
     
     public void SetTournament(iTournament tournament)
@@ -70,12 +70,8 @@ public class TournamentQualificationPhaseController implements Initializable
             GroupsPane.getChildren().clear();
             try 
             {
+                Tournament.createPreliminaryTiming();
                 List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
-                if(qualificationFights == null || qualificationFights.isEmpty())
-                {
-                    Tournament.createPreliminaryTiming();
-                    qualificationFights = Tournament.getAllPreliminary();
-                }
                 if(qualificationFights != null)
                 {
                     qualificationFights.sort((a,b) -> {return Integer.compare(a.getGroup(), b.getGroup());});
