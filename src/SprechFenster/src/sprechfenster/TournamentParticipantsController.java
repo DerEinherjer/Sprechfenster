@@ -58,9 +58,9 @@ public class TournamentParticipantsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        GUIUtilities.FillNumberComboBox(FencingLanesComboBox, 10);
-        GUIUtilities.FillNumberComboBox(QualificationGroupsComboBox, 20);
-        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 20);
+        GUIUtilities.FillNumberComboBox(FencingLanesComboBox, 1, 10);
+        GUIUtilities.FillNumberComboBox(QualificationGroupsComboBox, 0, 20);
+        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 0, 20);
     }    
     
     public void setFencerSelectionInterface(iFencerSelection selectionInterface)
@@ -75,9 +75,9 @@ public class TournamentParticipantsController implements Initializable {
         {
             NameTextField.setText(Tournament.getName());
             StartDatePicker.setValue(LocalDate.parse(Tournament.getDate(), DateTimeFormatter.ISO_DATE));
-            setComboBoxSelection(FencingLanesComboBox, Tournament.getLanes());
-            setComboBoxSelection(QualificationGroupsComboBox, Tournament.getGroups());
-            setComboBoxSelection(FinalRoundsComboBox, Tournament.getFinalRounds());
+            setComboBoxSelection(FencingLanesComboBox, 1, Tournament.getLanes());
+            setComboBoxSelection(QualificationGroupsComboBox, 0, Tournament.getGroups());
+            setComboBoxSelection(FinalRoundsComboBox, 0, Tournament.getFinalRounds());
             UpdateParticipantsList();
         }
     }
@@ -100,11 +100,11 @@ public class TournamentParticipantsController implements Initializable {
         }
     }
     
-    private void setComboBoxSelection(ComboBox box, int selectedNumber)
+    private void setComboBoxSelection(ComboBox box, int startNumber, int selectedNumber)
     {
         if(selectedNumber > box.getItems().size())
         {
-            GUIUtilities.FillNumberComboBox(box, selectedNumber);
+            GUIUtilities.FillNumberComboBox(box, startNumber, selectedNumber);
         }
         box.getSelectionModel().select(selectedNumber);
     }

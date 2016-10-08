@@ -15,10 +15,10 @@ import javafx.scene.control.DatePicker;
  * @author Stefan
  */
 public class GUIUtilities {
-    static void FillNumberComboBox(ComboBox box, int maxNumber)
+    static void FillNumberComboBox(ComboBox box, int startNumber, int maxNumber)
     {
         ArrayList<String> numbers = new ArrayList<>(maxNumber);
-        for(Integer i = 1; i <= maxNumber; i++)
+        for(Integer i = startNumber; i <= maxNumber; i++)
         {
             numbers.add(i.toString());
         }

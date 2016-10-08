@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<SplitPane fx:id="MainSplitPane" dividerPositions="0.479933110367893" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="910.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
+<SplitPane fx:id="MainSplitPane" dividerPositions="0.479933110367893" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
   <items>
       <ScrollPane prefViewportHeight="398.0" prefViewportWidth="433.0">
          <content>
@@ -15,12 +15,14 @@
       </ScrollPane>
     <AnchorPane fx:id="FightsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
-            <TableView fx:id="FightsTableView" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <TableView fx:id="FightsTableView" prefHeight="398.0" prefWidth="501.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-24.0" AnchorPane.topAnchor="0.0">
               <columns>
                 <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
                 <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
-                  <TableColumn fx:id="FirstFencerTableColumn" prefWidth="202.0" text="Fechter A" />
-                  <TableColumn fx:id="SecondFencerTableColumn" prefWidth="174.0" text="Fechter B" />
+                  <TableColumn fx:id="FirstFencerTableColumn" prefWidth="164.0" text="Fechter A" />
+                  <TableColumn fx:id="SecondFencerTableColumn" prefWidth="121.0" text="Fechter B" />
+                  <TableColumn fx:id="GroupTableColumn" prefWidth="53.0" text="Gruppe" />
+                  <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
               </columns>
             </TableView>
          </children></AnchorPane>

@@ -26,6 +26,11 @@ public class QualificationFightPresenter
         Fight = fightToPresent;
     }
     
+    public iPreliminary getFight()
+    {
+        return Fight;
+    }
+    
     @Override
     public boolean equals(Object other)
     {

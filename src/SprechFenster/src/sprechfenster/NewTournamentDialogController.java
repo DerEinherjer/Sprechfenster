@@ -44,8 +44,8 @@ public class NewTournamentDialogController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        GUIUtilities.FillNumberComboBox(GroupsComboBox, 20);
-        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 20);
+        GUIUtilities.FillNumberComboBox(GroupsComboBox, 1, 20);
+        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
     }    
     
     @FXML

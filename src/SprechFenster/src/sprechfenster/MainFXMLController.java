@@ -66,7 +66,7 @@ public class MainFXMLController implements Initializable, iFencerSelection
     @FXML
     Button NewFencerButton;
     @FXML
-    Button AddParticipantsButton;
+    Button ShowParticipantsButton;
     @FXML
     Button ShowGroupsButton;
     @FXML
@@ -184,12 +184,7 @@ public class MainFXMLController implements Initializable, iFencerSelection
                 TournamentParticipantsController.setFencerSelectionInterface(this);
                 TournamentParticipantsController.setTournament(tournament);
                 LeftContentAnchorPane.getChildren().add(tournamentPlanningView);
-                ObservableList<Node> items = MainToolBar.getItems();
-                items.clear();
-                items.add(OverviewButton);
-                items.add(NewFencerButton);
-                items.add(ShowGroupsButton);
-                items.add(ShowFinalRoundsButton);
+                SetupToolbarForActiveTournament();
                 ActiveTournament = tournament;
             }
             catch (IOException e)
@@ -211,12 +206,24 @@ public class MainFXMLController implements Initializable, iFencerSelection
                 ContentAnchorPane.getChildren().add(tournamentQualificationPhaseView);
                 TournamentQualificationPhaseController controller = loader.<TournamentQualificationPhaseController>getController();
                 controller.SetTournament(tournament);
+                SetupToolbarForActiveTournament();
             }
             catch (IOException ex)
             {
                 Logger.getLogger(MainFXMLController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    private void SetupToolbarForActiveTournament()
+    {
+        ObservableList<Node> items = MainToolBar.getItems();
+        items.clear();
+        items.add(OverviewButton);
+        items.add(NewFencerButton);
+        items.add(ShowParticipantsButton);
+        items.add(ShowGroupsButton);
+        items.add(ShowFinalRoundsButton);
     }
 
     @FXML
