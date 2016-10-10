@@ -9,10 +9,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.print.attribute.ResolutionSyntax;
+
 
 //TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
 
-public class DBConnector 
+class DBConnector 
 {
 	private static String url = "jdbc:h2:~/SprechfensterData";
 	private static DBConnector dbConnector;
@@ -511,7 +513,7 @@ public class DBConnector
 	
 	private PreparedStatement stfp1Stmt = null;
 	private PreparedStatement stfp2Stmt = null;
-	public boolean setTimeForPreliminary(Preliminary p, int round, int lane) throws SQLException
+	boolean setTimeForPreliminary(Preliminary p, int round, int lane) throws SQLException
 	{
 		if(stfp1Stmt == null)
 		{
@@ -666,5 +668,73 @@ public class DBConnector
 		ResultSet rs = gefStmt.executeQuery();
 		rs.next();//TODO
 		return rs.getBoolean("Ausruestungskontrolle");
+	}
+	
+	private PreparedStatement stff1Stmt = null;
+	private PreparedStatement stff2Stmt = null;
+	boolean setTimeForFinalround(Finalrounds p, int round, int lane) throws SQLException
+	{
+		if(stff1Stmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
+			stff1Stmt = con.prepareStatement(sql);
+			
+			sql = "SELECT Bahnen FROM Turniere AS t, Vorrunden AS v WHERE v.TurnierID = t.ID AND v.ID = ?;";
+			stff2Stmt = con.prepareStatement(sql);
+		}
+		
+		stff2Stmt.setInt(1, p.getID());
+		ResultSet rs = stff2Stmt.executeQuery();
+		rs.next(); //TODO
+		if(lane<1||lane>rs.getInt("Bahnen")) return false;
+		
+		
+		stff1Stmt.setInt(1, round);
+		stff1Stmt.setInt(2, lane);
+		stff1Stmt.setInt(3, p.getID());
+		stff1Stmt.executeUpdate();
+		return true;
+	}
+	
+	
+	
+	private PreparedStatement lfStmt = null;
+	void loadFinalround(int id, Tournament t) throws SQLException
+	{
+		if(lfStmt == null)
+		{
+			String sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
+			lfStmt = con.prepareStatement(sql);
+		}
+		
+		lfStmt.setInt(1, id);
+		ResultSet rs = lfStmt.executeQuery();
+		rs.next();//TODO
+		Finalrounds ret = new Finalrounds(id, this);
+		Fencer f1 = iSync.getInstance().getFencer(rs.getInt("Teilnehmer1"));
+		Fencer f2 = iSync.getInstance().getFencer(rs.getInt("Teilnehmer2"));
+		ret.initFencer1(f1);
+		ret.initFencer2(f2);
+		ret.initFinished(rs.getBoolean("Beendet"));
+		ret.initLane(rs.getInt("Bahn"));
+		ret.initPointsFor(f1, rs.getInt("PunkteVon1"));
+		ret.initPointsFor(f2, rs.getInt("PunkteVon2"));
+		ret.initRound(rs.getInt("Runde"));
+		ret.initTournament(t);
+		
+		t.add(ret);
+		
+		int tmp = rs.getInt("Vorher1");
+		if(tmp != -1)
+			ret.initPreround1(t.loadAFinalRound(tmp));
+		tmp = rs.getInt("Vorher2");
+		if(tmp != -1)
+			ret.initPreround2(t.loadAFinalRound(tmp));
+		tmp = rs.getInt("Gewinner");
+		if(tmp != -1)
+			ret.initWinnersRound(t.loadAFinalRound(tmp));
+		tmp = rs.getInt("Verlierer");
+		if(tmp != -1)
+			ret.initLosersRound(t.loadAFinalRound(tmp));
 	}
 }

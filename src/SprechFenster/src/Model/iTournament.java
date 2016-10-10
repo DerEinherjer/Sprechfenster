@@ -35,5 +35,6 @@ public interface iTournament
 	
 	public iScore getScoreFrom(iFencer f);
 	public List<iScore> getScores() throws SQLException;
+	public List<iScore>[] getScoresInGroups() throws SQLException;
 	
 }

@@ -16,7 +16,7 @@ class Tournament implements iTournament
 	private String name = null;
 	private String date = null;
 	private Integer groups = null;
-	private Integer finalrounds = null;
+	private Integer numberFinalrounds = null;
 	private Integer lanes = null;
 	private Map<Fencer, Boolean> entryFee = new HashMap<>();
 	private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
@@ -68,14 +68,14 @@ class Tournament implements iTournament
 	void initName(String name){if(this.name == null) this.name = name;}
 	void initDate(String date){if(this.date == null) this.date = date;}
 	void initGroups(int groups){if(this.groups == null) this.groups = groups;}
-	void initFinalRounds(int rounds){if(this.finalrounds == null) this.finalrounds = rounds;}
+	void initFinalRounds(int rounds){if(this.numberFinalrounds == null) this.numberFinalrounds = rounds;}
 	void initLanes(int lanes){if(this.lanes == null) this.lanes = lanes;}
 	
 	int getID(){return ID;}
 	public String getName(){return name;}
 	public String getDate(){return date;}
 	public int getGroups(){return groups;}
-	public int getFinalRounds(){return finalrounds;}
+	public int getFinalRounds(){return numberFinalrounds;}
 	public int getLanes(){return lanes;}
 
 	public void setName(String name) throws SQLException
@@ -112,7 +112,7 @@ class Tournament implements iTournament
 	public void setFinalRounds(int rounds) throws SQLException
 	{
 		con.tournamentSetFinalRounds(rounds, ID);
-		this.finalrounds = rounds;
+		this.numberFinalrounds = rounds;
 	}
 	
 	public void setLanes(int lanes) throws SQLException
@@ -323,10 +323,38 @@ class Tournament implements iTournament
 		{
 			ret.add(scores.get((Fencer)f));
 		}
-		if(ret==null)
-			System.out.println("DOCH NULL");
 		Collections.sort(ret);
 		return ret;
+	}
+	
+	public List<iScore>[] getScoresInGroups() throws SQLException
+	{
+		List<iScore> ret[] = new ArrayList[getGroups()];
+		for(iFencer f : getAllParticipants())
+		{
+			ret[getParticipantGroup(f)-1].add(scores.get((Fencer)f));
+		}
+		for(int i=0;i<getGroups();i++)
+			Collections.sort(ret[i]);
+		return ret;
+	}
+	
+	Map<Integer, Finalrounds> finalrounds = new HashMap<>();
+	
+	void add(Finalrounds r)
+	{
+		finalrounds.put(r.getID(), r);
+	}
+	
+	Finalrounds loadAFinalRound(int id) throws SQLException
+	{
+		if(finalrounds.containsKey(id))
+			return finalrounds.get(id);
+		else
+		{
+			con.loadFinalround(id, this);
+		}
+		return null;
 	}
 	
 	@Override

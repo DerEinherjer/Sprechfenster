@@ -95,7 +95,8 @@ public class Test
 			
 			iSync s = iSync.getInstance();
 			iTournament t = s.createTournament("Turnier");
-			t.setGroups(1);
+			t.setGroups(2);
+			t.setLanes(2);
 			
 			iFencer f1 = s.createFencer("A", "A");
 			iFencer f2 = s.createFencer("B", "B");
@@ -106,13 +107,27 @@ public class Test
 			t.addParticipant(f3);
 			t.addParticipant(f4);
 			
+			t.createPreliminaryTiming();
+			iPreliminary [][] shed = t.getPreliminarySchedule();
+			for(int x = 0;x<shed.length;x++)
+			{
+				String line= "";
+				for(int y = 0; y<shed[0].length;y++)
+				{
+					//System.out.println("HI?");
+					if(y!=0)
+						line+= " | ";
+					line += shed[x][y].getGroup();
+				}
+				System.out.println(line);
+			}
 			List<iPreliminary> list = t.getAllPreliminary();
 			
 			for(iPreliminary p : list)
 			{
 				p.setPoints(p.getFencer().get(0),	(int)(Math.random()*16+1));
 				p.setPoints(p.getFencer().get(1),	(int)(Math.random()*16+1));
-				p.setFinisched(true);
+				p.setFinished(true);
 			}
 			List<iScore> scores = t.getScores();
 			for(int i = 0;i<scores.size();i++)

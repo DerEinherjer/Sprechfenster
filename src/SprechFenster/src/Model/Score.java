@@ -68,9 +68,9 @@ public class Score implements iScore
 				return -1;
 			else
 			{
-				if(hits/gotHit<o.getHits()/o.getGotHit())
+				if(hits-gotHit<o.getHits()-o.getGotHit())
 					return 1;
-				else if(hits/gotHit>o.getHits()/o.getGotHit())
+				else if(hits-gotHit>o.getHits()-o.getGotHit())
 					return -1;
 				else
 					return 0;
