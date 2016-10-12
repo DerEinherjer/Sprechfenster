@@ -2,10 +2,15 @@ package Model;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Preliminary implements iPreliminary
 {
+	// -----
+	private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
+	// -----
 	private int ID;
 	private Tournament t;
 	private DBConnector con;
@@ -35,26 +40,25 @@ class Preliminary implements iPreliminary
 				+ "Beendet boolean;";
 	}
 	
-	Preliminary(int id, DBConnector con) 
+	Preliminary(Map<String, Object> set, DBConnector con) throws ObjectExistExeption, SQLException
 	{
-		this.ID = id;
+		this.ID = (Integer) set.get("ID");
 		this.con = con;
+		
+		if(preliminarys.containsKey(this.ID))
+			throw new ObjectExistExeption(preliminarys.get(this.ID));
+		preliminarys.put(this.ID, this);
+		
+		this.t = iSync.getInstance().getTournament((Integer) set.get("TurnierID"));
+		this.group = (Integer) set.get("Gruppe");
+		this.round = (Integer) set.get("Runde");
+		this.lane = (Integer) set.get("Bahn");
+		this.fencer1 = iSync.getInstance().getFencer((Integer)set.get("Teilnehmer1")); 
+		this.fencer2 = iSync.getInstance().getFencer((Integer)set.get("Teilnehmer2"));
+		this.pointsFor1 = (Integer) set.get("PunkteVon1");
+		this.pointsFor2 = (Integer) set.get("PunkteVon2");
+		this.finished = (Boolean) set.get("Beendet");
 	}
-	
-	void initTournament(Tournament t) {if(this.t == null) this.t= t;}
-	void initGroup(int group) {if(this.group == null) this.group = group;}
-	void initRound(int round) {if(this.round == null) this.round = round;}
-	void initLane(int lane) {if(this.lane == null) this.lane = lane;}
-	void initFencer1(Fencer f) {if(this.fencer1 == null) this.fencer1 = f;}
-	void initFencer2(Fencer f) {if(this.fencer2 == null) this.fencer2 = f;}
-	void initPointsFor(Fencer f, int points)
-	{ 
-		if(this.fencer1.equals(f)&&pointsFor1 == null)
-			pointsFor1=points;
-		else if(this.fencer2.equals(f)&&pointsFor2 == null)
-			pointsFor2=points;
-	}
-	void initFinished(boolean finished) {if(this.finished==null) this.finished=finished;}
 	
 	int getID(){return ID;}
 	public int getGroup(){return group;}
@@ -173,6 +177,67 @@ class Preliminary implements iPreliminary
 			t.addGotHit(fencer1, pointsFor2);
 			t.addGotHit(fencer2, pointsFor1);
 		}
+	}
+	
+	public boolean isFinished()
+	{
+		return finished;
+	}
+	
+	public iTournament getTournament()
+	{
+		return t;
+	}
+	
+	public boolean removeParticipant(iFencer f) throws SQLException
+	{
+		if(fencer1.equals(f))
+		{
+			con.removeParticipantFromPrelim(this, (Fencer) f);
+			fencer1 = null;
+			return true;
+		}
+		else if(fencer2.equals(f))
+		{
+			con.removeParticipantFromPrelim(this, (Fencer) f);
+			fencer2 = null;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean addParticipant(iFencer f) throws SQLException
+	{
+		if(fencer1 == null)
+		{
+			con.addParticipantToPrelim(this, (Fencer) f);
+			fencer1 = (Fencer)f;
+			return true;
+		}
+		else if(fencer2 == null)
+		{
+			con.addParticipantToPrelim(this, (Fencer) f);
+			fencer2 = (Fencer)f;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException
+	{
+		if(fencer1.equals(out)&&!fencer2.equals(in))
+		{
+			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			fencer1 = (Fencer)in;
+			return true;
+		}
+		else if(fencer2.equals(out)&&!fencer1.equals(in))
+		{
+			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			fencer2 = (Fencer)in;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

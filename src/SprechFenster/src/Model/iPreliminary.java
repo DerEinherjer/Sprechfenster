@@ -17,5 +17,12 @@ public interface iPreliminary
 	public int getPoints(iFencer f) throws SQLException;
 	public int getOpponentPoints(iFencer f) throws SQLException;
 	
+	public boolean isFinished();
 	public iFencer getWinner();
+	
+	public iTournament getTournament();
+	
+	public boolean removeParticipant(iFencer f) throws SQLException;
+	public boolean addParticipant(iFencer f) throws SQLException;
+	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException; 
 }

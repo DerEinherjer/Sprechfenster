@@ -2,13 +2,26 @@ package Model;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Finalrounds implements iFinalrounds
 {
+	// -----
+	private static DBConnector con = DBConnector.getInstants();
+	private static Map<Integer, Finalrounds> finalrounds = new HashMap<>();
+	
+	static Finalrounds getFinalround(int id) throws SQLException
+	{
+		if(!finalrounds.containsKey(id))
+			con.loadFinalround(id);
+		return finalrounds.get(id);
+	}
+	
+	// -----
 	private int ID;
 	private Tournament t;
-	private DBConnector con;
 	
 	private Integer round = null;
 	private Integer lane = null;
@@ -40,6 +53,28 @@ public class Finalrounds implements iFinalrounds
 				+ "Vorher2 int,"
 				+ "Gewinner int,"
 				+ "Verlierer int);";
+	}
+	
+	Finalrounds(Map<String, Object> set) throws ObjectExistExeption, SQLException
+	{
+		this.ID = (Integer) set.get("ID");
+		
+		if(finalrounds.containsKey(this.ID))
+			throw new ObjectExistExeption(finalrounds.get(this.ID));
+		finalrounds.put(this.ID, this);
+		
+		this.t = iSync.getInstance().getTournament((Integer) set.get("TurnierID"));
+		this.round = (Integer) set.get("Runde");
+		this.lane = (Integer) set.get("Bahn");
+		this.fencer1 = iSync.getInstance().getFencer((Integer) set.get("Teilnehmer1"));
+		this.fencer2 = iSync.getInstance().getFencer((Integer) set.get("Teilnehmer2"));
+		this.pointsFor1 = (Integer) set.get("PunkteVon1");
+		this.pointsFor2 = (Integer) set.get("PunkteVon2");
+		this.finished = (Boolean) set.get("Beendet");
+		this.preround1 = Finalrounds.getFinalround((Integer) set.get("Vorher1"));
+		this.preround2 = Finalrounds.getFinalround((Integer) set.get("Vorher2"));
+		this.winnersround = Finalrounds.getFinalround((Integer) set.get("Gewinner"));
+		this.losersround = Finalrounds.getFinalround((Integer) set.get("Verlierer"));
 	}
 	
 	Finalrounds(int id, DBConnector con) 

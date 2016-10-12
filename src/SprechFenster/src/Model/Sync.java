@@ -23,6 +23,10 @@ public class Sync extends iSync
 	{
 		Fencer ret = con.loadFencer(con.createFencer(name, familyName));
 		fencers.put(ret.getID(), ret);
+		
+		setChanged();               // Eine Änderung ist aufgetreten
+		notifyObservers("New fencer.");  // Informiere Observer über Änderung
+		
 		return ret;
 	}
 	
@@ -53,6 +57,10 @@ public class Sync extends iSync
 	{
 		Tournament ret = con.loadTournament(con.createTournament(name));
 		tournaments.put(ret.getID(), ret);
+		
+		setChanged();               // Eine Änderung ist aufgetreten
+		notifyObservers("New tournament.");  // Informiere Observer über Änderung
+		
 		return ret;
 	}
 	

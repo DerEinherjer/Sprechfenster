@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.print.attribute.ResolutionSyntax;
 
@@ -92,8 +95,11 @@ class DBConnector
 		cfStmt.setString(2, familyname);
 		cfStmt.executeUpdate();
 		ResultSet rs = cfStmt.getGeneratedKeys();
-		rs.next();//TODO
-		return rs.getInt(1);
+		
+		if(rs.next())
+			return rs.getInt(1);
+		else
+			throw new SQLException("Didn't return ID of the new fencer.");
 	}
 	
 	private PreparedStatement gfvStmt = null;
@@ -106,16 +112,20 @@ class DBConnector
 			gfvStmt = con.prepareStatement(sql);
 		}
 		
-		Fencer ret = new Fencer(id, this);
-		
 		gfvStmt.setInt(1, id);
 		ResultSet rs = gfvStmt.executeQuery();
-		rs.next();//TODO
-		ret.initName(rs.getString("Vorname"));
-		ret.initFamilyName(rs.getString("Nachname"));
-		ret.initBirthday(rs.getString("Geburtstag"));
-		ret.initFencingSchool(rs.getString("Fechtschule"));
-		ret.initNationality(rs.getString("Nationalitaet"));
+		if(!rs.next())
+			throw new SQLException("Didn't found the fencer.");
+		
+		Fencer ret;
+		try 
+		{
+			ret = new Fencer(rowToHash(rs), this);
+		} 
+		catch (ObjectExistExeption e) 
+		{
+			ret = (Fencer) e.getObject();
+		}
 		rs.close();
 		
 		return ret;
@@ -231,16 +241,20 @@ class DBConnector
 			gtvStmt = con.prepareStatement(sql);
 		}
 		
-		Tournament ret = new Tournament(id, this);
-		
 		gtvStmt.setInt(1, id);
 		ResultSet rs = gtvStmt.executeQuery();
-		rs.next();//TODO
-		ret.initName(rs.getString("Name"));
-		ret.initDate(rs.getString("Datum"));
-		ret.initGroups(rs.getInt("Gruppen"));
-		ret.initFinalRounds(rs.getInt("Finalrunden"));
-		ret.initLanes(rs.getInt("Bahnen"));
+		if(!rs.next())
+			throw new SQLException("Didn't found tournament.");
+		
+		Tournament ret;
+		try 
+		{
+			ret = new Tournament(rowToHash(rs), this);
+		} 
+		catch (ObjectExistExeption e) 
+		{
+			ret = (Tournament) e.getObject();
+		}
 		rs.close();
 		
 		return ret;
@@ -491,23 +505,19 @@ class DBConnector
 		
 		lpStmt.setInt(1, id);
 		ResultSet rs = lpStmt.executeQuery();
-		rs.next();//TODO
+		if(!rs.next())//TODO
+			throw new SQLException("Didn't found preliminary");
 		
-		Preliminary ret = new Preliminary(id, this);
-		//ret.initTurnamentID(rs.getInt("TurnierID"));
-		if(t.getID()==rs.getInt("TurnierID"))
-			ret.initTournament(t);
-		ret.initGroup(rs.getInt("Gruppe"));
-		ret.initRound(rs.getInt("Runde"));
-		ret.initLane(rs.getInt("Bahn"));
-		Fencer f1 = Sync.getInstance().getFencer(rs.getInt("Teilnehmer1"));
-		Fencer f2 = Sync.getInstance().getFencer(rs.getInt("Teilnehmer2"));
-		ret.initFencer1(f1);
-		ret.initFencer2(f2);
-		ret.initPointsFor(f1, rs.getInt("PunkteVon1"));
-		ret.initPointsFor(f2, rs.getInt("PunkteVon2"));
-		ret.initFinished(rs.getBoolean("Beendet"));
-		
+		Preliminary ret;
+		try 
+		{
+			ret = new Preliminary(rowToHash(rs), this);
+		} 
+		catch (ObjectExistExeption e) 
+		{
+			ret = (Preliminary) e.getObject();
+		}
+		rs.close();
 		return ret;
 	}
 	
@@ -657,15 +667,15 @@ class DBConnector
 	private PreparedStatement gecStmt = null;
 	boolean getEquipmentCheck(Tournament t, Fencer f) throws SQLException
 	{
-		if(gefStmt == null)
+		if(gecStmt == null)
 		{
 			String sql = "SELECT Ausruestungskontrolle FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
-			gefStmt = con.prepareStatement(sql);
+			gecStmt = con.prepareStatement(sql);
 		}
 		
-		gefStmt.setInt(1, t.getID());
-		gefStmt.setInt(2, f.getID());
-		ResultSet rs = gefStmt.executeQuery();
+		gecStmt.setInt(1, t.getID());
+		gecStmt.setInt(2, f.getID());
+		ResultSet rs = gecStmt.executeQuery();
 		rs.next();//TODO
 		return rs.getBoolean("Ausruestungskontrolle");
 	}
@@ -699,7 +709,7 @@ class DBConnector
 	
 	
 	private PreparedStatement lfStmt = null;
-	void loadFinalround(int id, Tournament t) throws SQLException
+	void loadFinalround(int id) throws SQLException
 	{
 		if(lfStmt == null)
 		{
@@ -709,32 +719,107 @@ class DBConnector
 		
 		lfStmt.setInt(1, id);
 		ResultSet rs = lfStmt.executeQuery();
+		if(!rs.next())
+			throw new SQLException("Didn't found the finalround.");
+
+		try 
+		{
+			new Finalrounds(rowToHash(rs));
+		} 
+		catch (ObjectExistExeption e) {}
+		rs.close();
+	}
+	
+	private PreparedStatement rpfpStmt = null;
+	void removeParticipantFromPrelim(Preliminary p, Fencer f) throws SQLException
+	{
+		if(rpfpStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? THEN -1 ELSE Teilnehmer1 END, "
+                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? THEN -1 ELSE Teilnehmer2 END WHERE ID = ?;";
+			rpfpStmt = con.prepareStatement(sql);
+		}
+		
+		rpfpStmt.setInt(1, f.getID());
+		rpfpStmt.setInt(2, f.getID());
+		rpfpStmt.setInt(3, p.getID());
+		rpfpStmt.executeUpdate();
+	}
+	
+	private PreparedStatement aptpStmt = null;
+	void addParticipantToPrelim(Preliminary p, Fencer f) throws SQLException
+	{
+		if(aptpStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = -1 THEN ? ELSE Teilnehmer1 END, "
+                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = -1 AND Teilnehmer1 != -1 THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
+			aptpStmt = con.prepareStatement(sql);
+		}
+		aptpStmt.setInt(1, f.getID());
+		aptpStmt.setInt(2, f.getID());
+		aptpStmt.setInt(3, p.getID());
+		aptpStmt.executeUpdate();
+	}
+	
+	private PreparedStatement spipStmt = null; 
+	void switchParticipantsInPrelim(Preliminary p, Fencer out, Fencer in) throws SQLException
+	{
+		if(spipStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? AND Teilnehmer2 != ? THEN ? ELSE Teilnehmer1 END, "
+                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? AND Teilnehmer1 != ? THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
+			spipStmt = con.prepareStatement(sql);
+		}
+		
+		spipStmt.setInt(1, out.getID());
+		spipStmt.setInt(2, in.getID());
+		spipStmt.setInt(3, in.getID());
+		spipStmt.setInt(4, out.getID());
+		spipStmt.setInt(5, in.getID());
+		spipStmt.setInt(6, in.getID());
+		spipStmt.setInt(7, p.getID());
+		spipStmt.executeUpdate();
+	}
+	
+	
+	private PreparedStatement cfrStmt = null;
+	void createFinalRounds(Tournament t, int n) throws SQLException // Verhindert die rückgabe der ID der Finalrunde
+	{
+		createFinalRounds(n, t);
+	}
+	private int createFinalRounds(int n,Tournament t) throws SQLException
+	{
+		if(cfrStmt == null)
+		{
+			String sql = "INSERT INTO Finalrunden (TurnierID, Vorher1, Vorher2) VALUES (?,?,?);";
+			cfrStmt = con.prepareStatement(sql);
+		}
+		int pre1=-1, pre2=-1;
+		
+		if(n!=0)
+		{
+			pre1 = createFinalRounds(n-1, t);
+			pre1 = createFinalRounds(n-1, t);
+		}
+		cfrStmt.setInt(1, t.getID());
+		cfrStmt.setInt(1, pre1);
+		cfrStmt.setInt(1, pre2);
+		
+		cfrStmt.executeUpdate();
+		ResultSet rs = cfrStmt.getGeneratedKeys();
 		rs.next();//TODO
-		Finalrounds ret = new Finalrounds(id, this);
-		Fencer f1 = iSync.getInstance().getFencer(rs.getInt("Teilnehmer1"));
-		Fencer f2 = iSync.getInstance().getFencer(rs.getInt("Teilnehmer2"));
-		ret.initFencer1(f1);
-		ret.initFencer2(f2);
-		ret.initFinished(rs.getBoolean("Beendet"));
-		ret.initLane(rs.getInt("Bahn"));
-		ret.initPointsFor(f1, rs.getInt("PunkteVon1"));
-		ret.initPointsFor(f2, rs.getInt("PunkteVon2"));
-		ret.initRound(rs.getInt("Runde"));
-		ret.initTournament(t);
-		
-		t.add(ret);
-		
-		int tmp = rs.getInt("Vorher1");
-		if(tmp != -1)
-			ret.initPreround1(t.loadAFinalRound(tmp));
-		tmp = rs.getInt("Vorher2");
-		if(tmp != -1)
-			ret.initPreround2(t.loadAFinalRound(tmp));
-		tmp = rs.getInt("Gewinner");
-		if(tmp != -1)
-			ret.initWinnersRound(t.loadAFinalRound(tmp));
-		tmp = rs.getInt("Verlierer");
-		if(tmp != -1)
-			ret.initLosersRound(t.loadAFinalRound(tmp));
+		return rs.getInt(1);
+	}
+	
+
+	private Map<String, Object> rowToHash(ResultSet rs) throws SQLException
+	{
+		Map<String, Object> ret = new HashMap<>();
+		ResultSetMetaData md = rs.getMetaData();
+		int columns = md.getColumnCount();
+		for(int i=1; i<=columns; ++i){           
+			ret.put(md.getColumnName(i),rs.getObject(i));
+		}
+		return null;
 	}
 }

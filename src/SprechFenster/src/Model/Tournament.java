@@ -9,7 +9,16 @@ import java.util.Map;
 
 class Tournament implements iTournament
 {
+	// -----
+	private static Map<Integer, Tournament> tournaments = new HashMap<>();
 	
+	Tournament getTournament(int id) throws SQLException
+	{
+		if(!tournaments.containsKey(id))
+			con.loadTournament(id);
+		return tournaments.get(id);
+	}
+	// -----
 	private int ID;
 	private DBConnector con;
 	
@@ -32,24 +41,27 @@ class Tournament implements iTournament
 				   + "Bahnen int);";
 	}
 	
-	Tournament(int id, DBConnector con) throws SQLException
+	public Tournament(Map<String, Object> set, DBConnector con) throws ObjectExistExeption, SQLException
 	{
-		this.ID = id;
+		this.ID = (Integer) set.get("ID");
 		this.con = con;
+		
+		if(tournaments.containsKey(this.ID))
+			throw new ObjectExistExeption(tournaments.get(this.ID));
+		tournaments.put(this.ID, this);
+		
+		this.name = (String) set.get("Name");
+		this.date = (String) set.get("Datum");
+		this.groups = (Integer) set.get("Gruppen");
+		this.numberFinalrounds = (Integer) set.get("Finalrunden");
+		this.lanes = (Integer) set.get("Bahnen");
 		
 		for(iFencer f : getAllParticipants())
 		{
 			scores.put((Fencer)f, new Score((Fencer)f));
 		}
 		
-		try 
-		{
-			updatePreliminarys();
-		} 
-		catch (SQLException e) 
-		{
-			e.printStackTrace();
-		}
+		updatePreliminarys();
 	}
 	
 	private void updatePreliminarys() throws SQLException
@@ -64,12 +76,6 @@ class Tournament implements iTournament
 			}
 		}
 	}
-	
-	void initName(String name){if(this.name == null) this.name = name;}
-	void initDate(String date){if(this.date == null) this.date = date;}
-	void initGroups(int groups){if(this.groups == null) this.groups = groups;}
-	void initFinalRounds(int rounds){if(this.numberFinalrounds == null) this.numberFinalrounds = rounds;}
-	void initLanes(int lanes){if(this.lanes == null) this.lanes = lanes;}
 	
 	int getID(){return ID;}
 	public String getName(){return name;}
@@ -346,7 +352,7 @@ class Tournament implements iTournament
 		finalrounds.put(r.getID(), r);
 	}
 	
-	Finalrounds loadAFinalRound(int id) throws SQLException
+	/*Finalrounds loadAFinalRound(int id) throws SQLException
 	{
 		if(finalrounds.containsKey(id))
 			return finalrounds.get(id);
@@ -354,6 +360,30 @@ class Tournament implements iTournament
 		{
 			con.loadFinalround(id, this);
 		}
+		return null;
+	}*/
+	
+	public int getPreliminaryCount() throws SQLException 
+	{
+		return getAllPreliminary().size();
+	}
+	
+	public List<iFencer> getParticipantsOfGroup(int group) throws SQLException
+	{
+		List<iFencer> ret = new ArrayList<>();
+		
+		for(iFencer f : getAllParticipants())
+		{
+			if(getParticipantGroup(f)==group)
+				ret.add(f);
+		}
+		
+		return ret;
+	}
+	
+	public Finalrounds createFinalround() throws SQLException
+	{
+		con.createFinalRounds(this,numberFinalrounds-1);
 		return null;
 	}
 	

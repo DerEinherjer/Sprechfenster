@@ -1,11 +1,23 @@
 package Model;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 class Fencer implements iFencer
 {
+	// -----
+	private static DBConnector con = DBConnector.getInstants();
+	private static Map<Integer, Fencer> fencers = new HashMap<>();
+	
+	static Fencer getFencer(int id) throws SQLException
+	{
+		if(!fencers.containsKey(id))
+			con.loadFencer(id);
+		return fencers.get(id);
+	}
+	// -----
 	private int ID;
-	private DBConnector con;
 	
 	private String name = null;
 	private String familyName = null;
@@ -23,17 +35,21 @@ class Fencer implements iFencer
 				   + "Nationalitaet varchar(255));";
 	}
 	
-	Fencer(int id, DBConnector con)
+	Fencer(Map<String, Object> set, DBConnector con) throws ObjectExistExeption
 	{
-		this.ID = id;
+		this.ID = (Integer)set.get("ID");
 		this.con = con;
+		
+		if(fencers.containsKey(this.ID))
+			throw new ObjectExistExeption(fencers.get(this.ID));	
+		fencers.put(this.ID, this);
+		
+		this.name = (String) set.get("Vorname");
+		this.familyName = (String) set.get("Nachname");
+		this.birthday = (String) set.get("Geburtstag");
+		this.fencingSchool = (String) set.get("Fechtschule");
+		this.nationality = (String) set.get("Nationalitaet");
 	}
-	
-	void initName(String name){if(this.name==null)this.name=name;}
-	void initFamilyName(String name){if(this.familyName==null)this.familyName=name;}
-	void initBirthday(String date){if(this.birthday==null)this.birthday=date;}
-	void initFencingSchool(String school){if(this.fencingSchool==null)this.fencingSchool=school;}
-	void initNationality(String nation){if(this.nationality==null)this.nationality=nation;}
 	
 	int getID(){return ID;}
 	public String getName(){return name;}

@@ -2,8 +2,11 @@ package Model;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Observable;
 
-public abstract class iSync 
+import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+
+public abstract class iSync extends Observable
 {
 	private static Sync sync = null;
 	
@@ -21,4 +24,5 @@ public abstract class iSync
 	public List<iTournament> getAllTournaments() throws SQLException{return null;}
 	
 	Fencer getFencer(int id) throws SQLException{return null;}
+	Tournament getTournament(int id) throws SQLException{return null;}
 }
