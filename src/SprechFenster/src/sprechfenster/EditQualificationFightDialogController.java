@@ -152,7 +152,7 @@ public class EditQualificationFightDialogController implements Initializable
                     Fight.setPoints(firstFencer, firstFencerPoints);
                     Fight.setPoints(secondFencer, secondFencerPoints);
                     Fight.setTime(round, lane);
-                    Fight.setFinisched(fightIsFinished);
+                    Fight.setFinished(fightIsFinished);
                 }
             }
             catch (NumberFormatException ex)
