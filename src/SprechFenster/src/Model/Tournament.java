@@ -11,16 +11,16 @@ class Tournament implements iTournament
 {
 	// -----
 	private static Map<Integer, Tournament> tournaments = new HashMap<>();
+	private Sync sync = (Sync) iSync.getInstance();
 	
 	Tournament getTournament(int id) throws SQLException
 	{
 		if(!tournaments.containsKey(id))
-			con.loadTournament(id);
+			sync.loadTournament(id);
 		return tournaments.get(id);
 	}
 	// -----
 	private int ID;
-	private DBConnector con;
 	
 	private String name = null;
 	private String date = null;
@@ -33,7 +33,7 @@ class Tournament implements iTournament
 	
 	static String getSQLString()
 	{
-		return "CREATE TABLE Turniere (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
+		return "CREATE TABLE IF NOT EXISTS Turniere (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 				   + "Name varchar(255),"
 				   + "Datum varchar(11),"
 				   + "Gruppen int,"
@@ -41,10 +41,15 @@ class Tournament implements iTournament
 				   + "Bahnen int);";
 	}
 	
-	public Tournament(Map<String, Object> set, DBConnector con) throws ObjectExistExeption, SQLException
+	public Tournament(Map<String, Object> set) throws ObjectExistExeption, SQLException
 	{
+		if(set == null)
+			System.out.println("Nullpointer");
+		if(!set.containsKey("ID"))
+			System.out.println("Kein KEy");
 		this.ID = (Integer) set.get("ID");
-		this.con = con;
+		
+		sync = (Sync) iSync.getInstance();
 		
 		if(tournaments.containsKey(this.ID))
 			throw new ObjectExistExeption(tournaments.get(this.ID));
@@ -61,20 +66,6 @@ class Tournament implements iTournament
 			scores.put((Fencer)f, new Score((Fencer)f));
 		}
 		
-		updatePreliminarys();
-	}
-	
-	private void updatePreliminarys() throws SQLException
-	{
-		for(Integer integer : con.getTournamentPreliminarys(this))
-		{
-			if(!preliminarys.containsKey(integer))
-			{
-				Preliminary tmp =  con.loadPreliminary(integer, this);
-				preliminarys.put(integer, tmp);
-				tmp.propagateScore();
-			}
-		}
 	}
 	
 	int getID(){return ID;}
@@ -86,13 +77,13 @@ class Tournament implements iTournament
 
 	public void setName(String name) throws SQLException
 	{
-		con.tournamentSetName(name, ID);
+		sync.tournamentSetName(name, ID);
 		this.name = name;
 	}
 	
 	public void setDate(String date) throws SQLException
 	{
-		con.tournamentSetDate(date, ID);
+		sync.tournamentSetDate(date, ID);
 		this.date = date;
 	}
 	
@@ -108,7 +99,7 @@ class Tournament implements iTournament
 			}
 		}
 		
-		con.tournamentSetGroups(groups, ID);
+		sync.tournamentSetGroups(groups, ID);
 		this.groups = groups;
 		
 		for(iFencer f : tmp)
@@ -117,8 +108,10 @@ class Tournament implements iTournament
 	
 	public void setFinalRounds(int rounds) throws SQLException
 	{
-		con.tournamentSetFinalRounds(rounds, ID);
+		sync.tournamentSetFinalRounds(rounds, ID);
 		this.numberFinalrounds = rounds;
+		
+		sync.createFinalrounds(this);
 	}
 	
 	public void setLanes(int lanes) throws SQLException
@@ -128,7 +121,7 @@ class Tournament implements iTournament
 			if(p.getLane()>lanes)
 				p.setTime(0, 0);
 		}
-		con.tournamentSetLanes(lanes, ID);
+		sync.tournamentSetLanes(lanes, ID);
 		this.lanes = lanes;
 	}
 	
@@ -140,7 +133,7 @@ class Tournament implements iTournament
 	public void addParticipant(iFencer f) throws SQLException
 	{
 		if(!(f instanceof Fencer)) return;
-		int counts[] = con.getGroupsMemberCount(this); 
+		int counts[] = sync.getGroupsMemberCount(this); 
 		int index = 0;
 		for(int i = 1; i< counts.length; i++)
 			if(counts[i]<counts[index])
@@ -151,28 +144,22 @@ class Tournament implements iTournament
 	public void addParticipant(iFencer f, int group) throws SQLException
 	{
 		if(!(f instanceof Fencer)) return;
-		con.addParticipant(this, (Fencer)f, group);
-		
-		updatePreliminarys();
+		sync.addParticipant(this, (Fencer)f, group);
 	}
 
 	private Map<Integer, Preliminary> preliminarys = new HashMap<>();
 	public List<iPreliminary> getAllPreliminary() throws SQLException 
 	{
-		List<iPreliminary> ret = new ArrayList<>();
-		for(Integer integer : con.getTournamentPreliminarys(this))
-		{
-			if(!preliminarys.containsKey(integer))
-				preliminarys.put(integer, con.loadPreliminary(integer, this));
-			ret.add(preliminarys.get(integer));
-		}
+		List<iPreliminary> ret = new ArrayList<>(); 
+		for(Preliminary tmp : Preliminary.getPreliminarys(this))
+			ret.add(tmp);
 		return ret;
 	}
 	
 	public boolean isParticipant(iFencer f) throws SQLException
 	{
 		if(!(f instanceof Fencer)) return false;
-		return con.isFencerParticipant(this, (Fencer)f);
+		return sync.isFencerParticipant(this, (Fencer)f);
 	}
 	
 	public void createPreliminaryTiming() throws SQLException
@@ -231,49 +218,48 @@ class Tournament implements iTournament
 	public List<iFencer> getAllParticipants() throws SQLException
 	{
 		List<iFencer> ret = new ArrayList<>();
-		for(Integer i : con.getAllParticipants(this))
-			ret.add(iSync.getInstance().getFencer(i));
+		for(Fencer f : Fencer.getFencer(this))
+			ret.add(f);
 		return ret;
 	}
 	
 	public int getParticipantGroup(iFencer f) throws SQLException
 	{
-		return con.getParticipantGroup(this, (Fencer)f);
+		return sync.getParticipantGroup(this, (Fencer)f);
 	}
 	
 	public void removeParticipant(iFencer f) throws SQLException
 	{
-		con.removeParticipant((Fencer)f);
+		sync.removeParticipant((Fencer)f);
 		
 		preliminarys = new HashMap<>();
 		scores = new HashMap<>();
-		updatePreliminarys();
 	}
 	
 	public void setEntryFee(iFencer f, boolean paid) throws SQLException
 	{
-		con.setEntryFee(this, (Fencer)f, paid);
+		sync.setEntryFee(this, (Fencer)f, paid);
 		entryFee.put((Fencer)f, paid);
 		
 	}
 	
 	public void setEquipmentCheck(iFencer f, boolean checked) throws SQLException
 	{
-		con.setEquipmentCheck(this, (Fencer) f, checked);
+		sync.setEquipmentCheck(this, (Fencer) f, checked);
 		equipmentChecked.put((Fencer)f, checked);
 	}
 	
 	public boolean getEntryFee(iFencer f) throws SQLException 
 	{
 		if(!entryFee.containsKey((Fencer)f))
-			entryFee.put((Fencer)f, con.getEntryFee(this, (Fencer)f));
+			entryFee.put((Fencer)f, sync.getEntryFee(this, (Fencer)f));
 		return entryFee.get((Fencer)f);
 	}
 	
 	public boolean getEquipmentCheck(iFencer f) throws SQLException
 	{
 		if(!equipmentChecked.containsKey((Fencer) f))
-			equipmentChecked.put((Fencer)f, con.getEquipmentCheck(this, (Fencer)f));
+			equipmentChecked.put((Fencer)f, sync.getEquipmentCheck(this, (Fencer)f));
 		return equipmentChecked.get((Fencer)f);
 	}
 	
@@ -345,24 +331,6 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
-	Map<Integer, Finalrounds> finalrounds = new HashMap<>();
-	
-	void add(Finalrounds r)
-	{
-		finalrounds.put(r.getID(), r);
-	}
-	
-	/*Finalrounds loadAFinalRound(int id) throws SQLException
-	{
-		if(finalrounds.containsKey(id))
-			return finalrounds.get(id);
-		else
-		{
-			con.loadFinalround(id, this);
-		}
-		return null;
-	}*/
-	
 	public int getPreliminaryCount() throws SQLException 
 	{
 		return getAllPreliminary().size();
@@ -383,8 +351,13 @@ class Tournament implements iTournament
 	
 	public Finalrounds createFinalround() throws SQLException
 	{
-		con.createFinalRounds(this,numberFinalrounds-1);
+		sync.createFinalRounds(this);
 		return null;
+	}
+	
+	private boolean finalroundsCreated() throws SQLException
+	{
+		return sync.finalroundsCount(this) != 0;
 	}
 	
 	@Override

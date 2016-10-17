@@ -50,26 +50,26 @@ class DBConnector
 		{
 			con.prepareStatement(Fencer.getSQLString()).executeUpdate();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException e) {e.printStackTrace();}
 		
 
 		try 
 		{
 			con.prepareStatement(Tournament.getSQLString()).executeUpdate();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException e) {e.printStackTrace();}
 		
 		try 
 		{
 			con.prepareStatement(Participation.getSQLString()).executeUpdate();
 		} 
-		catch (SQLException e) {}
+		catch (SQLException e) {e.printStackTrace();}
 		
 		try
 		{
 			con.prepareStatement(Preliminary.getSQLString()).executeUpdate();
 		}
-		catch (SQLException e) {}
+		catch (SQLException e) {e.printStackTrace();}
 	}
 	
 	static DBConnector getInstants()
@@ -249,7 +249,7 @@ class DBConnector
 		Tournament ret;
 		try 
 		{
-			ret = new Tournament(rowToHash(rs), this);
+			ret = new Tournament(rowToHash(rs));
 		} 
 		catch (ObjectExistExeption e) 
 		{
@@ -414,7 +414,6 @@ class DBConnector
 		cp2Stmt.setInt(2, group);
 		cp2Stmt.setInt(3, f.getID());
 		
-		int count = 0;
 		while(rs.next())
 		{
 			cp2Stmt.setInt(4, rs.getInt("FechterID"));
@@ -783,34 +782,76 @@ class DBConnector
 	
 	
 	private PreparedStatement cfrStmt = null;
-	void createFinalRounds(Tournament t, int n) throws SQLException // Verhindert die rückgabe der ID der Finalrunde
+	void createFinalRounds(Tournament t) throws SQLException
 	{
-		createFinalRounds(n, t);
+		removeFinalrounds(t);
+		createFinalRounds(t.getFinalRounds()-1, t, -1, -1);
 	}
-	private int createFinalRounds(int n,Tournament t) throws SQLException
+	private void createFinalRounds(int n,Tournament t, int winner, int loser) throws SQLException
 	{
 		if(cfrStmt == null)
 		{
-			String sql = "INSERT INTO Finalrunden (TurnierID, Vorher1, Vorher2) VALUES (?,?,?);";
+			String sql = "INSERT INTO Finalrunden (TurnierID, Gewinner, Verlierer) VALUES (?,?);";
 			cfrStmt = con.prepareStatement(sql);
 		}
-		int pre1=-1, pre2=-1;
-		
-		if(n!=0)
-		{
-			pre1 = createFinalRounds(n-1, t);
-			pre1 = createFinalRounds(n-1, t);
-		}
+
 		cfrStmt.setInt(1, t.getID());
-		cfrStmt.setInt(1, pre1);
-		cfrStmt.setInt(1, pre2);
+		cfrStmt.setInt(1, winner);
+		cfrStmt.setInt(1, loser);
 		
 		cfrStmt.executeUpdate();
 		ResultSet rs = cfrStmt.getGeneratedKeys();
-		rs.next();//TODO
-		return rs.getInt(1);
+		if(rs.next())
+			throw new SQLException("Could not create finalround.");
+		
+		int newwinner = rs.getInt(1);
+		rs.close();
+		int newloser = -1;
+		
+		if(winner==-1)
+		{
+			cfrStmt.executeUpdate();
+			rs = cfrStmt.getGeneratedKeys();
+			if(rs.next())
+				throw new SQLException("Could not create finalround.");
+			newloser = rs.getInt(1);
+			rs.close();
+		}
+		
+		
+		if(n!=0)
+		{
+			createFinalRounds(n-1, t,newwinner, newloser);
+			createFinalRounds(n-1, t,newwinner, newloser);
+		}
 	}
 	
+	private PreparedStatement frcStmt = null;
+	int finalroundsCount(Tournament t) throws SQLException
+	{
+		if(frcStmt == null)
+		{
+			String sql = "SELECT SUM(ID) AS Count FROM Finalrunden WHERE TurnierID = ?;";
+			frcStmt = con.prepareStatement(sql);
+		}
+		
+		frcStmt.setInt(1, t.getID());
+		ResultSet rs = frcStmt.executeQuery();
+		
+		if(!rs.next())
+			throw new SQLException("Could not count finalrounds.");
+		
+		return rs.getInt("Count");
+	}
+	
+	private PreparedStatement rfrStmt = null;
+	private void removeFinalrounds(Tournament t)
+	{
+		if(rfrStmt == null)
+		{
+			String sql = "";
+		}
+	}
 
 	private Map<String, Object> rowToHash(ResultSet rs) throws SQLException
 	{
@@ -820,6 +861,6 @@ class DBConnector
 		for(int i=1; i<=columns; ++i){           
 			ret.put(md.getColumnName(i),rs.getObject(i));
 		}
-		return null;
+		return ret;
 	}
 }

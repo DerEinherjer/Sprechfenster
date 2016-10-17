@@ -1,20 +1,32 @@
 package Model;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class Fencer implements iFencer
 {
 	// -----
-	private static DBConnector con = DBConnector.getInstants();
+	//private static DBConnector con = DBConnector.getInstants();
+	private static Sync sync = (Sync)iSync.getInstance();
 	private static Map<Integer, Fencer> fencers = new HashMap<>();
 	
 	static Fencer getFencer(int id) throws SQLException
 	{
 		if(!fencers.containsKey(id))
-			con.loadFencer(id);
+			sync.loadFencer(id);
 		return fencers.get(id);
+	}
+	
+	static List<Fencer> getFencer(Tournament t) throws SQLException
+	{
+		List<Fencer> ret = new ArrayList<>();
+		for(Map.Entry<Integer, Fencer> entry : fencers.entrySet())
+			if(sync.isFencerParticipant(t, entry.getValue()))
+				ret.add(entry.getValue());
+		return ret;
 	}
 	// -----
 	private int ID;
@@ -27,7 +39,7 @@ class Fencer implements iFencer
 	
 	static String getSQLString()
 	{
-		return "CREATE TABLE Fechter (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
+		return "CREATE TABLE IF NOT EXISTS Fechter (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 				   + "Vorname varchar(255),"
 				   + "Nachname varchar(255),"
 				   + "Geburtstag varchar(255),"
@@ -38,7 +50,6 @@ class Fencer implements iFencer
 	Fencer(Map<String, Object> set, DBConnector con) throws ObjectExistExeption
 	{
 		this.ID = (Integer)set.get("ID");
-		this.con = con;
 		
 		if(fencers.containsKey(this.ID))
 			throw new ObjectExistExeption(fencers.get(this.ID));	
@@ -61,31 +72,31 @@ class Fencer implements iFencer
 	
 	public void setName(String name) throws SQLException
 	{
-		con.fencerSetName(name, ID);
+		sync.fencerSetName(name, ID);
 		this.name = name;
 	}
 	
 	public void setFamilyName(String name) throws SQLException
 	{
-		con.fencerSetFamilyName(name, ID);
+		sync.fencerSetFamilyName(name, ID);
 		this.familyName = name;
 	}
 	
 	public void setBirthday(String date) throws SQLException
 	{
-		con.fencerSetBirthday(date, ID);
+		sync.fencerSetBirthday(date, ID);
 		this.birthday = date;
 	}
 	
 	public void setFencingSchool(String school) throws SQLException
 	{
-		con.fencerSetFencingSchool(school, ID);
+		sync.fencerSetFencingSchool(school, ID);
 		this.fencingSchool=school;
 	}
 	
 	public void setNationality(String nation) throws SQLException
 	{
-		con.fencerSetNationality(nation, ID);
+		sync.fencerSetNationality(nation, ID);
 		this.nationality=nation;
 	}
 	

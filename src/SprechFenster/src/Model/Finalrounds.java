@@ -49,8 +49,6 @@ public class Finalrounds implements iFinalrounds
 				+ "PunkteVon1 int,"
 				+ "PunkteVon2 int,"
 				+ "Beendet boolean,"
-				+ "Vorher1 int,"
-				+ "Vorher2 int,"
 				+ "Gewinner int,"
 				+ "Verlierer int);";
 	}
@@ -71,18 +69,10 @@ public class Finalrounds implements iFinalrounds
 		this.pointsFor1 = (Integer) set.get("PunkteVon1");
 		this.pointsFor2 = (Integer) set.get("PunkteVon2");
 		this.finished = (Boolean) set.get("Beendet");
-		this.preround1 = Finalrounds.getFinalround((Integer) set.get("Vorher1"));
-		this.preround2 = Finalrounds.getFinalround((Integer) set.get("Vorher2"));
 		this.winnersround = Finalrounds.getFinalround((Integer) set.get("Gewinner"));
 		this.losersround = Finalrounds.getFinalround((Integer) set.get("Verlierer"));
 	}
-	
-	Finalrounds(int id, DBConnector con) 
-	{
-		this.ID = id;
-		this.con = con;
-	}
-	
+
 	void initTournament(Tournament t) {if(this.t == null) this.t= t;}
 	void initRound(int round) {if(this.round == null) this.round = round;}
 	void initLane(int lane) {if(this.lane == null) this.lane = lane;}
@@ -167,11 +157,11 @@ public class Finalrounds implements iFinalrounds
 			finished = finish;
 			if(finished)
 			{
-				
+				//TODO
 			}
 			else
 			{
-				
+				//TODO
 			}
 		}
 	}

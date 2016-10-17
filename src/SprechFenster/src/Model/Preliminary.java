@@ -10,6 +10,17 @@ class Preliminary implements iPreliminary
 {
 	// -----
 	private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
+	
+	static List<Preliminary> getPreliminarys(Tournament t)
+	{
+		List<Preliminary> ret = new ArrayList<>();
+		for(Map.Entry<Integer, Preliminary> entry : preliminarys.entrySet())
+		{
+			if(entry.getValue().t.equals(t))
+				ret.add(entry.getValue());
+		}
+		return ret;
+	}
 	// -----
 	private int ID;
 	private Tournament t;
@@ -28,7 +39,7 @@ class Preliminary implements iPreliminary
 	
 	static String getSQLString()
 	{
-		return "CREATE TABLE Vorrunden( ID int NOT NULL AUTO_INCREMENT UNIQUE,"
+		return "CREATE TABLE IF NOT EXISTS Vorrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 				+ "TurnierID int,"
 				+ "Gruppe int,"
 				+ "Runde int,"
@@ -37,7 +48,7 @@ class Preliminary implements iPreliminary
 				+ "Teilnehmer2 int,"
 				+ "PunkteVon1 int,"
 				+ "PunkteVon2 int,"
-				+ "Beendet boolean;";
+				+ "Beendet boolean);";
 	}
 	
 	Preliminary(Map<String, Object> set, DBConnector con) throws ObjectExistExeption, SQLException
@@ -195,12 +206,14 @@ class Preliminary implements iPreliminary
 		{
 			con.removeParticipantFromPrelim(this, (Fencer) f);
 			fencer1 = null;
+			pointsFor1 = 0;
 			return true;
 		}
 		else if(fencer2.equals(f))
 		{
 			con.removeParticipantFromPrelim(this, (Fencer) f);
 			fencer2 = null;
+			pointsFor2 = 0;
 			return true;
 		}
 		return false;
@@ -229,12 +242,14 @@ class Preliminary implements iPreliminary
 		{
 			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
 			fencer1 = (Fencer)in;
+			pointsFor1 = 0;
 			return true;
 		}
 		else if(fencer2.equals(out)&&!fencer1.equals(in))
 		{
 			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
 			fencer2 = (Fencer)in;
+			pointsFor2 = 0;
 			return true;
 		}
 		return false;

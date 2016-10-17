@@ -4,7 +4,7 @@ class Participation
 {
 	static String getSQLString()
 	{
-		return "CREATE TABLE Teilnahme(TurnierID int,"
+		return "CREATE TABLE IF NOT EXISTS Teilnahme (TurnierID int,"
 				 + "FechterID int,"
 				 + "Gruppe int,"
 				 + "Startgeld boolean,"
