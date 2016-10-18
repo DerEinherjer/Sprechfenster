@@ -11,18 +11,30 @@ public class Sync extends iSync
 	private DBConnector con;
 	private static Sync sync;
 	
-	Sync()
+	Sync() throws SQLException
 	{
 		this.con = DBConnector.getInstants();
+		
+		//Load all Fencer so that getAll() works like intended
+		for(Integer integer : con.getAllFencer())
+			Fencer.getFencer(integer);
+		
+		//Load all Tournaments so that getAll() works like intended
+		for(Integer integer : con.getAllTournaments())
+			Tournament.getTournament(integer);
+		
+		for(Integer integer : con.getAllPreliminarys())
+			Preliminary.getPreliminary(integer);
+		
+		for(Integer integer : con.getAllFinalrounds())
+			Finalround.getFinalround(integer);
 	}
 	
 	// ----- Fencer -----
-	private Map<Integer, Fencer> fencers = new HashMap<>();
 
 	public iFencer createFencer(String name, String familyName) throws SQLException 
 	{
 		Fencer ret = con.loadFencer(con.createFencer(name, familyName));
-		fencers.put(ret.getID(), ret);
 		
 		setChanged();               // Eine Änderung ist aufgetreten
 		notifyObservers("New fencer.");  // Informiere Observer über Änderung
@@ -30,29 +42,17 @@ public class Sync extends iSync
 		return ret;
 	}
 	
+	public List<iFencer> getAllFencer()
+	{
+		List<iFencer> ret = new ArrayList<>();
+		for(Fencer f : Fencer.getAllFencer())
+			ret.add(f);
+		return ret;
+	}
+	
 	Fencer loadFencer(int id) throws SQLException
 	{
 		return con.loadFencer(id);
-	}
-	
-	public List<iFencer> getAllFencer() throws SQLException 
-	{
-		List<iFencer> ret = new ArrayList<>();
-		for(Integer integer : con.getAllFencer())
-		{
-			if(!fencers.containsKey(integer))
-				fencers.put(integer, con.loadFencer(integer));
-			ret.add(fencers.get(integer));
-		}
-		return ret;
-	}
-
-	Fencer getFencer(int id) throws SQLException
-	{
-		if(!fencers.containsKey(id))
-			fencers.put(id, con.loadFencer(id));
-		return fencers.get(id);
-			
 	}
 	
 	// ----- Tournament -----
@@ -66,6 +66,14 @@ public class Sync extends iSync
 		setChanged();               // Eine Änderung ist aufgetreten
 		notifyObservers("New tournament.");  // Informiere Observer über Änderung
 		
+		return ret;
+	}
+	
+	public List<iTournament> getAllTournaments()
+	{
+		List<iTournament> ret = new ArrayList<>();
+		for(Tournament t : Tournament.getAllTournaments())
+			ret.add(t);
 		return ret;
 	}
 	
@@ -109,9 +117,9 @@ public class Sync extends iSync
 		return con.getGroupsMemberCount(t);
 	}
 	
-	boolean isFencerParticipant(Tournament t, Fencer f)
+	boolean isFencerParticipant(Tournament t, Fencer f) throws SQLException
 	{
-		return isFencerParticipant(t, f);
+		return con.isFencerParticipant(t, f);
 	}
 	
 	void fencerSetName(String name, int id) throws SQLException
@@ -176,6 +184,7 @@ public class Sync extends iSync
 	
 	void removeParticipant(Fencer f) throws SQLException
 	{
+		Preliminary.deletePreliminarys(f);
 		con.removeParticipant(f);
 	}
 	
@@ -183,26 +192,49 @@ public class Sync extends iSync
 	{
 		con.addParticipant(t, f, group);
 	}
-	
-	public List<iTournament> getAllTournaments() throws SQLException
+
+	boolean setTimeForPreliminary(Preliminary p,int round,int lane) throws SQLException
 	{
-		List<iTournament> ret = new ArrayList<>();
-		
-		for(Integer integer : con.getAllTournaments())
-		{
-			if(!tournaments.containsKey(integer))
-				tournaments.put(integer, con.loadTournament(integer));
-			ret.add(tournaments.get(integer));
-		}
-		
-		return ret;
+		return con.setTimeForPreliminary(p, round, lane);
 	}
 	
-	Tournament getTournament(int id) throws SQLException
+	void setPoints(int id, int fencer, int points) throws SQLException
 	{
-		if(!tournaments.containsKey(id))
-			tournaments.put(id, con.loadTournament(id));
-		return tournaments.get(id);
+		con.setPoints(id, fencer, points);
 	}
 	
+	void removeParticipantFromPrelim(Preliminary p, Fencer f) throws SQLException
+	{
+		con.removeParticipantFromPrelim(p, f);
+	}
+	
+	void addParticipantToPrelim(Preliminary p, Fencer f) throws SQLException
+	{
+		con.addParticipantToPrelim(p, f);
+	}
+	
+	void switchParticipantsInPrelim(Preliminary p, Fencer out, Fencer in) throws SQLException
+	{
+		con.switchParticipantsInPrelim(p, out, in);
+	}
+	
+	void loadFinalround(int id) throws SQLException
+	{
+		con.loadFinalround(id);
+	}
+	
+	boolean setTimeForFinalround(Finalround f, int round, int lane) throws SQLException
+	{
+		return con.setTimeForFinalround(f, round, lane);
+	}
+	
+	void setPointsFR(int id, int fencer,int points) throws SQLException
+	{
+		con.setPointsFR(id, fencer, points);
+	}
+	
+	void loadPreliminary(int id) throws SQLException
+	{
+		con.loadPreliminary(id);
+	}
 }

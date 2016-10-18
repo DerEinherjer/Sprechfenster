@@ -12,8 +12,15 @@ public abstract class iSync extends Observable
 	
 	public static iSync getInstance()
 	{
-		if(sync==null)
-			sync = new Sync();
+		try 
+		{
+			if(sync==null)
+				sync = new Sync();
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
 		return sync;
 	}
 	
@@ -23,6 +30,4 @@ public abstract class iSync extends Observable
 	public iTournament createTournament(String name) throws SQLException{return null;}
 	public List<iTournament> getAllTournaments() throws SQLException{return null;}
 	
-	Fencer getFencer(int id) throws SQLException{return null;}
-	Tournament getTournament(int id) throws SQLException{return null;}
 }

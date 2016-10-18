@@ -10,6 +10,14 @@ class Preliminary implements iPreliminary
 {
 	// -----
 	private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
+	private static Sync sync = (Sync)iSync.getInstance();
+	
+	static Preliminary getPreliminary(int id) throws SQLException
+	{
+		if(!preliminarys.containsKey(id))
+			sync.loadPreliminary(id);
+		return preliminarys.get(id);
+	}
 	
 	static List<Preliminary> getPreliminarys(Tournament t)
 	{
@@ -21,10 +29,26 @@ class Preliminary implements iPreliminary
 		}
 		return ret;
 	}
+	
+	static void deletePreliminarys(Fencer f) throws SQLException
+	{
+		List<Preliminary> remove = new ArrayList<>();
+		for(Preliminary p : preliminarys.values())
+		{
+			if(p.isFencer(f))
+			{
+				remove.add(p);//DO NOT DELET HERE
+							  //IT FUCKS UP THE ITERATOR
+			}
+		}
+		
+		for(Preliminary p : remove)
+			p.delete();
+		
+	}
 	// -----
 	private int ID;
 	private Tournament t;
-	private DBConnector con;
 	
 	private Integer group = null;
 	private Integer round = null;
@@ -42,33 +66,33 @@ class Preliminary implements iPreliminary
 		return "CREATE TABLE IF NOT EXISTS Vorrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
 				+ "TurnierID int,"
 				+ "Gruppe int,"
-				+ "Runde int,"
-				+ "Bahn int,"
-				+ "Teilnehmer1 int,"
-				+ "Teilnehmer2 int,"
-				+ "PunkteVon1 int,"
-				+ "PunkteVon2 int,"
-				+ "Beendet boolean);";
+				+ "Runde int DEFAULT -1,"
+				+ "Bahn int DEFAULT -1,"
+				+ "Teilnehmer1 int DEFAULT -1,"
+				+ "Teilnehmer2 int DEFAULT -1,"
+				+ "PunkteVon1 int DEFAULT 0,"
+				+ "PunkteVon2 int DEFAULT 0,"
+				+ "Beendet boolean DEFAULT FALSE);";
 	}
 	
-	Preliminary(Map<String, Object> set, DBConnector con) throws ObjectExistExeption, SQLException
+	Preliminary(Map<String, Object> set) throws ObjectExistExeption, SQLException
 	{
 		this.ID = (Integer) set.get("ID");
-		this.con = con;
 		
 		if(preliminarys.containsKey(this.ID))
 			throw new ObjectExistExeption(preliminarys.get(this.ID));
 		preliminarys.put(this.ID, this);
 		
-		this.t = iSync.getInstance().getTournament((Integer) set.get("TurnierID"));
-		this.group = (Integer) set.get("Gruppe");
-		this.round = (Integer) set.get("Runde");
-		this.lane = (Integer) set.get("Bahn");
-		this.fencer1 = iSync.getInstance().getFencer((Integer)set.get("Teilnehmer1")); 
-		this.fencer2 = iSync.getInstance().getFencer((Integer)set.get("Teilnehmer2"));
-		this.pointsFor1 = (Integer) set.get("PunkteVon1");
-		this.pointsFor2 = (Integer) set.get("PunkteVon2");
-		this.finished = (Boolean) set.get("Beendet");
+		this.t = Tournament.getTournament((Integer) set.get("TurnierID".toUpperCase()));
+		
+		this.group = (Integer) set.get("Gruppe".toUpperCase());
+		this.round = (Integer) set.get("Runde".toUpperCase());
+		this.lane = (Integer) set.get("Bahn".toUpperCase());
+		this.fencer1 = Fencer.getFencer((Integer)set.get("Teilnehmer1".toUpperCase())); 
+		this.fencer2 = Fencer.getFencer((Integer)set.get("Teilnehmer2".toUpperCase()));
+		this.pointsFor1 = (Integer) set.get("PunkteVon1".toUpperCase());
+		this.pointsFor2 = (Integer) set.get("PunkteVon2".toUpperCase());
+		this.finished = (Boolean) set.get("Beendet".toUpperCase());
 	}
 	
 	int getID(){return ID;}
@@ -84,7 +108,7 @@ class Preliminary implements iPreliminary
 
 	public boolean setTime(int round, int lane) throws SQLException
 	{
-		if(con.setTimeForPreliminary(this, round, lane))
+		if(sync.setTimeForPreliminary(this, round, lane))
 		{
 			this.round = round;
 			this.lane = lane;
@@ -97,7 +121,7 @@ class Preliminary implements iPreliminary
 	{
 		if(!finished)
 		{
-			con.setPoints(ID, ((Fencer)f).getID(), points);
+			sync.setPoints(ID, ((Fencer)f).getID(), points);
 			if(fencer1.equals(f))
 				pointsFor1 = points;
 			if(fencer2.equals(f))
@@ -202,16 +226,16 @@ class Preliminary implements iPreliminary
 	
 	public boolean removeParticipant(iFencer f) throws SQLException
 	{
-		if(fencer1.equals(f))
+		if(fencer1!=null && fencer1.equals(f))
 		{
-			con.removeParticipantFromPrelim(this, (Fencer) f);
+			sync.removeParticipantFromPrelim(this, (Fencer) f);
 			fencer1 = null;
 			pointsFor1 = 0;
 			return true;
 		}
-		else if(fencer2.equals(f))
+		else if(fencer2!=null && fencer2.equals(f))
 		{
-			con.removeParticipantFromPrelim(this, (Fencer) f);
+			sync.removeParticipantFromPrelim(this, (Fencer) f);
 			fencer2 = null;
 			pointsFor2 = 0;
 			return true;
@@ -223,13 +247,13 @@ class Preliminary implements iPreliminary
 	{
 		if(fencer1 == null)
 		{
-			con.addParticipantToPrelim(this, (Fencer) f);
+			sync.addParticipantToPrelim(this, (Fencer) f);
 			fencer1 = (Fencer)f;
 			return true;
 		}
 		else if(fencer2 == null)
 		{
-			con.addParticipantToPrelim(this, (Fencer) f);
+			sync.addParticipantToPrelim(this, (Fencer) f);
 			fencer2 = (Fencer)f;
 			return true;
 		}
@@ -240,18 +264,33 @@ class Preliminary implements iPreliminary
 	{
 		if(fencer1.equals(out)&&!fencer2.equals(in))
 		{
-			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
 			fencer1 = (Fencer)in;
 			pointsFor1 = 0;
 			return true;
 		}
 		else if(fencer2.equals(out)&&!fencer1.equals(in))
 		{
-			con.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
 			fencer2 = (Fencer)in;
 			pointsFor2 = 0;
 			return true;
 		}
+		return false;
+	}
+	
+	void delete()
+	{
+		preliminarys.remove(this.ID);
+		this.ID = -1;
+	}
+	
+	boolean isFencer(Fencer f)
+	{
+		if(fencer1!=null && fencer1.equals(f))
+			return true;
+		if(fencer1!=null && fencer2.equals(f))
+			return true;
 		return false;
 	}
 	

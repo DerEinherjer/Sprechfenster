@@ -14,6 +14,9 @@ import java.util.Map;
 
 import javax.print.attribute.ResolutionSyntax;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 
 //TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
 
@@ -68,6 +71,12 @@ class DBConnector
 		try
 		{
 			con.prepareStatement(Preliminary.getSQLString()).executeUpdate();
+		}
+		catch (SQLException e) {e.printStackTrace();}
+		
+		try
+		{
+			con.prepareStatement(Finalround.getSQLString()).executeUpdate();
 		}
 		catch (SQLException e) {e.printStackTrace();}
 	}
@@ -228,7 +237,14 @@ class DBConnector
 		}
 		
 		ctStmt.setString(1, name);
-		return ctStmt.executeUpdate();
+		ctStmt.executeUpdate();
+		
+		ResultSet rs = ctStmt.getGeneratedKeys();
+		if(!rs.next())
+			throw new SQLException("Could not generate Tournament");
+		int ret = rs.getInt(1);
+		rs.close();
+		return ret;
 	}
 	
 	private PreparedStatement gtvStmt = null;
@@ -401,9 +417,8 @@ class DBConnector
 			cp1Stmt = con.prepareStatement(sql);
 			
 			sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
-			cp2Stmt = con.prepareStatement(sql);
+			cp2Stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		}
-		
 		cp1Stmt.setInt(1, t.getID());
 		cp1Stmt.setInt(2, group);
 		cp1Stmt.setInt(3, f.getID());
@@ -418,6 +433,12 @@ class DBConnector
 		{
 			cp2Stmt.setInt(4, rs.getInt("FechterID"));
 			cp2Stmt.executeUpdate();
+			ResultSet rs2 = cp2Stmt.getGeneratedKeys();
+			if(!rs2.next())
+				throw new SQLException("Could not generate preliminary");
+			int id = rs2.getInt(1);
+			rs2.close();
+			loadPreliminary(id);
 		}
 	}
 	
@@ -494,8 +515,9 @@ class DBConnector
 	}
 	
 	private PreparedStatement lpStmt = null;
-	Preliminary loadPreliminary(int id, Tournament t) throws SQLException
+	void loadPreliminary(int id) throws SQLException
 	{
+		if(id<0) return;
 		if(lpStmt == null)
 		{
 			String sql = "SELECT * FROM Vorrunden WHERE ID = ?;";
@@ -507,17 +529,12 @@ class DBConnector
 		if(!rs.next())//TODO
 			throw new SQLException("Didn't found preliminary");
 		
-		Preliminary ret;
 		try 
 		{
-			ret = new Preliminary(rowToHash(rs), this);
+			new Preliminary(rowToHash(rs));
 		} 
-		catch (ObjectExistExeption e) 
-		{
-			ret = (Preliminary) e.getObject();
-		}
+		catch (ObjectExistExeption e) {}
 		rs.close();
-		return ret;
 	}
 	
 	private PreparedStatement stfp1Stmt = null;
@@ -529,13 +546,14 @@ class DBConnector
 			String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
 			stfp1Stmt = con.prepareStatement(sql);
 			
-			sql = "SELECT Bahnen FROM Turniere AS t, Vorrunden AS v WHERE v.TurnierID = t.ID AND v.ID = ?;";
+			sql = "SELECT Bahnen FROM Turniere WHERE ID = ?;";
 			stfp2Stmt = con.prepareStatement(sql);
 		}
-		
-		stfp2Stmt.setInt(1, p.getID());
+		Tournament t = (Tournament)p.getTournament();
+		stfp2Stmt.setInt(1, t.getID());
 		ResultSet rs = stfp2Stmt.executeQuery();
-		rs.next(); //TODO
+		if(!rs.next())
+			throw new SQLException("Could not found Tournament. (ID "+t.getID()+")");
 		if(lane<1||lane>rs.getInt("Bahnen")) return false;
 		
 		
@@ -631,6 +649,25 @@ class DBConnector
 		spStmt.executeUpdate();
 	}
 	
+	private PreparedStatement spfrStmt = null;
+	void setPointsFR(int prelimID, int fencerID, int points) throws SQLException
+	{
+		if(spfrStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET PunkteVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE PunkteVon1 END, "
+					                           +"PunkteVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE PunkteVon2 END WHERE ID = ?;";
+			spfrStmt = con.prepareStatement(sql);
+		}
+		
+		spfrStmt.setInt(1, fencerID);
+		spfrStmt.setInt(2, points);
+		spfrStmt.setInt(3, fencerID);
+		spfrStmt.setInt(4, points);
+		spfrStmt.setInt(5, prelimID);
+		spfrStmt.executeUpdate();
+	}
+	
+	
 	private PreparedStatement gpStmt = null;
 	int getPoints(int prelimID, int fencerID) throws SQLException
 	{
@@ -681,7 +718,7 @@ class DBConnector
 	
 	private PreparedStatement stff1Stmt = null;
 	private PreparedStatement stff2Stmt = null;
-	boolean setTimeForFinalround(Finalrounds p, int round, int lane) throws SQLException
+	boolean setTimeForFinalround(Finalround p, int round, int lane) throws SQLException
 	{
 		if(stff1Stmt == null)
 		{
@@ -710,6 +747,7 @@ class DBConnector
 	private PreparedStatement lfStmt = null;
 	void loadFinalround(int id) throws SQLException
 	{
+		if(id < 0)return;
 		if(lfStmt == null)
 		{
 			String sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
@@ -719,11 +757,11 @@ class DBConnector
 		lfStmt.setInt(1, id);
 		ResultSet rs = lfStmt.executeQuery();
 		if(!rs.next())
-			throw new SQLException("Didn't found the finalround.");
+			throw new SQLException("Didn't found the finalround. (ID: "+id+")");
 
 		try 
 		{
-			new Finalrounds(rowToHash(rs));
+			new Finalround(rowToHash(rs));
 		} 
 		catch (ObjectExistExeption e) {}
 		rs.close();
@@ -791,20 +829,19 @@ class DBConnector
 	{
 		if(cfrStmt == null)
 		{
-			String sql = "INSERT INTO Finalrunden (TurnierID, Gewinner, Verlierer) VALUES (?,?);";
-			cfrStmt = con.prepareStatement(sql);
+			String sql = "INSERT INTO Finalrunden (TurnierID, Gewinner, Verlierer) VALUES (?,?,?);";
+			cfrStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		}
 
 		cfrStmt.setInt(1, t.getID());
-		cfrStmt.setInt(1, winner);
-		cfrStmt.setInt(1, loser);
+		cfrStmt.setInt(2, winner);
+		cfrStmt.setInt(3, loser);
 		
 		cfrStmt.executeUpdate();
 		ResultSet rs = cfrStmt.getGeneratedKeys();
-		if(rs.next())
-			throw new SQLException("Could not create finalround.");
-		
-		int newwinner = rs.getInt(1);
+		if(!rs.next())
+			throw new SQLException("Could not generate finalround.");
+		int tmp = rs.getInt(1);
 		rs.close();
 		int newloser = -1;
 		
@@ -812,17 +849,22 @@ class DBConnector
 		{
 			cfrStmt.executeUpdate();
 			rs = cfrStmt.getGeneratedKeys();
-			if(rs.next())
-				throw new SQLException("Could not create finalround.");
+			if(!rs.next())
+				throw new SQLException("Could not generate finalround");
 			newloser = rs.getInt(1);
-			rs.close();
+			System.out.println("tmp: "+tmp);
+			System.out.println("new loser: "+newloser);
 		}
 		
 		
 		if(n!=0)
 		{
-			createFinalRounds(n-1, t,newwinner, newloser);
-			createFinalRounds(n-1, t,newwinner, newloser);
+			createFinalRounds(n-1, t,tmp, newloser);
+			createFinalRounds(n-1, t,tmp, newloser);
+		}
+		else
+		{
+			loadFinalround(tmp);
 		}
 	}
 	
@@ -845,20 +887,62 @@ class DBConnector
 	}
 	
 	private PreparedStatement rfrStmt = null;
-	private void removeFinalrounds(Tournament t)
+	private void removeFinalrounds(Tournament t) throws SQLException
 	{
 		if(rfrStmt == null)
 		{
-			String sql = "";
+			String sql = "DELETE FROM Finalrunden WHERE TurnierID = ?;";
+			rfrStmt = con.prepareStatement(sql);
 		}
+		
+		rfrStmt.setInt(1, t.getID());
+		rfrStmt.executeUpdate();
 	}
+	
+	private PreparedStatement lapStmt = null;//gapStmt allread in use -> LoadAllPreliminary -> lapStmt
+	List<Integer> getAllPreliminarys() throws SQLException
+	{
+		if(lapStmt == null)
+		{
+			String sql = "SELECT ID FROM Vorrunden";
+			lapStmt= con.prepareStatement(sql);
+		}
+		
+		ResultSet rs = lapStmt.executeQuery();
+		
+		List<Integer> ret  = new ArrayList<>();
+		while(rs.next())
+			ret.add(rs.getInt(1));
+		
+		return ret;
+	}
+	
+	private PreparedStatement gafrStmt = null;
+	List<Integer> getAllFinalrounds() throws SQLException
+	{
+		if(gafrStmt == null)
+		{
+			String sql = "SELECT ID FROM Finalrunden";
+			gafrStmt = con.prepareStatement(sql);
+		}
+		
+		ResultSet rs = gafrStmt.executeQuery();
+		
+		List<Integer> ret = new ArrayList<>();
+		
+		while(rs.next())
+			ret.add(rs.getInt(1));
+		
+		return ret;
+	}
+	
 
 	private Map<String, Object> rowToHash(ResultSet rs) throws SQLException
 	{
 		Map<String, Object> ret = new HashMap<>();
 		ResultSetMetaData md = rs.getMetaData();
 		int columns = md.getColumnCount();
-		for(int i=1; i<=columns; ++i){           
+		for(int i=1; i<=columns; ++i){
 			ret.put(md.getColumnName(i),rs.getObject(i));
 		}
 		return ret;

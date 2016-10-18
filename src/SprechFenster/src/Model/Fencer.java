@@ -28,6 +28,14 @@ class Fencer implements iFencer
 				ret.add(entry.getValue());
 		return ret;
 	}
+	
+	static List<Fencer> getAllFencer()
+	{
+		List<Fencer> ret = new ArrayList<>();
+		for(Map.Entry<Integer, Fencer> entry : fencers.entrySet())
+			ret.add(entry.getValue());
+		return ret;
+	}
 	// -----
 	private int ID;
 	
@@ -40,11 +48,11 @@ class Fencer implements iFencer
 	static String getSQLString()
 	{
 		return "CREATE TABLE IF NOT EXISTS Fechter (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
-				   + "Vorname varchar(255),"
-				   + "Nachname varchar(255),"
-				   + "Geburtstag varchar(255),"
-				   + "Fechtschule varchar(255),"
-				   + "Nationalitaet varchar(255));";
+				   + "Vorname varchar(255) DEFAULT 'Max',"
+				   + "Nachname varchar(255) DEFAULT 'Musterman',"
+				   + "Geburtstag varchar(255) DEFAULT '1970-01-01',"
+				   + "Fechtschule varchar(255) DEFAULT 'Keine Fechtschule',"
+				   + "Nationalitaet varchar(255) DEFAULT 'Nicht Angegeben');";
 	}
 	
 	Fencer(Map<String, Object> set, DBConnector con) throws ObjectExistExeption
@@ -55,11 +63,11 @@ class Fencer implements iFencer
 			throw new ObjectExistExeption(fencers.get(this.ID));	
 		fencers.put(this.ID, this);
 		
-		this.name = (String) set.get("Vorname");
-		this.familyName = (String) set.get("Nachname");
-		this.birthday = (String) set.get("Geburtstag");
-		this.fencingSchool = (String) set.get("Fechtschule");
-		this.nationality = (String) set.get("Nationalitaet");
+		this.name = (String) set.get("Vorname".toUpperCase());
+		this.familyName = (String) set.get("Nachname".toUpperCase());
+		this.birthday = (String) set.get("Geburtstag".toUpperCase());
+		this.fencingSchool = (String) set.get("Fechtschule".toUpperCase());
+		this.nationality = (String) set.get("Nationalitaet".toUpperCase());
 	}
 	
 	int getID(){return ID;}

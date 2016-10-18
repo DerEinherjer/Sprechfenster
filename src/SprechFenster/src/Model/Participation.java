@@ -7,7 +7,7 @@ class Participation
 		return "CREATE TABLE IF NOT EXISTS Teilnahme (TurnierID int,"
 				 + "FechterID int,"
 				 + "Gruppe int,"
-				 + "Startgeld boolean,"
-				 + "Ausruestungskontrolle boolean)";
+				 + "Startgeld boolean DEFAULT FALSE,"
+				 + "Ausruestungskontrolle boolean DEFAULT FALSE)";
 	}
 }
