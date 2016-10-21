@@ -9,8 +9,7 @@ import java.util.Map;
 class Fencer implements iFencer
 {
 	// -----
-	//private static DBConnector con = DBConnector.getInstants();
-	private static Sync sync = (Sync)iSync.getInstance();
+	static Sync sync;
 	private static Map<Integer, Fencer> fencers = new HashMap<>();
 	
 	static Fencer getFencer(int id) throws SQLException

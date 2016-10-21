@@ -13,6 +13,8 @@ public class Sync extends iSync
 	
 	Sync() throws SQLException
 	{
+		initAsso();
+		
 		this.con = DBConnector.getInstants();
 		
 		//Load all Fencer so that getAll() works like intended
@@ -28,6 +30,14 @@ public class Sync extends iSync
 		
 		for(Integer integer : con.getAllFinalrounds())
 			Finalround.getFinalround(integer);
+	}
+	
+	void initAsso()
+	{
+		Fencer.sync = this;
+		Finalround.sync = this;
+		Preliminary.sync = this;
+		Tournament.sync = this;
 	}
 	
 	// ----- Fencer -----

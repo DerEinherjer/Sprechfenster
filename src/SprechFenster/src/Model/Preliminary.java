@@ -10,7 +10,7 @@ class Preliminary implements iPreliminary
 {
 	// -----
 	private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
-	private static Sync sync = (Sync)iSync.getInstance();
+	static Sync sync;
 	
 	static Preliminary getPreliminary(int id) throws SQLException
 	{

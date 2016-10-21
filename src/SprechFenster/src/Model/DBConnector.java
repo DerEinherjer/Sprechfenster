@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.print.attribute.ResolutionSyntax;
 
+import com.oracle.xmlns.internal.webservices.jaxws_databinding.SoapBindingParameterStyle;
 import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
 import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
@@ -71,8 +72,9 @@ class DBConnector
 		try
 		{
 			con.prepareStatement(Preliminary.getSQLString()).executeUpdate();
+			
 		}
-		catch (SQLException e) {e.printStackTrace();}
+		catch (SQLException e) {System.out.println(e.getMessage());e.printStackTrace();}
 		
 		try
 		{

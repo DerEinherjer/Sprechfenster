@@ -12,7 +12,7 @@ class Tournament implements iTournament
 {
 	// -----
 	private static Map<Integer, Tournament> tournaments = new HashMap<>();
-	private static Sync sync = (Sync) iSync.getInstance();
+	static Sync sync;
 	
 	static Tournament getTournament(int id) throws SQLException
 	{

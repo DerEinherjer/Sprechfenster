@@ -9,7 +9,7 @@ import java.util.Map;
 public class Finalround implements iFinalrounds
 {
 	// -----
-	private static Sync sync = (Sync) iSync.getInstance();
+	static Sync sync;
 	private static Map<Integer, Finalround> finalrounds = new HashMap<>();
 	
 	static Finalround getFinalround(int id) throws SQLException
