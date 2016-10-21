@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Observable;
 
-import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
 
 public abstract class iSync extends Observable
 {

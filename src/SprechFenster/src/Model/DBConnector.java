@@ -12,11 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.attribute.ResolutionSyntax;
-
-import com.oracle.xmlns.internal.webservices.jaxws_databinding.SoapBindingParameterStyle;
-import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 
 //TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
