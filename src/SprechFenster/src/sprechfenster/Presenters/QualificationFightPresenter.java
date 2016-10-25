@@ -7,7 +7,10 @@ package sprechfenster.Presenters;
 
 import Model.iFencer;
 import Model.iPreliminary;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -59,14 +62,24 @@ public class QualificationFightPresenter
     
     public String getFirstFencerName()
     {
-        iFencer fencer = GetFencer(0);
+        iFencer fencer = getFencer(0);
         return getFencerName(fencer);
+    }
+    
+    public String getFirstFencerPoints()
+    {
+        return getFencerPoints(getFencer(0));
     }
     
     public String getSecondFencerName()
     {
-        iFencer fencer = GetFencer(1);
+        iFencer fencer = getFencer(1);
         return getFencerName(fencer);
+    }
+    
+    public String getSecondFencerPoints()
+    {
+        return getFencerPoints(getFencer(1));
     }
     
     public String getLane()
@@ -96,7 +109,23 @@ public class QualificationFightPresenter
         }
     }
     
-    private iFencer GetFencer(int index)
+    private String getFencerPoints(iFencer fencer)
+    {
+        if(fencer != null)
+        {
+            try
+            {
+                return Integer.toString(Fight.getPoints(fencer));
+            }
+            catch (SQLException ex)
+            {
+                Logger.getLogger(QualificationFightPresenter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return "-";
+    }
+    
+    private iFencer getFencer(int index)
     {
         List<iFencer> fencers = Fight.getFencer();
         if(fencers != null && fencers.size() > index)

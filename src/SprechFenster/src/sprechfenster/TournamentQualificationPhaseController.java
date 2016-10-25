@@ -51,6 +51,10 @@ public class TournamentQualificationPhaseController implements Initializable
     @FXML
     TableColumn FirstFencerTableColumn;
     @FXML
+    TableColumn FirstFencerPointsTableColumn;
+    @FXML
+    TableColumn SecondFencerPointsTableColumn;
+    @FXML
     TableColumn SecondFencerTableColumn;
     @FXML
     TableColumn GroupTableColumn;
@@ -69,7 +73,9 @@ public class TournamentQualificationPhaseController implements Initializable
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
         FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
+        FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
         SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
+        SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
         GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
         
@@ -155,6 +161,7 @@ public class TournamentQualificationPhaseController implements Initializable
                         Node groupTable = loader.load();
                         GroupTableController controller = loader.getController();
                         controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
+                        controller.SetTournament(Tournament);
 
                         GroupControllers.add(controller);
                         GroupsPane.getChildren().add(groupTable);

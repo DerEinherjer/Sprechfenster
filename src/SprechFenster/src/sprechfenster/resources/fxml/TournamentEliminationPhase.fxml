@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="sprechfenster.TournamentEliminationPhaseController">
+   <children>
+      <TableView fx:id="FightsTableView" layoutX="10.0" layoutY="10.0" prefHeight="398.0" prefWidth="501.0">
+         <columns>
+            <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
+            <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
+            <TableColumn fx:id="FirstFencerTableColumn" prefWidth="164.0" text="Fechter A" />
+            <TableColumn fx:id="SecondFencerTableColumn" prefWidth="121.0" text="Fechter B" />
+            <TableColumn fx:id="GroupTableColumn" prefWidth="53.0" text="Gruppe" />
+            <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>

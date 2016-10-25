@@ -6,6 +6,7 @@
 package sprechfenster;
 
 import Model.iFencer;
+import Model.iTournament;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -36,9 +37,13 @@ public class GroupTableController implements Initializable
     @FXML
     private TableColumn PointsTableColumn;
     @FXML
+    private TableColumn WinsTableColumn;
+    @FXML
     private TableColumn FencingSchoolTableColumn;
     @FXML
     private Label GroupNameLabel;
+    @FXML
+    private iTournament Tournament;
 
     /**
      * Initializes the controller class.
@@ -47,7 +52,8 @@ public class GroupTableController implements Initializable
     public void initialize(URL url, ResourceBundle rb)
     {
         FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        //PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Points"));
+        WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Wins"));
+        PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Points"));
         FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
     }   
     
@@ -56,12 +62,17 @@ public class GroupTableController implements Initializable
         GroupNameLabel.setText(groupName);
     }
     
+    public void SetTournament(iTournament tournament)
+    {
+        Tournament = tournament;
+    }
+    
     public void AddFencer(List<iFencer> fencers)
     {
         ObservableList items = GroupTableView.getItems();
         for(iFencer fencer : fencers)
         {
-            FencerPresenter fencerPresenter = new FencerPresenter(fencer);
+            FencerPresenter fencerPresenter = new FencerPresenter(fencer, Tournament);
             if(!items.contains(fencerPresenter))
             {
                 items.add(fencerPresenter);

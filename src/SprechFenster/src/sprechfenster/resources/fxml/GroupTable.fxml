@@ -7,14 +7,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane fx:id="MainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="441.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.GroupTableController">
    <children>
       <TableView fx:id="GroupTableView" layoutX="14.0" layoutY="41.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="27.0">
         <columns>
-          <TableColumn fx:id="FencerNameTableColumn" prefWidth="240.0" text="Fechter" />
-          <TableColumn fx:id="PointsTableColumn" prefWidth="56.0" text="Punkte" />
-            <TableColumn fx:id="FencingSchoolTableColumn" prefWidth="112.0" text="Fechtschule" />
+          <TableColumn fx:id="FencerNameTableColumn" prefWidth="170.0" text="Fechter" />
+            <TableColumn fx:id="WinsTableColumn" prefWidth="47.0" text="Siege" />
+          <TableColumn fx:id="PointsTableColumn" prefWidth="48.0" text="Punkte" />
+            <TableColumn fx:id="FencingSchoolTableColumn" prefWidth="146.0" text="Fechtschule" />
         </columns>
       </TableView>
       <Label fx:id="GroupNameLabel" layoutX="14.0" layoutY="14.0" text="Gruppe 1" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="0.0">

@@ -215,6 +215,27 @@ public class MainFXMLController implements Initializable, iFencerSelection
         }
     }
     
+    private void SetupTournamentFinalEliminationPhase(iTournament tournament)
+    {
+        if(tournament != null)
+        {
+            try
+            {
+                ContentAnchorPane.getChildren().clear();
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentEliminiationPhase.fxml"));
+                Node tournamentFinalEliminationPhaseView = loader.load();
+                ContentAnchorPane.getChildren().add(tournamentFinalEliminationPhaseView);
+                TournamentEliminationPhaseController controller = loader.<TournamentEliminationPhaseController>getController();
+                controller.SetTournament(tournament);
+                SetupToolbarForActiveTournament();
+            }
+            catch (IOException ex)
+            {
+                Logger.getLogger(MainFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     private void SetupToolbarForActiveTournament()
     {
         ObservableList<Node> items = MainToolBar.getItems();

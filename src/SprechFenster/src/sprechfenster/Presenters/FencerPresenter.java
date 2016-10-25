@@ -6,6 +6,8 @@
 package sprechfenster.Presenters;
 
 import Model.iFencer;
+import Model.iScore;
+import Model.iTournament;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class FencerPresenter {
     
     private iFencer Fencer;
+    private iTournament Tournament;
     
     public FencerPresenter(iFencer fencerToPresent)
     {
@@ -25,6 +28,18 @@ public class FencerPresenter {
             throw new IllegalArgumentException("fencerToPresent must not be null");
         }
         Fencer = fencerToPresent;
+    }
+    
+    public FencerPresenter(iFencer fencerToPresent, iTournament tournament)
+    {
+        this(fencerToPresent);
+        Tournament = tournament;
+    }
+    
+    
+    public void AssignTournament(iTournament tournament)
+    {
+        Tournament = tournament;
     }
     
     @Override
@@ -74,5 +89,31 @@ public class FencerPresenter {
         LocalDate now = LocalDate.now();
         Period age = Period.between(birthday, now);
         return Integer.toString(age.getYears());
+    }
+    
+    public String getPoints()
+    {
+        if(Tournament != null)
+        {
+            iScore score = Tournament.getScoreFrom(Fencer);
+            if(score != null)
+            {
+                return String.format("%d/%d", score.getHits(), score.getGotHit());
+            }
+        }
+        return "-/-";
+    }
+    
+    public String getWins()
+    {
+        if(Tournament != null)
+        {
+            iScore score = Tournament.getScoreFrom(Fencer);
+            if(score != null)
+            {
+                return Integer.toString(score.getWins());
+            }
+        }
+        return "-";
     }
 }
