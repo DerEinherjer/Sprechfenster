@@ -12,17 +12,17 @@
          <children>
             <MenuBar prefHeight="25.0" prefWidth="832.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <menus>
-                  <Menu mnemonicParsing="false" text="File">
+                  <Menu mnemonicParsing="false" text="Datei">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Edit">
+                  <Menu mnemonicParsing="false" text="Import/Export">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Delete" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Help">
+                  <Menu mnemonicParsing="false" text="Hilfe">
                      <items>
                         <MenuItem mnemonicParsing="false" text="About" />
                      </items>

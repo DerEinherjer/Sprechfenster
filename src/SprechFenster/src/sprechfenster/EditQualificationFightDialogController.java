@@ -125,7 +125,7 @@ public class EditQualificationFightDialogController implements Initializable
                 iFencer firstFencer = null;
                 iFencer secondFencer = null;
                 String firstFencerName = FirstFencerComboBox.getValue().trim();
-                String secondFencerName = FirstFencerComboBox.getValue().trim();
+                String secondFencerName = SecondFencerComboBox.getValue().trim();
                 for (iFencer fencer : Tournament.getAllParticipants())
                 {
                     if (firstFencer == null && firstFencerName.equals(fencer.getFullName()))

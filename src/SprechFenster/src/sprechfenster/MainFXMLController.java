@@ -31,6 +31,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sprechfenster.Presenters.FencerPresenter;
 import sprechfenster.Presenters.TournamentPresenter;
@@ -124,7 +125,9 @@ public class MainFXMLController implements Initializable, iFencerSelection
             stage.setTitle("Neues Turnier");
             stage.setScene(new Scene(root));
             stage.initOwner(NewTournamentButton.getScene().getWindow());
-            stage.show();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            UpdateOverview();
         }
         catch (IOException e)
         {
@@ -258,7 +261,9 @@ public class MainFXMLController implements Initializable, iFencerSelection
             stage.setTitle("Neuer Fechter");
             stage.setScene(new Scene(root));
             stage.initOwner(NewFencerButton.getScene().getWindow());
-            stage.show();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            UpdateOverview();
         }
         catch (IOException e)
         {
@@ -275,7 +280,7 @@ public class MainFXMLController implements Initializable, iFencerSelection
     @FXML
     private void handleShowFinalRoundsButtonAction(ActionEvent event)
     {
-
+        SetupTournamentFinalEliminationPhase(ActiveTournament);
     }
 
     @FXML

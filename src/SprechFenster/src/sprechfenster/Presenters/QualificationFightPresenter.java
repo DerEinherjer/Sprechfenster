@@ -97,6 +97,18 @@ public class QualificationFightPresenter
         return Integer.toString(Fight.getGroup());
     }
     
+    public String getStatus()
+    {
+        if(Fight.isFinished())
+        {
+            return "Beendet";
+        }
+        else
+        {
+            return "Offen";
+        }
+    }
+    
     private String getFencerName(iFencer fencer)
     {
         if(fencer != null)

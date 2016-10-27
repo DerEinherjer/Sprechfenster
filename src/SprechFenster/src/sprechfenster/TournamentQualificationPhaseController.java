@@ -28,6 +28,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import sprechfenster.Presenters.QualificationFightPresenter;
@@ -60,6 +61,8 @@ public class TournamentQualificationPhaseController implements Initializable
     TableColumn GroupTableColumn;
     @FXML
     TableColumn EditTableColumn;
+    @FXML 
+    TableColumn StatusTableColumn;
 
     iTournament Tournament;
     ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
@@ -77,58 +80,64 @@ public class TournamentQualificationPhaseController implements Initializable
         SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
         SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
         GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
+        StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
-        
-        Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory =                 //
-        (final TableColumn<QualificationFightPresenter, String> param) ->
-        {
-            final TableCell<QualificationFightPresenter, String> cell = new TableCell<QualificationFightPresenter, String>()
-            {
-                final Button EditButton = new Button( "Ändern" );
-                
-                @Override
-                public void updateItem( String item, boolean empty )
+
+        Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory
+                = //
+                (final TableColumn<QualificationFightPresenter, String> param)
+                -> 
                 {
-                    super.updateItem( item, empty );
-                    if ( empty )
+                    final TableCell<QualificationFightPresenter, String> cell = new TableCell<QualificationFightPresenter, String>()
                     {
-                        setGraphic( null );
-                        setText( null );
-                    }
-                    else
-                    {
-                        EditButton.setOnAction( ( ActionEvent event ) ->
+                        final Button EditButton = new Button("Ändern");
+
+                        @Override
+                        public void updateItem(String item, boolean empty)
                         {
-                            try
+                            super.updateItem(item, empty);
+                            if (empty)
                             {
-                                QualificationFightPresenter fight = getTableView().getItems().get( getIndex() );
-                                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                                        "sprechfenster/resources/fxml/EditQualificationFightDialog.fxml"
-                                ));
-                                Parent dialog = loader.<Parent>load();
-                                EditQualificationFightDialogController controller = loader.getController();
-                                controller.SetData(fight.getFight(), Tournament);
-                                Stage stage = new Stage();
-                                stage.setTitle("Gefecht bearbeiten");
-                                stage.setScene(new Scene(dialog));
-                                stage.initOwner(EditButton.getScene().getWindow());
-                                stage.show();
+                                setGraphic(null);
+                                setText(null);
                             }
-                            catch (IOException ex)
+                            else
                             {
-                                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                                EditButton.setOnAction((ActionEvent event)
+                                        -> 
+                                        {
+                                            try
+                                            {
+                                                QualificationFightPresenter fight = getTableView().getItems().get(getIndex());
+                                                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
+                                                        "sprechfenster/resources/fxml/EditQualificationFightDialog.fxml"
+                                                ));
+                                                Parent dialog = loader.<Parent>load();
+                                                EditQualificationFightDialogController controller = loader.getController();
+                                                controller.SetData(fight.getFight(), Tournament);
+                                                Stage stage = new Stage();
+                                                stage.setTitle("Gefecht bearbeiten");
+                                                stage.setScene(new Scene(dialog));
+                                                stage.initModality(Modality.APPLICATION_MODAL);
+                                                stage.initOwner(EditButton.getScene().getWindow());
+                                                stage.showAndWait();
+                                                UpdateData();
+                                            }
+                                            catch (IOException ex)
+                                            {
+                                                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+
+                                });
+                                setGraphic(EditButton);
+                                setText(null);
                             }
-                            
-                        } );
-                        setGraphic(EditButton);
-                        setText( null );
-                    }
-                }
-            };
-            return cell;
+                        }
+                    };
+                    return cell;
         };
 
-        EditTableColumn.setCellFactory( editCellFactory );
+        EditTableColumn.setCellFactory(editCellFactory);
     }
 
     public void SetTournament(iTournament tournament)
@@ -141,31 +150,60 @@ public class TournamentQualificationPhaseController implements Initializable
     {
         if (Tournament != null)
         {
-            GroupControllers.clear();
-            FightsTableView.getItems().clear();
-            GroupsPane.getChildren().clear();
             try
             {
                 Tournament.createPreliminaryTiming();
+                UpdateData();
+            }
+            catch (SQLException ex)
+            {
+                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void UpdateData()
+    {
+        if(Tournament != null)
+        {
+            try
+            {
+                GroupControllers.clear();
+                FightsTableView.getItems().clear();
+                GroupsPane.getChildren().clear();
                 List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
                 if (qualificationFights != null)
                 {
                     qualificationFights.sort((a, b)
-                            -> 
-                            {
-                                return Integer.compare(a.getGroup(), b.getGroup());
-                    });
-                    for (int groupNumber = 1; groupNumber <= Tournament.getGroups(); groupNumber++)
+                            ->
                     {
-                        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-                        Node groupTable = loader.load();
-                        GroupTableController controller = loader.getController();
-                        controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
-                        controller.SetTournament(Tournament);
+                        return Integer.compare(a.getGroup(), b.getGroup());
+                    });
+                    try
+                    {
+                        for (int groupNumber = 1; groupNumber <= Tournament.getGroups(); groupNumber++)
+                        {
 
-                        GroupControllers.add(controller);
-                        GroupsPane.getChildren().add(groupTable);
+                            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
+                            Node groupTable = loader.load();
+                            GroupTableController controller = loader.getController();
+                            controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
+                            controller.SetTournament(Tournament);
+
+                            GroupControllers.add(controller);
+                            GroupsPane.getChildren().add(groupTable);
+                        }
+
                     }
+                    catch (IOException ex)
+                    {
+                        Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    qualificationFights.sort((a,b)
+                            -> 
+                    {
+                        return Integer.compare(a.getRound(), b.getRound());
+                    });
                     for (iPreliminary qualificationFight : qualificationFights)
                     {
                         int groupNumber = qualificationFight.getGroup();
@@ -179,10 +217,6 @@ public class TournamentQualificationPhaseController implements Initializable
                 }
             }
             catch (SQLException ex)
-            {
-                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            catch (IOException ex)
             {
                 Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
             }

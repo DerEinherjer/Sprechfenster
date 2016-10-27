@@ -10,6 +10,7 @@ import Model.iTournament;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,6 +56,10 @@ public class GroupTableController implements Initializable
         WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Wins"));
         PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Points"));
         FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
+        GroupTableView.setFixedCellSize(25);
+        GroupTableView.prefHeightProperty().bind(GroupTableView.fixedCellSizeProperty().multiply(Bindings.size(GroupTableView.getItems()).add(1.01)));
+        MainAnchorPane.minHeightProperty().bind(GroupTableView.prefHeightProperty().add(50));
+        MainAnchorPane.maxHeightProperty().bind(GroupTableView.prefHeightProperty().add(50));
     }   
     
     public void SetGroupName(String groupName)
