@@ -404,6 +404,26 @@ class DBConnector
 		}
 	}
 	
+	
+	private PreparedStatement apStmt = null;
+	int addPreliminary(Tournament t) throws SQLException
+	{
+		if(apStmt == null)
+		{
+			String sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, 0, -1, -1);";
+			apStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		}
+		
+		apStmt.setInt(1, t.getID());
+		apStmt.executeUpdate();
+		ResultSet rs = spStmt.getGeneratedKeys();
+		if(!rs.next())
+			throw new SQLException("Could not create preliminary.");
+		int ret = rs.getInt(1);
+		rs.close();
+		return ret;
+	}
+	
 	private PreparedStatement cp1Stmt = null;
 	private PreparedStatement cp2Stmt = null;
 	private void createPreliminary(Tournament t,Fencer f, int group) throws SQLException
@@ -780,6 +800,22 @@ class DBConnector
 		rpfpStmt.executeUpdate();
 	}
 	
+	private PreparedStatement rpffStmt = null;
+	void removeParticipantFromFinal(Finalround p, Fencer f) throws SQLException
+	{
+		if(rpffStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? THEN -1 ELSE Teilnehmer1 END, "
+                                               +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? THEN -1 ELSE Teilnehmer2 END WHERE ID = ?;";
+			rpffStmt = con.prepareStatement(sql);
+		}
+		
+		rpffStmt.setInt(1, f.getID());
+		rpffStmt.setInt(2, f.getID());
+		rpffStmt.setInt(3, p.getID());
+		rpffStmt.executeUpdate();
+	}
+	
 	private PreparedStatement aptpStmt = null;
 	void addParticipantToPrelim(Preliminary p, Fencer f) throws SQLException
 	{
@@ -793,6 +829,21 @@ class DBConnector
 		aptpStmt.setInt(2, f.getID());
 		aptpStmt.setInt(3, p.getID());
 		aptpStmt.executeUpdate();
+	}
+	
+	private PreparedStatement aptfStmt = null;
+	void addParticipantToFinal(Finalround p, Fencer f) throws SQLException
+	{
+		if(aptfStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = -1 THEN ? ELSE Teilnehmer1 END, "
+                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = -1 AND Teilnehmer1 != -1 THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
+			aptfStmt = con.prepareStatement(sql);
+		}
+		aptfStmt.setInt(1, f.getID());
+		aptfStmt.setInt(2, f.getID());
+		aptfStmt.setInt(3, p.getID());
+		aptfStmt.executeUpdate();
 	}
 	
 	private PreparedStatement spipStmt = null; 
@@ -813,6 +864,26 @@ class DBConnector
 		spipStmt.setInt(6, in.getID());
 		spipStmt.setInt(7, p.getID());
 		spipStmt.executeUpdate();
+	}
+	
+	private PreparedStatement spifStmt = null; 
+	void switchParticipantsInFinal(Finalround p, Fencer out, Fencer in) throws SQLException
+	{
+		if(spifStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? AND Teilnehmer2 != ? THEN ? ELSE Teilnehmer1 END, "
+                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? AND Teilnehmer1 != ? THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
+			spifStmt = con.prepareStatement(sql);
+		}
+		
+		spifStmt.setInt(1, out.getID());
+		spifStmt.setInt(2, in.getID());
+		spifStmt.setInt(3, in.getID());
+		spifStmt.setInt(4, out.getID());
+		spifStmt.setInt(5, in.getID());
+		spifStmt.setInt(6, in.getID());
+		spifStmt.setInt(7, p.getID());
+		spifStmt.executeUpdate();
 	}
 	
 	

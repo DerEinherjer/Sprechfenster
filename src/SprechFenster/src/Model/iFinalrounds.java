@@ -9,4 +9,8 @@ public interface iFinalrounds
 	public int getRound();
 	public int getLane();
 	public boolean setTime(int round, int lane) throws SQLException;
+	
+	public boolean removeParticipant(iFencer f) throws SQLException;
+	public boolean addParticipant(iFencer f) throws SQLException;
+	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException; 
 }

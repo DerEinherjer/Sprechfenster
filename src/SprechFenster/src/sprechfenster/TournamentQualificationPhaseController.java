@@ -76,11 +76,11 @@ public class TournamentQualificationPhaseController implements Initializable
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
         FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
-        FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
+        //FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
         SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
-        SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
+        //SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
         GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
-        StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
+        //StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
         Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory

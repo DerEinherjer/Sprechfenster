@@ -1,0 +1,48 @@
+-Gefechte nach Bahnen in eigene Tabellen
+
+-Punkteverhältnis: getrennt nach Vorrunde und Vorrunde + Finale (Ergebnisse der Vorrunden müssen erhalten bleiben)
+
+-Wertung: 1.Siege, 2.Differenz Treffer/getroffen worden (inklusive Bonustreffer durch rote Karten des Gegners) 3. ?? Michael schaut nach
+
+-KEIN Unterschied zwischen Bonustreffern durch rote Karten und normalen Treffern
+
+-Editieren der Kampfergebnisse in Tabellenansicht!
+
+-Gruppe für Änderungen sperren, bevor Vorrunden neu berechnet werden
+
+-Manueller Schalter, um Vorrunde abzuschließen, und Finale zu beginnen - danach sind Finalbegegnungen festgelegt
+
+-Anwendungsfall: Wildcard im Finale (bester Fechter der Wertung gewinnt Finalrunde automatisch)
+
+-Anwendungsfall: Fechter fällt wegen Verletzung aus -> nächstbester Fechter aus Vorrunde rückt ins Finale auf
+
+-Startdatum: umbenennen in Turnierdatum
+
+-Strafpunkte: 
+-pro Person und pro Gefecht. Gelb: Verwarnung, keine Auswirkung ansonsten. Rot: Treffer für Gegner
+-Schwarze Karte: wie Verletzung (Ausschluß)
+-Turniersoftware soll nur Anzahl der Karten tracken (gelb, rot, schwarz). Punkte müssen manuell erhöht werden
+-Schwarze Karte: Sicherheitsabfrage
+-Summe pro Fechter, Karten pro Gefecht
+
+-Fechter: benötigt Funktion, um Fechter aus Turnier auszuschließen wg. Verletzung o. schwarzer Karte 
+--Gefechte, die nicht mehr stattfinden, wg. schwarzer Karte oder Verletzung
+--Kommentar für Fechter pro Turnier (Strafen, Anmerkungen, Coaching) - sehr wichtig       
+
+-Obmännner müssen nicht gespeichert werden
+
+GUI Element für Strafkarten:
+------------------
+|[1]    [2]   [3]|
+------------------
+ gelb   rot   schwarz
+
+-Anzeige auf Beamer: Punkte und Karten sollten schnell sichtbar sein
+
+-Waffencheck, Startgeld: Prio sehr gering
+
+-Gesamtwertung für Fechter über alle Turniere in eigener Übersicht (gelbe Karten hierbei unwichtig, schwarze und rote Karten aber schon)
+--Wieviele 1., 2., 3. Plätze hat der Fechter geschafft, und in welchen Turnieren
+--Sollte getrennt von einzelnen Turnieren und Fechtern exportiert werden können (Gesamtübersicht für einen Fechter)
+
+

@@ -382,6 +382,20 @@ class Tournament implements iTournament
 			f = ((Finalround) f).getWinnerround();
 		f.printTree();
 	}
+
+	public int preliminaryWithoutTiming() throws SQLException 
+	{
+		int ret = 0;
+		for(iPreliminary p : getAllPreliminary())
+			if(p.getLane()<1||p.getRound()<1)
+				ret ++;
+		return ret;
+	}
+	
+	public void addPreliminary() throws SQLException
+	{
+		sync.addPreliminary(this);
+	}
 	
 	@Override
 	public boolean equals(Object other){
@@ -392,4 +406,5 @@ class Tournament implements iTournament
 	    	return true;
 	    return false;
 	}
+
 }

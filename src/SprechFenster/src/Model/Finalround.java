@@ -187,6 +187,8 @@ public class Finalround implements iFinalrounds
 		return deep+1;
 	}
 	
+	
+	
 	@Override
 	public boolean equals(Object other){
 	    if (other == null) return false;
@@ -195,5 +197,61 @@ public class Finalround implements iFinalrounds
 	    if(((Finalround)other).getID()==ID)
 	    	return true;
 	    return false;
+	}
+
+	public boolean removeParticipant(iFencer f) throws SQLException 
+	{
+		if(fencer1!=null && fencer1.equals(f))
+		{
+			sync.removeParticipantFromFinal(this, (Fencer) f);
+			fencer1 = null;
+			pointsFor1 = 0;
+			return true;
+		}
+		else if(fencer2!=null && fencer2.equals(f))
+		{
+			sync.removeParticipantFromFinal(this, (Fencer) f);
+			fencer2 = null;
+			pointsFor2 = 0;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean addParticipant(iFencer f) throws SQLException 
+	{
+
+		if(fencer1 == null)
+		{
+			sync.addParticipantToFinal(this, (Fencer) f);
+			fencer1 = (Fencer)f;
+			return true;
+		}
+		else if(fencer2 == null)
+		{
+			sync.addParticipantToFinal(this, (Fencer) f);
+			fencer2 = (Fencer)f;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException 
+	{
+		if(fencer1.equals(out)&&!fencer2.equals(in))
+		{
+			sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			fencer1 = (Fencer)in;
+			pointsFor1 = 0;
+			return true;
+		}
+		else if(fencer2.equals(out)&&!fencer1.equals(in))
+		{
+			sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
+			fencer2 = (Fencer)in;
+			pointsFor2 = 0;
+			return true;
+		}
+		return false;
 	}
 }

@@ -228,8 +228,8 @@ public class MainFXMLController implements Initializable, iFencerSelection
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentEliminiationPhase.fxml"));
                 Node tournamentFinalEliminationPhaseView = loader.load();
                 ContentAnchorPane.getChildren().add(tournamentFinalEliminationPhaseView);
-                TournamentEliminationPhaseController controller = loader.<TournamentEliminationPhaseController>getController();
-                controller.SetTournament(tournament);
+                //TournamentEliminationPhaseController controller = loader.<TournamentEliminationPhaseController>getController();
+                //controller.SetTournament(tournament);
                 SetupToolbarForActiveTournament();
             }
             catch (IOException ex)
