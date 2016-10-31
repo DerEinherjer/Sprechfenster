@@ -36,9 +36,11 @@ class Tournament implements iTournament
 	private Integer groups = null;
 	private Integer numberFinalrounds = null;
 	private Integer lanes = null;
+	private Boolean finishedPreliminary = null;
 	private Map<Fencer, Boolean> entryFee = new HashMap<>();
 	private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
-	private Map<Fencer, Score> scores = new HashMap<>();
+	private Map<Fencer, Score> scoresPrelim = new HashMap<>();
+	private Map<Fencer, Score> scoresFinal = new HashMap<>();
 	
 	static String getSQLString()
 	{
@@ -47,7 +49,8 @@ class Tournament implements iTournament
 				   + "Datum varchar(11) DEFAULT '1970-01-01',"
 				   + "Gruppen int DEFAULT 2,"
 				   + "Finalrunden int DEFAULT 2,"
-				   + "Bahnen int DEFAULT 2);";
+				   + "Bahnen int DEFAULT 2,"
+				   + "InFinalrunden BOOLEAN DEFAULT FALSE);";
 	}
 	
 	public Tournament(Map<String, Object> set) throws ObjectExistExeption, SQLException
@@ -65,16 +68,14 @@ class Tournament implements iTournament
 		this.groups = (Integer) set.get("Gruppen".toUpperCase());
 		this.numberFinalrounds = (Integer) set.get("Finalrunden".toUpperCase());
 		this.lanes = (Integer) set.get("Bahnen".toUpperCase());
+		this.finishedPreliminary = (Boolean) set.get("InFinalrunden".toUpperCase());
 		
 		for(iFencer f : getAllParticipants())
 		{
-			scores.put((Fencer) f, new Score((Fencer)f));
+			scoresPrelim.put((Fencer) f, new Score((Fencer)f));
 			entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer)f));
 			equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
 		}
-		
-		if(!isFinalroundsCreated())
-			createFinalround();
 		
 	}
 	
@@ -159,7 +160,7 @@ class Tournament implements iTournament
 		if(!(f instanceof Fencer)) return;
 		sync.addParticipant(this, (Fencer)f, group);
 		
-		scores.put((Fencer) f, new Score((Fencer)f));
+		scoresPrelim.put((Fencer) f, new Score((Fencer)f));
 		entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer)f));
 		equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
 	}
@@ -248,7 +249,7 @@ class Tournament implements iTournament
 	{
 		sync.removeParticipant((Fencer)f);
 		
-		scores.remove((Fencer)f);
+		scoresPrelim.remove((Fencer)f);
 	}
 	
 	public void setEntryFee(iFencer f, boolean paid) throws SQLException
@@ -278,57 +279,113 @@ class Tournament implements iTournament
 		return equipmentChecked.get((Fencer)f);
 	}
 	
-	void addWin(Fencer f) throws SQLException
+	void addWinPrelim(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
-			if(!scores.containsKey(f))
-				scores.put(f, new Score(f));
-			scores.get(f).addWin();
+			if(!scoresPrelim.containsKey(f))
+				scoresPrelim.put(f, new Score(f));
+			scoresPrelim.get(f).addWin();
 		}
 	}
 	
-	void subWin(Fencer f) throws SQLException
+	void addWinFinal(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
-			if(!scores.containsKey(f))
-				scores.put(f, new Score(f));
-			scores.get(f).subWin();
+			if(!scoresFinal.containsKey(f))
+				scoresFinal.put(f, new Score(f));
+			scoresFinal.get(f).addWin();
 		}
 	}
 	
-	void addHits(Fencer f, int points) throws SQLException
+	void subWinPrelim(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
-			if(!scores.containsKey(f))
-				scores.put(f, new Score(f));
-			scores.get(f).addHits(points);
+			if(!scoresPrelim.containsKey(f))
+				scoresPrelim.put(f, new Score(f));
+			scoresPrelim.get(f).subWin();
 		}
 	}
 	
-	void addGotHit(Fencer f, int points) throws SQLException
+	void subWinFinal(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
-			if(!scores.containsKey(f))
-				scores.put(f, new Score(f));
-			scores.get(f).addGotHit(points);
+			if(!scoresFinal.containsKey(f))
+				scoresFinal.put(f, new Score(f));
+			scoresFinal.get(f).subWin();
 		}
 	}
 	
-	public Score getScoreFrom(iFencer f)
+	void addHitsPrelim(Fencer f, int points) throws SQLException
 	{
-		return scores.get((Fencer)f);
+		if(isParticipant(f))
+		{
+			if(!scoresPrelim.containsKey(f))
+				scoresPrelim.put(f, new Score(f));
+			scoresPrelim.get(f).addHits(points);
+		}
 	}
 	
-	public List<iScore> getScores() throws SQLException
+	void addHitsFinal(Fencer f, int points) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scoresFinal.containsKey(f))
+				scoresFinal.put(f, new Score(f));
+			scoresFinal.get(f).addHits(points);
+		}
+	}
+	
+	void addGotHitPrelim(Fencer f, int points) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scoresPrelim.containsKey(f))
+				scoresPrelim.put(f, new Score(f));
+			scoresPrelim.get(f).addGotHit(points);
+		}
+	}
+	
+	void addGotHitFinal(Fencer f, int points) throws SQLException
+	{
+		if(isParticipant(f))
+		{
+			if(!scoresFinal.containsKey(f))
+				scoresFinal.put(f, new Score(f));
+			scoresFinal.get(f).addGotHit(points);
+		}
+	}
+	
+	public Score getScoreFromPrelim(iFencer f)
+	{
+		return scoresPrelim.get((Fencer)f);
+	}
+	
+	public Score getScoreFromFinal(iFencer f)
+	{
+		return scoresFinal.get((Fencer)f);
+	}
+	
+	public List<iScore> getScoresPrelim() throws SQLException
 	{
 		List<iScore> ret = new ArrayList<>();
 		for(iFencer f : getAllParticipants())
 		{
-			ret.add(scores.get((Fencer)f));
+			ret.add(scoresPrelim.get((Fencer)f));
+		}
+		Collections.sort(ret);
+		return ret;
+	}
+	
+	public List<iScore> getScoresFinal() throws SQLException
+	{
+		List<iScore> ret = new ArrayList<>();
+		for(iFencer f : getAllParticipants())
+		{
+			ret.add(scoresFinal.get((Fencer)f));
 		}
 		Collections.sort(ret);
 		return ret;
@@ -337,9 +394,12 @@ class Tournament implements iTournament
 	public List<iScore>[] getScoresInGroups() throws SQLException
 	{
 		List<iScore> ret[] = new ArrayList[getGroups()];
+		for(int i=0;i<ret.length;i++)
+			ret[i] = new ArrayList<>();
+		
 		for(iFencer f : getAllParticipants())
 		{
-			ret[getParticipantGroup(f)-1].add(scores.get((Fencer)f));
+			ret[getParticipantGroup(f)-1].add(scoresPrelim.get((Fencer)f));
 		}
 		for(int i=0;i<getGroups();i++)
 			Collections.sort(ret[i]);
@@ -395,6 +455,101 @@ class Tournament implements iTournament
 	public void addPreliminary() throws SQLException
 	{
 		sync.addPreliminary(this);
+	}
+	
+	void setFinishedPreliminary() throws SQLException
+	{
+		sync.setFinishedPreliminary(this);
+		finishedPreliminary = true;
+	}
+	
+	boolean isPrelimFinished()
+	{
+		return finishedPreliminary;
+	}
+	
+	public boolean finishPreliminary() throws SQLException
+	{
+		if(allPreliminaryFinished())
+		{
+			createFinalround();
+			
+			int finalist = (int) Math.pow(2, numberFinalrounds);
+			int finalistPerGroup = finalist/groups;
+			int wildcards = finalist - (finalistPerGroup*groups);
+			List<Finalround> f = new ArrayList<>();
+			
+			List<iScore>[] s = getScoresInGroups();
+			
+			//Find the round in the leaves of the tree and collect them in f
+			for(Finalround tmp : Finalround.getFinalrounds(this))
+			{
+				if(!tmp.hasPrerounds())
+					f.add(tmp);
+			}
+			
+			//First part of selection:
+			//As long as I can take 1 from every group (have more groups than free places) take one from every group
+			for(int i = 0; i<finalist-wildcards; i++)
+			{
+				if(s[i%groups].size()>i/groups)//Has that group enouth members?
+					f.get((i+1)%(f.size())).addParticipant(s[i%groups].get(i/groups).getFencer());
+				else
+					wildcards++;
+			}
+			
+			//Sort everyone out who is allready in the finals
+			for(int i = 0; i<finalist-wildcards; i++)
+				if(s[i%groups].size()>i/groups)
+					s[i%groups].remove(s[i%groups].get(i/groups));
+			
+			List<iScore> wilds = new ArrayList<>();
+			
+			//Collect everyone who is NOT in the final in wilds
+			for(int i = 0; i< groups; i++)
+				for(int c = 0; c < s[i].size(); c++)
+					wilds.add(s[i].get(c));
+			
+			//Get from all who are not allready in the final those who have the best hit-gotHit
+			for(int i = 0; i < wildcards; i++)
+			{
+				int best = 0;
+				for(int c = 1; c < wilds.size(); c ++)
+					if(wilds.get(best).getHitDifference()<wilds.get(c).getHitDifference())
+						best = c;
+				
+				int c = 0;
+				while(!f.get(c++).addParticipant(wilds.get(best).getFencer()));
+			}
+			
+			for(Finalround tmp : f)
+			{
+				scoresFinal.put((Fencer)tmp.getFencer().get(0), new Score((Fencer)tmp.getFencer().get(0)));
+				scoresFinal.put((Fencer)tmp.getFencer().get(1), new Score((Fencer)tmp.getFencer().get(1)));
+			}
+			
+					
+			setFinishedPreliminary();
+		}
+		return false;
+	}
+	
+	boolean allPreliminaryFinished()
+	{
+		for(Preliminary p : Preliminary.getPreliminarys(this))
+		{
+			if(!p.isFinished())
+				return false;
+		}
+		return true;
+	}
+	
+	public List<iFinalround> getAllFinalrounds() 
+	{
+		List<iFinalround> ret = new ArrayList<>();
+		for(Finalround f :Finalround.getFinalrounds(this))
+			ret.add(f);
+		return ret;
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package Model;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Test 
@@ -9,44 +10,48 @@ public class Test
 	{
 		try 
 		{
+			
 			iSync sync = iSync.getInstance();
 			
+			iTournament t = sync.createTournament("Name");
 			
-			iFencer[] fencers = new Fencer[26];
-			char a = 'A';
-			for(int i = 0;i<26;i++)
+			iFencer[] f = new iFencer[8];
+			
+			for(char i = 'A'; i < 'I'; i++)
 			{
-				fencers[i] = sync.createFencer(a+"", a+"");
-				a++;
+				f[i-'A'] = sync.createFencer(i+"", i+"");
+				t.addParticipant(f[i-'A']);
 			}
 			
-			iTournament t = sync.createTournament("Test");
+			int points = 0;
+			for(iPreliminary p : t.getAllPreliminary())
+			{
+				p.setPoints(p.getFencer().get(0), points++);
+				p.setPoints(p.getFencer().get(1), points++);
+				p.setFinished(true);
+			}
 			
-
-			System.out.println("Fechter: "+Fencer.getFencer((Tournament)t).size());
+			if(t.finishPreliminary())
+				System.out.println("Konnte vorrunden nicht beenden.");
 			
-			for(int i = 0; i < 16; i++)
-				t.addParticipant(fencers[i]);
-			
-
-			System.out.println("Fechter: "+Fencer.getFencer((Tournament)t).size());
-			
-			System.out.println("Vorrunden: "+t.getAllPreliminary().size());
-			
-			t.setGroups(4);
-			System.out.println(t.getParticipantsOfGroup(1));
-			System.out.println(t.getParticipantsOfGroup(2));
-			System.out.println(t.getParticipantsOfGroup(3));
-			System.out.println(t.getParticipantsOfGroup(4));
-
-			System.out.println("Vorrunden: "+t.getAllPreliminary().size());
-			
-			t.createPreliminaryTiming();
-			printSchedule( t.getPreliminarySchedule());
-			
-			
-			t.setFinalRounds(3);
 			((Tournament)t).printTree();
+			
+			boolean found = true;
+			while(found)
+			{
+				found = false;
+				for(iFinalround fr : t.getAllFinalrounds())
+				{
+					if(fr.getFencer().size()==2)
+					{
+						fr.setPoints(fr.getFencer().get(0), points++);
+						fr.setPoints(fr.getFencer().get(1), points++);
+						
+						fr.setFinished(true);
+					}
+				}
+			}
+		
 		} 
 		catch (SQLException e) 
 		{

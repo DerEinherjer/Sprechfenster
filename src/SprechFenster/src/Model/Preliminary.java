@@ -108,6 +108,7 @@ class Preliminary implements iPreliminary
 
 	public boolean setTime(int round, int lane) throws SQLException
 	{
+		if(finished || t.isPrelimFinished()) return false;
 		if(sync.setTimeForPreliminary(this, round, lane))
 		{
 			this.round = round;
@@ -119,6 +120,8 @@ class Preliminary implements iPreliminary
 	
 	public void setPoints(iFencer f, int points) throws SQLException
 	{
+		if(finished || t.isPrelimFinished()) return;
+		
 		if(!finished)
 		{
 			sync.setPoints(ID, ((Fencer)f).getID(), points);
@@ -161,6 +164,8 @@ class Preliminary implements iPreliminary
 	
 	public void setFinished(boolean finish) throws SQLException 
 	{
+		if(t.isPrelimFinished()) return;
+		
 		if(finish != finished)
 		{
 			finished=finish;
@@ -169,28 +174,28 @@ class Preliminary implements iPreliminary
 				propagated = true;
 				
 				if(pointsFor1>pointsFor2)
-					t.addWin(fencer1);
+					t.addWinPrelim(fencer1);
 				else if(pointsFor1 < pointsFor2)
-					t.addWin(fencer2);
+					t.addWinPrelim(fencer2);
 				
-				t.addHits(fencer1, pointsFor1);
-				t.addHits(fencer2, pointsFor2);
-				t.addGotHit(fencer1, pointsFor2);
-				t.addGotHit(fencer2, pointsFor1);
+				t.addHitsPrelim(fencer1, pointsFor1);
+				t.addHitsPrelim(fencer2, pointsFor2);
+				t.addGotHitPrelim(fencer1, pointsFor2);
+				t.addGotHitPrelim(fencer2, pointsFor1);
 			}
 			else
 			{
 				if(propagated)
 				{
 					if(pointsFor1>pointsFor2)
-						t.subWin(fencer1);
+						t.subWinPrelim(fencer1);
 					else if(pointsFor1 < pointsFor2)
-						t.subWin(fencer2);
+						t.subWinPrelim(fencer2);
 					
-					t.addHits(fencer1, -pointsFor1);
-					t.addHits(fencer2, -pointsFor2);
-					t.addGotHit(fencer1, -pointsFor2);
-					t.addGotHit(fencer2, -pointsFor1);
+					t.addHitsPrelim(fencer1, -pointsFor1);
+					t.addHitsPrelim(fencer2, -pointsFor2);
+					t.addGotHitPrelim(fencer1, -pointsFor2);
+					t.addGotHitPrelim(fencer2, -pointsFor1);
 				}
 			}
 		}
@@ -203,14 +208,14 @@ class Preliminary implements iPreliminary
 		if(finished)
 		{
 			if(pointsFor1>pointsFor2)
-				t.addWin(fencer1);
+				t.addWinPrelim(fencer1);
 			else if(pointsFor1 < pointsFor2)
-				t.addWin(fencer2);
+				t.addWinPrelim(fencer2);
 			
-			t.addHits(fencer1, pointsFor1);
-			t.addHits(fencer2, pointsFor2);
-			t.addGotHit(fencer1, pointsFor2);
-			t.addGotHit(fencer2, pointsFor1);
+			t.addHitsPrelim(fencer1, pointsFor1);
+			t.addHitsPrelim(fencer2, pointsFor2);
+			t.addGotHitPrelim(fencer1, pointsFor2);
+			t.addGotHitPrelim(fencer2, pointsFor1);
 		}
 	}
 	
@@ -226,6 +231,8 @@ class Preliminary implements iPreliminary
 	
 	public boolean removeParticipant(iFencer f) throws SQLException
 	{
+		if(finished || t.isPrelimFinished()) return false;
+		
 		if(fencer1!=null && fencer1.equals(f))
 		{
 			sync.removeParticipantFromPrelim(this, (Fencer) f);
@@ -245,6 +252,8 @@ class Preliminary implements iPreliminary
 	
 	public boolean addParticipant(iFencer f) throws SQLException
 	{
+		if(finished || t.isPrelimFinished()) return false;
+		
 		if(fencer1 == null)
 		{
 			sync.addParticipantToPrelim(this, (Fencer) f);
@@ -262,6 +271,8 @@ class Preliminary implements iPreliminary
 	
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException
 	{
+		if(finished || t.isPrelimFinished()) return false;
+		
 		if(fencer1.equals(out)&&!fencer2.equals(in))
 		{
 			sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
@@ -281,6 +292,8 @@ class Preliminary implements iPreliminary
 	
 	void delete()
 	{
+		if(finished || t.isPrelimFinished()) return; //TODO Finished trotzdem löschen??
+		
 		preliminarys.remove(this.ID);
 		this.ID = -1;
 	}

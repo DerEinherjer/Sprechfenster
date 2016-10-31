@@ -37,8 +37,14 @@ public interface iTournament
 	public int preliminaryWithoutTiming() throws SQLException;
 	public void addPreliminary() throws SQLException;
 	
-	public iScore getScoreFrom(iFencer f);
-	public List<iScore> getScores() throws SQLException;
+	public iScore getScoreFromPrelim(iFencer f);
+	public iScore getScoreFromFinal(iFencer f);
+	public List<iScore> getScoresPrelim() throws SQLException;
+	public List<iScore> getScoresFinal() throws SQLException;
 	public List<iScore>[] getScoresInGroups() throws SQLException;
+	
+	public boolean finishPreliminary() throws SQLException;
+	
+	public List<iFinalround> getAllFinalrounds();
 	
 }

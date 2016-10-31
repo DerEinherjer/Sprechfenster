@@ -229,7 +229,7 @@ class DBConnector
 			return -1;
 		if(ctStmt == null)
 		{
-			String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen) VALUES (?, '', 2, 2, 2);";
+			String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen, InFinalrunden) VALUES (?, '', 2, 2, 2, FALSE);";
 			ctStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		}
 		
@@ -920,8 +920,6 @@ class DBConnector
 			if(!rs.next())
 				throw new SQLException("Could not generate finalround");
 			newloser = rs.getInt(1);
-			System.out.println("tmp: "+tmp);
-			System.out.println("new loser: "+newloser);
 		}
 		
 		
@@ -1004,6 +1002,29 @@ class DBConnector
 		return ret;
 	}
 	
+	private PreparedStatement apfStmt = null;
+	@Deprecated
+	boolean allPreliminaryFinished(Tournament t) throws SQLException
+	{
+		if(apfStmt == null)
+		{
+			String sql = "SELCT COUNT(ID) as Unfertig FROM Vorrunden WHERE Beendet = false AND TurnierID = ?;";
+			apfStmt = con.prepareStatement(sql);
+		}
+		
+		apfStmt.setInt(1, t.getID());
+		ResultSet rs = apfStmt.executeQuery();
+		
+		if(!rs.next())
+			throw new SQLException("Cloud not count unfinished preliminarys");
+		
+		int unfinished = rs.getInt("Unfertig");
+		
+		rs.close();
+		
+		return unfinished==0;
+	}
+	
 
 	private Map<String, Object> rowToHash(ResultSet rs) throws SQLException
 	{
@@ -1014,5 +1035,18 @@ class DBConnector
 			ret.put(md.getColumnName(i),rs.getObject(i));
 		}
 		return ret;
+	}
+
+	private PreparedStatement sfpStmt = null;
+	void setFinishedPreliminary(Tournament t) throws SQLException
+	{
+		if(sfpStmt == null)
+		{
+			String sql = "UPDATE Turniere SET InFinalrunden = TRUE WHERE ID = ?;";
+			sfpStmt = con.prepareStatement(sql);
+		}
+		
+		sfpStmt.setInt(1, t.getID());
+		sfpStmt.executeUpdate();
 	}
 }

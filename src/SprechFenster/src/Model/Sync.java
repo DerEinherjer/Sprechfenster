@@ -340,4 +340,9 @@ public class Sync extends iSync
 		setChanged();
 		notifyObservers(change.changedFinalround);
 	}
+
+	public void setFinishedPreliminary(Tournament t) throws SQLException 
+	{
+		con.setFinishedPreliminary(t);
+	}
 }

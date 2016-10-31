@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Finalround implements iFinalrounds
+import sun.security.action.GetLongAction;
+
+public class Finalround implements iFinalround
 {
 	// -----
 	static Sync sync;
@@ -97,7 +99,13 @@ public class Finalround implements iFinalrounds
 	int getID(){return ID;}
 	public int getRound(){return round;}
 	public int getLane(){return lane;}
-	public List<iFencer> getFencer(){List<iFencer> ret = new ArrayList<>();ret.add(fencer1);ret.add(fencer2);return ret;}
+	public List<iFencer> getFencer()
+	{
+		List<iFencer> ret = new ArrayList<>();
+		if(fencer1!=null) ret.add(fencer1);
+		if(fencer2!=null) ret.add(fencer2);
+		return ret;
+	}
 	public boolean setTime(int round, int lane) throws SQLException
 	{
 		if(sync.setTimeForFinalround(this, round, lane))
@@ -151,20 +159,54 @@ public class Finalround implements iFinalrounds
 		return null;
 	}
 	
-	public void setFinished(boolean finish)
+	public void setFinished(boolean finish) throws SQLException
 	{
 		if(finished!=finish)
 		{
 			finished = finish;
 			if(finished)
 			{
-				//TODO
+				if(winnersround!=null)
+					winnersround.addParticipant(getWinner());
+				if(losersround!=null)
+					losersround.addParticipant(getLoser());
+				
+				t.addWinFinal((Fencer)getWinner());
+				
+				t.addHitsFinal(fencer1, pointsFor1);
+				t.addHitsFinal(fencer2, pointsFor2);
+				
+				t.addGotHitFinal(fencer1, pointsFor2);
+				t.addGotHitFinal(fencer2, pointsFor1);
 			}
 			else
 			{
-				//TODO
+				if(winnersround!=null)
+					winnersround.removeParticipant(getWinner());
+				if(losersround!=null)
+					losersround.removeParticipant(getLoser());
+				
+				t.subWinFinal((Fencer)getWinner());
+
+				t.addHitsFinal(fencer1, -pointsFor1);
+				t.addHitsFinal(fencer2, -pointsFor2);
+				
+				t.addGotHitFinal(fencer1, -pointsFor2);
+				t.addGotHitFinal(fencer2, -pointsFor1);
 			}
 		}
+	}
+	
+	Fencer getLoser()
+	{
+		if(finished)
+		{
+			if(pointsFor1>pointsFor2)
+				return fencer2;
+			if(pointsFor1<pointsFor2)
+				return fencer1;
+		}
+		return null;
 	}
 	
 	Finalround getWinnerround()
@@ -234,6 +276,13 @@ public class Finalround implements iFinalrounds
 			return true;
 		}
 		return false;
+	}
+	
+	boolean hasPrerounds()
+	{
+		if(preround1==null && preround2==null)
+			return false;
+		return true;
 	}
 
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException 

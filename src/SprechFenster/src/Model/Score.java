@@ -53,7 +53,11 @@ public class Score implements iScore
 		return gotHit;
 	}
 
-	@Override
+	public int getHitDifference() 
+	{
+		return hits-gotHit;
+	}
+	
 	public int compareTo(iScore o) 
 	{
 		if(wins<o.getWins())

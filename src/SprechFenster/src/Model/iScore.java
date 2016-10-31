@@ -6,4 +6,5 @@ public interface iScore extends Comparable<iScore>
 	public int getWins();
 	public int getHits();
 	public int getGotHit();
+	public int getHitDifference();
 }
