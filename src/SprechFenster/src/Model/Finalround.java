@@ -42,6 +42,13 @@ public class Finalround implements iFinalround
 	private Integer pointsFor2 = null;
 	private Boolean finished = null;
 	
+	private Integer yellowFor1 = null;
+	private Integer redFor1 = null;
+	private Integer blackFor1 = null;
+	private Integer yellowFor2 = null;
+	private Integer redFor2 = null;
+	private Integer blackFor2 = null;
+	
 	private Finalround winnersround = null;
 	private Finalround losersround = null;
 	private Finalround preround1 = null;
@@ -59,7 +66,13 @@ public class Finalround implements iFinalround
 				+ "PunkteVon2 int DEFAULT 0,"
 				+ "Beendet boolean DEFAULT false,"
 				+ "Gewinner int DEFAULT -1,"
-				+ "Verlierer int DEFAULT -1);";
+				+ "Verlierer int DEFAULT -1,"
+				+ "GelbVon1 int DEFAULT 0,"
+				+ "RotVon1 int DEFAULT 0,"
+				+ "SchwarzVon1 int DEFAULT 0,"
+				+ "GelbVon2 int DEFAULT 0,"
+				+ "RotVon2 int DEFAULT 0,"
+				+ "SchwarzVon2 int DEFAULT 0);";
 	}
 	
 	Finalround(Map<String, Object> set) throws ObjectExistExeption, SQLException
@@ -80,6 +93,13 @@ public class Finalround implements iFinalround
 		this.finished = (Boolean) set.get("Beendet".toUpperCase());
 		this.winnersround = Finalround.getFinalround((Integer) set.get("Gewinner".toUpperCase()));
 		this.losersround = Finalround.getFinalround((Integer) set.get("Verlierer".toUpperCase()));
+		
+		this.yellowFor1 = (Integer) set.get("GeldVon1".toUpperCase());
+		this.redFor1 = (Integer) set.get("RotVon1".toUpperCase());
+		this.blackFor1 = (Integer) set.get("SchwarzVon1".toUpperCase());
+		this.yellowFor2 = (Integer) set.get("GeldVon2".toUpperCase());
+		this.redFor2 = (Integer) set.get("RotVon2".toUpperCase());
+		this.blackFor2 = (Integer) set.get("SchwarzVon2".toUpperCase());
 		
 		if(this.winnersround!=null)
 			this.winnersround.initPrerounds(this);
@@ -302,5 +322,79 @@ public class Finalround implements iFinalround
 			return true;
 		}
 		return false;
+	}
+	
+	public void setYellow(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setYellowFinal(this, (Fencer)f, count);
+			yellowFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setYellowFinal(this, (Fencer)f, count);
+			yellowFor2 = count;
+		}
+	}
+	
+	public void setRed(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setRedFinal(this, (Fencer)f, count);
+			redFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setRedFinal(this, (Fencer)f, count);
+			redFor2 = count;
+		}
+	}
+	
+	public void setBlack(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setBlackFinal(this, (Fencer)f, count);
+			blackFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setBlackFinal(this, (Fencer)f, count);
+			blackFor2 = count;
+		}
+	}
+	
+	public int getYellow(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return yellowFor1;
+		if(f.equals(fencer2))
+			return yellowFor2;
+		return -1;
+	}
+	
+	public int getRed(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return redFor1;
+		if(f.equals(fencer2))
+			return redFor2;
+		return -1;
+	}
+	
+	public int getBlack(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return blackFor1;
+		if(f.equals(fencer2))
+			return blackFor2;
+		return -1;
+	}
+	
+	public boolean isFinished()
+	{
+		return finished;
 	}
 }

@@ -15,8 +15,16 @@ public interface iFinalround
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException; 
 	
 	public void setFinished(boolean finisch) throws SQLException;
+	public boolean isFinished();
 	
 	public void setPoints(iFencer f, int points) throws SQLException;
 	public int getPoints(iFencer f) throws SQLException;
 	public int getOpponentPoints(iFencer f) throws SQLException;
+	
+	public void setYellow(iFencer f, int count) throws SQLException;
+	public void setRed(iFencer f, int count) throws SQLException;
+	public void setBlack(iFencer f, int count) throws SQLException;
+	public int getYellow(iFencer f);
+	public int getRed(iFencer f);
+	public int getBlack(iFencer f);
 }

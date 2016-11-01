@@ -25,4 +25,11 @@ public interface iPreliminary
 	public boolean removeParticipant(iFencer f) throws SQLException;
 	public boolean addParticipant(iFencer f) throws SQLException;
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException; 
+	
+	public void setYellow(iFencer f, int count) throws SQLException;
+	public void setRed(iFencer f, int count) throws SQLException;
+	public void setBlack(iFencer f, int count) throws SQLException;
+	public int getYellow(iFencer f);
+	public int getRed(iFencer f);
+	public int getBlack(iFencer f);
 }

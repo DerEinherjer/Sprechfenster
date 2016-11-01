@@ -59,6 +59,13 @@ class Preliminary implements iPreliminary
 	private Integer pointsFor2 = null;
 	private Boolean finished = null;
 	
+	private Integer yellowFor1 = null;
+	private Integer redFor1 = null;
+	private Integer blackFor1 = null;
+	private Integer yellowFor2 = null;
+	private Integer redFor2 = null;
+	private Integer blackFor2 = null;
+	
 	private Boolean propagated = false;
 	
 	static String getSQLString()
@@ -72,7 +79,13 @@ class Preliminary implements iPreliminary
 				+ "Teilnehmer2 int DEFAULT -1,"
 				+ "PunkteVon1 int DEFAULT 0,"
 				+ "PunkteVon2 int DEFAULT 0,"
-				+ "Beendet boolean DEFAULT FALSE);";
+				+ "Beendet boolean DEFAULT FALSE,"
+				+ "GelbVon1 int DEFAULT 0,"
+				+ "RotVon1 int DEFAULT 0,"
+				+ "SchwarzVon1 int DEFAULT 0,"
+				+ "GelbVon2 int DEFAULT 0,"
+				+ "RotVon2 int DEFAULT 0,"
+				+ "SchwarzVon2 int DEFAULT 0);";
 	}
 	
 	Preliminary(Map<String, Object> set) throws ObjectExistExeption, SQLException
@@ -305,6 +318,75 @@ class Preliminary implements iPreliminary
 		if(fencer1!=null && fencer2.equals(f))
 			return true;
 		return false;
+	}
+	
+	public void setYellow(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setYellowPrelim(this, (Fencer)f, count);
+			yellowFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setYellowPrelim(this, (Fencer)f, count);
+			yellowFor2 = count;
+		}
+	}
+	
+	public void setRed(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setRedPrelim(this, (Fencer)f, count);
+			redFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setRedPrelim(this, (Fencer)f, count);
+			redFor2 = count;
+		}
+	}
+	
+	public void setBlack(iFencer f, int count) throws SQLException
+	{
+		if(f.equals(fencer1))
+		{
+			sync.setBlackPrelim(this, (Fencer)f, count);
+			blackFor1 = count;
+		}
+		else if(f.equals(fencer2))
+		{
+			sync.setBlackPrelim(this, (Fencer)f, count);
+			blackFor2 = count;
+		}
+	}
+	
+	public int getYellow(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return yellowFor1;
+		if(f.equals(fencer2))
+			return yellowFor2;
+		return -1;
+	}
+	
+	public int getRed(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return redFor1;
+		if(f.equals(fencer2))
+			return redFor2;
+		return -1;
+	}
+	
+	public int getBlack(iFencer f)
+	{
+		if(f.equals(fencer1))
+			return blackFor1;
+		if(f.equals(fencer2))
+			return blackFor2;
+		return -1;
 	}
 	
 	@Override

@@ -341,8 +341,38 @@ public class Sync extends iSync
 		notifyObservers(change.changedFinalround);
 	}
 
-	public void setFinishedPreliminary(Tournament t) throws SQLException 
+	void setFinishedPreliminary(Tournament t) throws SQLException 
 	{
 		con.setFinishedPreliminary(t);
+	}
+	
+	void setYellowFinal(Finalround fr, Fencer f, int count) throws SQLException
+	{
+		con.setYellowFinal(fr, f, count);
+	}
+	
+	void setYellowPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		con.setYellowPrelim(p, f, count);
+	}
+	
+	void setRedFinal(Finalround fr, Fencer f, int count) throws SQLException
+	{
+		con.setRedFinal(fr, f, count);
+	}
+	
+	void setRedPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		con.setRedPrelim(p, f, count);
+	}
+	
+	void setBlackFinal(Finalround fr, Fencer f, int count) throws SQLException
+	{
+		con.setBlackFinal(fr, f, count);
+	}
+	
+	void setBlackPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		con.setBlackPrelim(p, f, count);
 	}
 }

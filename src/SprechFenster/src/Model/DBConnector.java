@@ -1049,4 +1049,124 @@ class DBConnector
 		sfpStmt.setInt(1, t.getID());
 		sfpStmt.executeUpdate();
 	}
+	
+	private PreparedStatement sypStmt = null;
+	void setYellowPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		if(sypStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET GelbVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE GelbVon1 END,"
+						                     +"GelbVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE GelbVon2 END "
+						                     +"WHERE ID = ?";
+			sypStmt = con .prepareStatement(sql);
+		}
+		
+		sypStmt.setInt(1, f.getID());
+		sypStmt.setInt(2, count);
+		sypStmt.setInt(3, f.getID());
+		sypStmt.setInt(4, count);
+		sypStmt.setInt(5, p.getID());
+		
+		sypStmt.executeUpdate();
+	}
+	
+	private PreparedStatement syfStmt = null;
+	void setYellowFinal(Finalround p, Fencer f, int count) throws SQLException
+	{
+		if(syfStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET GelbVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE GelbVon1 END,"
+						                      +"GelbVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE GelbVon2 END "
+						                      +"WHERE ID = ?";
+			syfStmt = con .prepareStatement(sql);
+		}
+		
+		syfStmt.setInt(1, f.getID());
+		syfStmt.setInt(2, count);
+		syfStmt.setInt(3, f.getID());
+		syfStmt.setInt(4, count);
+		syfStmt.setInt(5, p.getID());
+		
+		syfStmt.executeUpdate();
+	}
+	
+	private PreparedStatement srpStmt = null;
+	void setRedPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		if(srpStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET RotVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE RotVon1 END,"
+						                     +"RotVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE RotVon2 END "
+						                     +"WHERE ID = ?";
+			srpStmt = con .prepareStatement(sql);
+		}
+		
+		srpStmt.setInt(1, f.getID());
+		srpStmt.setInt(2, count);
+		srpStmt.setInt(3, f.getID());
+		srpStmt.setInt(4, count);
+		srpStmt.setInt(5, p.getID());
+		
+		srpStmt.executeUpdate();
+	}
+	
+	private PreparedStatement srfStmt = null;
+	void setRedFinal(Finalround p, Fencer f, int count) throws SQLException
+	{
+		if(srfStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET RotVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE RotVon1 END,"
+						                      +"RotVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE RotVon2 END "
+						                      +"WHERE ID = ?";
+			srfStmt = con .prepareStatement(sql);
+		}
+		
+		srfStmt.setInt(1, f.getID());
+		srfStmt.setInt(2, count);
+		srfStmt.setInt(3, f.getID());
+		srfStmt.setInt(4, count);
+		srfStmt.setInt(5, p.getID());
+		
+		srfStmt.executeUpdate();
+	}
+	
+	private PreparedStatement sbpStmt = null;
+	void setBlackPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	{
+		if(sbpStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET SchwarzVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE SchwarzVon1 END,"
+						                     +"SchwarzVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE SchwarzVon2 END "
+						                     +"WHERE ID = ?";
+			sbpStmt = con .prepareStatement(sql);
+		}
+		
+		sbpStmt.setInt(1, f.getID());
+		sbpStmt.setInt(2, count);
+		sbpStmt.setInt(3, f.getID());
+		sbpStmt.setInt(4, count);
+		sbpStmt.setInt(5, p.getID());
+		
+		sbpStmt.executeUpdate();
+	}
+	
+	private PreparedStatement sbfStmt = null;
+	void setBlackFinal(Finalround p, Fencer f, int count) throws SQLException
+	{
+		if(sbfStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET SchwarzVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE SchwarzVon1 END,"
+						                      +"SchwarzVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE SchwarzVon2 END "
+						                      +"WHERE ID = ?";
+			sbfStmt = con .prepareStatement(sql);
+		}
+		
+		sbfStmt.setInt(1, f.getID());
+		sbfStmt.setInt(2, count);
+		sbfStmt.setInt(3, f.getID());
+		sbfStmt.setInt(4, count);
+		sbfStmt.setInt(5, p.getID());
+		
+		sbfStmt.executeUpdate();
+	}
 }
