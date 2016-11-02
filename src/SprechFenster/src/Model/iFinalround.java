@@ -27,4 +27,6 @@ public interface iFinalround
 	public int getYellow(iFencer f);
 	public int getRed(iFencer f);
 	public int getBlack(iFencer f);
+	
+	public boolean isFencer(iFencer f);
 }

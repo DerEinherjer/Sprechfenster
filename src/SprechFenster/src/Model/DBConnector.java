@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+
 
 
 //TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
@@ -566,19 +568,26 @@ class DBConnector
 			sql = "SELECT Bahnen FROM Turniere WHERE ID = ?;";
 			stfp2Stmt = con.prepareStatement(sql);
 		}
-		Tournament t = (Tournament)p.getTournament();
-		stfp2Stmt.setInt(1, t.getID());
-		ResultSet rs = stfp2Stmt.executeQuery();
-		if(!rs.next())
-			throw new SQLException("Could not found Tournament. (ID "+t.getID()+")");
-		if(lane<1||lane>rs.getInt("Bahnen")) return false;
-		
-		
-		stfp1Stmt.setInt(1, round);
-		stfp1Stmt.setInt(2, lane);
-		stfp1Stmt.setInt(3, p.getID());
-		stfp1Stmt.executeUpdate();
-		return true;
+		try
+		{
+			Tournament t = (Tournament)p.getTournament();
+			stfp2Stmt.setInt(1, t.getID());
+			ResultSet rs = stfp2Stmt.executeQuery();
+			if(!rs.next())
+				throw new SQLException("Could not found Tournament. (ID "+t.getID()+")");
+			if(lane<1||lane>rs.getInt("Bahnen")) return false;
+			
+			
+			stfp1Stmt.setInt(1, round);
+			stfp1Stmt.setInt(2, lane);
+			stfp1Stmt.setInt(3, p.getID());
+			stfp1Stmt.executeUpdate();
+			return true;
+		}
+		catch(ObjectDeprecatedExeption e)
+		{
+			return false;
+		}
 	}
 	
 	private PreparedStatement gapStmt = null;
@@ -793,11 +802,14 @@ class DBConnector
                                              +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? THEN -1 ELSE Teilnehmer2 END WHERE ID = ?;";
 			rpfpStmt = con.prepareStatement(sql);
 		}
-		
-		rpfpStmt.setInt(1, f.getID());
-		rpfpStmt.setInt(2, f.getID());
-		rpfpStmt.setInt(3, p.getID());
-		rpfpStmt.executeUpdate();
+		try
+		{
+			rpfpStmt.setInt(1, f.getID());
+			rpfpStmt.setInt(2, f.getID());
+			rpfpStmt.setInt(3, p.getID());
+			rpfpStmt.executeUpdate();
+		}
+		catch (ObjectDeprecatedExeption e) {}
 	}
 	
 	private PreparedStatement rpffStmt = null;
@@ -825,10 +837,14 @@ class DBConnector
                                              +"Teilnehmer2 = CASE WHEN Teilnehmer2 = -1 AND Teilnehmer1 != -1 THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
 			aptpStmt = con.prepareStatement(sql);
 		}
-		aptpStmt.setInt(1, f.getID());
-		aptpStmt.setInt(2, f.getID());
-		aptpStmt.setInt(3, p.getID());
-		aptpStmt.executeUpdate();
+		try
+		{
+			aptpStmt.setInt(1, f.getID());
+			aptpStmt.setInt(2, f.getID());
+			aptpStmt.setInt(3, p.getID());
+			aptpStmt.executeUpdate();
+		}
+		catch(ObjectDeprecatedExeption e){}
 	}
 	
 	private PreparedStatement aptfStmt = null;
@@ -855,15 +871,18 @@ class DBConnector
                                              +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? AND Teilnehmer1 != ? THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
 			spipStmt = con.prepareStatement(sql);
 		}
-		
-		spipStmt.setInt(1, out.getID());
-		spipStmt.setInt(2, in.getID());
-		spipStmt.setInt(3, in.getID());
-		spipStmt.setInt(4, out.getID());
-		spipStmt.setInt(5, in.getID());
-		spipStmt.setInt(6, in.getID());
-		spipStmt.setInt(7, p.getID());
-		spipStmt.executeUpdate();
+		try
+		{
+			spipStmt.setInt(1, out.getID());
+			spipStmt.setInt(2, in.getID());
+			spipStmt.setInt(3, in.getID());
+			spipStmt.setInt(4, out.getID());
+			spipStmt.setInt(5, in.getID());
+			spipStmt.setInt(6, in.getID());
+			spipStmt.setInt(7, p.getID());
+			spipStmt.executeUpdate();
+		}
+		catch(ObjectDeprecatedExeption e){}
 	}
 	
 	private PreparedStatement spifStmt = null; 
@@ -1060,14 +1079,17 @@ class DBConnector
 						                     +"WHERE ID = ?";
 			sypStmt = con .prepareStatement(sql);
 		}
-		
-		sypStmt.setInt(1, f.getID());
-		sypStmt.setInt(2, count);
-		sypStmt.setInt(3, f.getID());
-		sypStmt.setInt(4, count);
-		sypStmt.setInt(5, p.getID());
-		
-		sypStmt.executeUpdate();
+		try
+		{
+			sypStmt.setInt(1, f.getID());
+			sypStmt.setInt(2, count);
+			sypStmt.setInt(3, f.getID());
+			sypStmt.setInt(4, count);
+			sypStmt.setInt(5, p.getID());
+			
+			sypStmt.executeUpdate();
+		}
+		catch(ObjectDeprecatedExeption e){}
 	}
 	
 	private PreparedStatement syfStmt = null;
@@ -1100,14 +1122,17 @@ class DBConnector
 						                     +"WHERE ID = ?";
 			srpStmt = con .prepareStatement(sql);
 		}
-		
-		srpStmt.setInt(1, f.getID());
-		srpStmt.setInt(2, count);
-		srpStmt.setInt(3, f.getID());
-		srpStmt.setInt(4, count);
-		srpStmt.setInt(5, p.getID());
-		
-		srpStmt.executeUpdate();
+		try
+		{
+			srpStmt.setInt(1, f.getID());
+			srpStmt.setInt(2, count);
+			srpStmt.setInt(3, f.getID());
+			srpStmt.setInt(4, count);
+			srpStmt.setInt(5, p.getID());
+			
+			srpStmt.executeUpdate();
+		}
+		catch(ObjectDeprecatedExeption e){}
 	}
 	
 	private PreparedStatement srfStmt = null;
@@ -1140,14 +1165,17 @@ class DBConnector
 						                     +"WHERE ID = ?";
 			sbpStmt = con .prepareStatement(sql);
 		}
-		
-		sbpStmt.setInt(1, f.getID());
-		sbpStmt.setInt(2, count);
-		sbpStmt.setInt(3, f.getID());
-		sbpStmt.setInt(4, count);
-		sbpStmt.setInt(5, p.getID());
-		
-		sbpStmt.executeUpdate();
+		try
+		{
+			sbpStmt.setInt(1, f.getID());
+			sbpStmt.setInt(2, count);
+			sbpStmt.setInt(3, f.getID());
+			sbpStmt.setInt(4, count);
+			sbpStmt.setInt(5, p.getID());
+			
+			sbpStmt.executeUpdate();
+		}
+		catch(ObjectDeprecatedExeption e){}
 	}
 	
 	private PreparedStatement sbfStmt = null;
@@ -1168,5 +1196,25 @@ class DBConnector
 		sbfStmt.setInt(5, p.getID());
 		
 		sbfStmt.executeUpdate();
+	}
+	
+	private PreparedStatement gdoStmt = null;
+	boolean getDropedOut(Tournament t, Fencer f) throws SQLException
+	{
+		if(gdoStmt == null)
+		{
+			String sql = "SELECT Ausgeschieden FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			gdoStmt = con.prepareStatement(sql);			
+		}
+		
+		gdoStmt.setInt(1, t.getID());
+		gdoStmt.setInt(2, f.getID());
+		ResultSet rs = gdoStmt.executeQuery();
+		if(!rs.next())
+			throw new SQLException("Could not find participant entry. (TournamentId: "+t.getID()+", FencerID: "+f.getID()+")");
+		
+		boolean ret = rs.getBoolean(1);
+		rs.close();
+		return ret;
 	}
 }

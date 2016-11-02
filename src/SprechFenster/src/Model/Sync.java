@@ -17,12 +17,13 @@ public class Sync extends iSync
 		createdFencer,
 		createdTournament,
 		changedFencerValue,
-		changedTournamentValue, 
-		removedParticipant, 
-		addedParticipant, 
-		changedPreliminary, 
-		changedFinalround, 
-		createdPreliminary
+		changedTournamentValue,
+		removedParticipant,
+		addedParticipant,
+		changedPreliminary,
+		changedFinalround,
+		createdPreliminary,
+		changedCards
 	}
 	
 	Sync() throws SQLException
@@ -349,30 +350,47 @@ public class Sync extends iSync
 	void setYellowFinal(Finalround fr, Fencer f, int count) throws SQLException
 	{
 		con.setYellowFinal(fr, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
 	}
 	
 	void setYellowPrelim(Preliminary p, Fencer f, int count) throws SQLException
 	{
 		con.setYellowPrelim(p, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
 	}
 	
 	void setRedFinal(Finalround fr, Fencer f, int count) throws SQLException
 	{
 		con.setRedFinal(fr, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
 	}
 	
 	void setRedPrelim(Preliminary p, Fencer f, int count) throws SQLException
 	{
 		con.setRedPrelim(p, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
 	}
 	
 	void setBlackFinal(Finalround fr, Fencer f, int count) throws SQLException
 	{
 		con.setBlackFinal(fr, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
 	}
 	
 	void setBlackPrelim(Preliminary p, Fencer f, int count) throws SQLException
 	{
 		con.setBlackPrelim(p, f, count);
+		setChanged();
+		notifyObservers(change.changedCards);
+	}
+	
+	boolean getDropedOut(Tournament t,Fencer f) throws SQLException
+	{
+		return con.getDropedOut(t, f);
 	}
 }

@@ -397,4 +397,11 @@ public class Finalround implements iFinalround
 	{
 		return finished;
 	}
+	
+	public boolean isFencer(iFencer f)
+	{
+		if(fencer1.equals(f)||fencer2.equals(f))
+			return true;
+		return false;
+	}
 }

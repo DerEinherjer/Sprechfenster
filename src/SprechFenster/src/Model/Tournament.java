@@ -41,6 +41,7 @@ class Tournament implements iTournament
 	private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
 	private Map<Fencer, Score> scoresPrelim = new HashMap<>();
 	private Map<Fencer, Score> scoresFinal = new HashMap<>();
+	private Map<Fencer, Boolean> dropedOut = new HashMap<>();
 	
 	static String getSQLString()
 	{
@@ -73,7 +74,9 @@ class Tournament implements iTournament
 		for(iFencer f : getAllParticipants())
 		{
 			scoresPrelim.put((Fencer) f, new Score((Fencer)f));
+			scoresFinal.put((Fencer) f, new Score((Fencer) f));
 			entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer)f));
+			dropedOut.put((Fencer) f, sync.getDropedOut(this, (Fencer)f));
 			equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
 		}
 		
@@ -132,8 +135,12 @@ class Tournament implements iTournament
 	{
 		for(Preliminary p : Preliminary.getPreliminarys(this))
 		{
-			if(p.getLane()>lanes)
-				p.setTime(0, 0);
+			try
+			{
+				if(p.getLane()>lanes)
+					p.setTime(0, 0);
+			}
+			catch(ObjectDeprecatedExeption e){}
 		}
 		sync.tournamentSetLanes(lanes, ID);
 		this.lanes = lanes;
@@ -161,6 +168,7 @@ class Tournament implements iTournament
 		sync.addParticipant(this, (Fencer)f, group);
 		
 		scoresPrelim.put((Fencer) f, new Score((Fencer)f));
+		scoresFinal.put((Fencer) f, new Score((Fencer)f));
 		entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer)f));
 		equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
 	}
@@ -191,25 +199,29 @@ class Tournament implements iTournament
 		
 		for(int i = 0;!prelim.isEmpty(); i++)
 		{
-			iPreliminary next = prelim.get(0);
-			for(iPreliminary p : prelim)
+			try
 			{
-				if(lastForPrelim.get(next)>lastForPrelim.get(p))
+				iPreliminary next = prelim.get(0);
+				for(iPreliminary p : prelim)
 				{
-					next = p;
+					if(lastForPrelim.get(next)>lastForPrelim.get(p))
+					{
+						next = p;
+					}
+				}
+				
+				if(lastForPrelim.get(next)==i/lanes) continue;
+				
+				next.setTime((i/lanes)+1, (i%lanes)+1);
+				
+				prelim.remove(next);
+				for(iPreliminary p : prelim)
+				{
+					if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(1)))
+						lastForPrelim.put(p, i/lanes);
 				}
 			}
-			
-			if(lastForPrelim.get(next)==i/lanes) continue;
-			
-			next.setTime((i/lanes)+1, (i%lanes)+1);
-			
-			prelim.remove(next);
-			for(iPreliminary p : prelim)
-			{
-				if(p.getFencer().contains(next.getFencer().get(0))||p.getFencer().contains(next.getFencer().get(1)))
-					lastForPrelim.put(p, i/lanes);
-			}
+			catch(ObjectDeprecatedExeption e){}
 		}
 	}
 	
@@ -218,15 +230,23 @@ class Tournament implements iTournament
 		List<iPreliminary> list = getAllPreliminary();
 		int last = 0;
 		for(iPreliminary p: list)
-			if(p.getRound()>last)
-				last = p.getRound();
+			try
+			{
+				if(p.getRound()>last)
+					last = p.getRound();
+			}
+			catch(ObjectDeprecatedExeption e){list.remove(p);}
 		
 		iPreliminary[][] ret = new iPreliminary[last][lanes];
 		
 		for(iPreliminary p: list)
 		{
-			if(p.getRound()<1||p.getLane()<1) continue; //Noch nicht angesetzte begegnungen werden ignoriert
-			ret[p.getRound()-1][p.getLane()-1]=p;
+			try
+			{
+				if(p.getRound()<1||p.getLane()<1) continue; //Noch nicht angesetzte begegnungen werden ignoriert
+				ret[p.getRound()-1][p.getLane()-1]=p;
+			}
+			catch(ObjectDeprecatedExeption e){list.remove(p);}
 		}
 		
 		return ret;
@@ -247,9 +267,13 @@ class Tournament implements iTournament
 	
 	public void removeParticipant(iFencer f) throws SQLException
 	{
-		sync.removeParticipant((Fencer)f);
-		
-		scoresPrelim.remove((Fencer)f);
+		if(isParticipant(f))
+		{
+			sync.removeParticipant((Fencer)f);
+			
+			scoresPrelim.remove((Fencer)f);
+			scoresFinal.remove((Fencer)f);
+		}
 	}
 	
 	public void setEntryFee(iFencer f, boolean paid) throws SQLException
@@ -447,8 +471,12 @@ class Tournament implements iTournament
 	{
 		int ret = 0;
 		for(iPreliminary p : getAllPreliminary())
-			if(p.getLane()<1||p.getRound()<1)
-				ret ++;
+			try
+			{
+				if(p.getLane()<1||p.getRound()<1)
+					ret ++;
+			}
+			catch(ObjectDeprecatedExeption e){}
 		return ret;
 	}
 	
@@ -538,8 +566,12 @@ class Tournament implements iTournament
 	{
 		for(Preliminary p : Preliminary.getPreliminarys(this))
 		{
-			if(!p.isFinished())
-				return false;
+			try
+			{
+				if(!p.isFinished())
+					return false;
+			}
+			catch(ObjectDeprecatedExeption e){}
 		}
 		return true;
 	}
@@ -550,6 +582,50 @@ class Tournament implements iTournament
 		for(Finalround f :Finalround.getFinalrounds(this))
 			ret.add(f);
 		return ret;
+	}
+	
+	public void dropOut(iFencer f) throws SQLException
+	{
+		if(!finishedPreliminary)
+		{
+			for(Preliminary p : Preliminary.getPreliminarys(this))
+			{
+				try
+				{
+					if(p.isFencer((Fencer)f))
+					{
+						for(iFencer tmp : p.getFencer())
+						{
+							if(tmp.equals(f))
+								p.setPoints(tmp, 0);
+							else
+								p.setPoints(tmp, 5);
+						}
+						p.setFinished(true);
+						dropedOut.put((Fencer) f, true);
+					}
+				}
+				catch(ObjectDeprecatedExeption e){}
+			}
+		}
+		else
+		{
+			for(Finalround fr : Finalround.getFinalrounds(this))
+			{
+				if(fr.isFencer(f))
+				{
+					for(iFencer tmp : fr.getFencer())
+					{
+						if(tmp.equals(f))
+							fr.setPoints(tmp, 0);
+						else
+							fr.setPoints(tmp, 5);
+					}
+					fr.setFinished(true);
+					dropedOut.put((Fencer) f, true);
+				}
+			}
+		}
 	}
 	
 	@Override

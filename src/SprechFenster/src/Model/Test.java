@@ -89,13 +89,13 @@ public class Test
 			}
 		
 		} 
-		catch (SQLException e) 
+		catch (Exception e) 
 		{
 			e.printStackTrace();
 		}	
 	}
 	
-	static void printSchedule(iPreliminary schedule[][])
+	static void printSchedule(iPreliminary schedule[][]) throws ObjectDeprecatedExeption
 	{
 		for(int x = 0; x < schedule.length; x++)
 		{

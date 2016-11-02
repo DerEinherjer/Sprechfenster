@@ -122,5 +122,4 @@ class Fencer implements iFencer
 	    	return true;
 	    return false;
 	}
-	
 }
