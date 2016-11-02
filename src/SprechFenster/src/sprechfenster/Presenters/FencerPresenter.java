@@ -95,7 +95,7 @@ public class FencerPresenter {
     {
         if(Tournament != null)
         {
-            iScore score = Tournament.getScoreFrom(Fencer);
+            iScore score = Tournament.getScoreFromPrelim(Fencer);
             if(score != null)
             {
                 return String.format("%d/%d", score.getHits(), score.getGotHit());
@@ -108,7 +108,7 @@ public class FencerPresenter {
     {
         if(Tournament != null)
         {
-            iScore score = Tournament.getScoreFrom(Fencer);
+            iScore score = Tournament.getScoreFromPrelim(Fencer);
             if(score != null)
             {
                 return Integer.toString(score.getWins());
