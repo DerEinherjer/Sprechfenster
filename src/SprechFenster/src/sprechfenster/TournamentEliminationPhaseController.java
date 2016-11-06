@@ -5,13 +5,16 @@
  */
 package sprechfenster;
 
+import Model.iSync;
 import Model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +22,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -35,9 +40,11 @@ import sprechfenster.Presenters.QualificationFightPresenter;
  *
  * @author Stefan
  */
-public class TournamentEliminationPhaseController implements Initializable
+public class TournamentEliminationPhaseController implements Initializable, Observer
 {
 
+    @FXML
+    Button CreateEliminationRoundsButton;
     @FXML
     FlowPane FencersPane;
     @FXML
@@ -68,6 +75,7 @@ public class TournamentEliminationPhaseController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
+        iSync.getInstance().addObserver(this);
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
         FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
@@ -119,7 +127,7 @@ public class TournamentEliminationPhaseController implements Initializable
                                             }
                                             catch (IOException ex)
                                             {
-                                                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                                                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                             }
 
                                 });
@@ -137,16 +145,30 @@ public class TournamentEliminationPhaseController implements Initializable
     public void SetTournament(iTournament tournament)
     {
         Tournament = tournament;
-        SetupEliminationPhaseView();
+        UpdateData();
     }
-
-    private void SetupEliminationPhaseView()
+    
+    @FXML
+    private void handleCreateEliminiationRoundsButtonAction(ActionEvent event)
     {
         if (Tournament != null)
         {
-            //Tournament.CreateFinalRounds();
-            UpdateData();
-
+            try
+            {
+                Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?",
+                        ButtonType.YES, ButtonType.NO);
+                Optional<ButtonType> result = confirmationDialog.showAndWait();
+                if(result.isPresent() && result.get() == ButtonType.YES)
+                {
+                    Tournament.finishPreliminary();
+                    UpdateData();
+                }
+            }
+            catch (SQLException ex)
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -167,17 +189,19 @@ public class TournamentEliminationPhaseController implements Initializable
                 FencerListController = controller;
                 FencersPane.getChildren().add(groupTable);
                 controller.AddFencer(Tournament.getAllParticipants());
-
+                CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
             }
-            catch (IOException ex)
+            catch (IOException | SQLException ex)
             {
-                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            catch (SQLException ex)
-            {
-                Logger.getLogger(TournamentEliminationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    @Override
+    public void update(Observable o, Object o1)
+    {
+        UpdateData();
     }
 
 }

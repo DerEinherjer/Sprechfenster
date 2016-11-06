@@ -5,12 +5,14 @@
  */
 package sprechfenster.Presenters;
 
+import Model.ObjectDeprecatedExeption;
 import Model.iFencer;
 import Model.iPreliminary;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sprechfenster.LoggingUtilities;
 
 /**
  *
@@ -84,28 +86,63 @@ public class QualificationFightPresenter
     
     public String getLane()
     {
-        return Integer.toString(Fight.getLane());
+        String lane = "";
+        try
+        {
+            lane = Integer.toString(Fight.getLane());
+        }
+        catch (ObjectDeprecatedExeption ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return lane;
     }
     
     public String getRound()
     {
-        return Integer.toString(Fight.getRound());
+        String round = "";
+        try
+        {
+            round = Integer.toString(Fight.getRound());
+        }
+        catch (ObjectDeprecatedExeption ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return round;
     }
     
     public String getGroup()
     {
-        return Integer.toString(Fight.getGroup());
+        String group = "";
+        try
+        {
+            group = Integer.toString(Fight.getGroup());
+        }
+        catch (ObjectDeprecatedExeption ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return group;
     }
     
     public String getStatus()
     {
-        if(Fight.isFinished())
+        try
         {
-            return "Beendet";
+            if(Fight.isFinished())
+            {
+                return "Beendet";
+            }
+            else
+            {
+                return "Offen";
+            }
         }
-        else
+        catch (ObjectDeprecatedExeption ex)
         {
-            return "Offen";
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            return "-";
         }
     }
     
@@ -131,7 +168,11 @@ public class QualificationFightPresenter
             }
             catch (SQLException ex)
             {
-                Logger.getLogger(QualificationFightPresenter.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
+            catch (ObjectDeprecatedExeption ex)
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
         return "-";
@@ -139,14 +180,22 @@ public class QualificationFightPresenter
     
     private iFencer getFencer(int index)
     {
-        List<iFencer> fencers = Fight.getFencer();
-        if(fencers != null && fencers.size() > index)
+        try
         {
-            iFencer fencer = fencers.get(index);
-            return fencer;
+            List<iFencer> fencers = Fight.getFencer();
+            if(fencers != null && fencers.size() > index)
+            {
+                iFencer fencer = fencers.get(index);
+                return fencer;
+            }
+            else
+            {
+                return null;
+            }
         }
-        else
+        catch (ObjectDeprecatedExeption ex)
         {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             return null;
         }
     }

@@ -5,6 +5,7 @@
  */
 package sprechfenster;
 
+import Model.ObjectDeprecatedExeption;
 import Model.iFencer;
 import Model.iPreliminary;
 import Model.iTournament;
@@ -109,7 +110,11 @@ public class EditQualificationFightDialogController implements Initializable
             }
             catch (SQLException ex)
             {
-                Logger.getLogger(EditQualificationFightDialogController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
+            catch (ObjectDeprecatedExeption ex)
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -149,10 +154,17 @@ public class EditQualificationFightDialogController implements Initializable
 
                 if (allValuesOk)
                 {
-                    Fight.setPoints(firstFencer, firstFencerPoints);
-                    Fight.setPoints(secondFencer, secondFencerPoints);
-                    Fight.setTime(round, lane);
-                    Fight.setFinished(fightIsFinished);
+                    try
+                    {
+                        Fight.setPoints(firstFencer, firstFencerPoints);
+                        Fight.setPoints(secondFencer, secondFencerPoints);
+                        Fight.setTime(round, lane);
+                        Fight.setFinished(fightIsFinished);
+                    }
+                    catch (ObjectDeprecatedExeption ex)
+                    {
+                        LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             catch (NumberFormatException ex)
@@ -161,7 +173,7 @@ public class EditQualificationFightDialogController implements Initializable
             }
             catch (SQLException ex)
             {
-                Logger.getLogger(EditQualificationFightDialogController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
             finally
             {

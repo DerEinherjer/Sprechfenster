@@ -153,7 +153,7 @@ class Preliminary implements iPreliminary
 	public boolean setTime(int round, int lane) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return false;
+		if(finished || t.isPreliminaryFinished()) return false;
 		if(sync.setTimeForPreliminary(this, round, lane))
 		{
 			this.round = round;
@@ -166,7 +166,7 @@ class Preliminary implements iPreliminary
 	public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return;
+		if(finished || t.isPreliminaryFinished()) return;
 		
 		if(!finished)
 		{
@@ -214,7 +214,7 @@ class Preliminary implements iPreliminary
 	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedExeption 
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(t.isPrelimFinished()) return;
+		if(t.isPreliminaryFinished()) return;
 		
 		if(finish != finished)
 		{
@@ -284,7 +284,7 @@ class Preliminary implements iPreliminary
 	public boolean removeParticipant(iFencer f) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return false;
+		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1!=null && fencer1.equals(f))
 		{
@@ -306,7 +306,7 @@ class Preliminary implements iPreliminary
 	public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return false;
+		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1 == null)
 		{
@@ -326,7 +326,7 @@ class Preliminary implements iPreliminary
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return false;
+		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1.equals(out)&&!fencer2.equals(in))
 		{
@@ -348,7 +348,7 @@ class Preliminary implements iPreliminary
 	public void delete() throws ObjectDeprecatedExeption
 	{
 		if(!isValid) throw new ObjectDeprecatedExeption();
-		if(finished || t.isPrelimFinished()) return; //TODO Finished trotzdem löschen??
+		if(finished || t.isPreliminaryFinished()) return; //TODO Finished trotzdem löschen??
 		
 		preliminarys.remove(this.ID);
 		this.ID = -1;

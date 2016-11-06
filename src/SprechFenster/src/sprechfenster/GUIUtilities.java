@@ -24,6 +24,10 @@ public class GUIUtilities {
         }
         box.getItems().clear();
         box.getItems().addAll(numbers);
+        if(box.getItems().size() > 0)
+        {
+            box.getSelectionModel().select(0);
+        }
     }
     
     static String GetDateStringFromDatePicker(DatePicker picker)

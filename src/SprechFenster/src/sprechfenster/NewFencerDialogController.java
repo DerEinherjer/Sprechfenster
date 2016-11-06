@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -96,7 +95,7 @@ public class NewFencerDialogController implements Initializable {
                 newFencer.setNationality(NationalityComboBox.getValue().toString());
                 newFencer.setFencingSchool(FencingSchoolComboBox.getValue().toString());
             } catch (SQLException ex) {
-                Logger.getLogger(NewFencerDialogController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
         CloseDialog();

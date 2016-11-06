@@ -5,16 +5,19 @@
  */
 package sprechfenster;
 
+import Model.ObjectDeprecatedExeption;
 import Model.iPreliminary;
+import Model.iSync;
 import Model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -38,7 +41,7 @@ import sprechfenster.Presenters.QualificationFightPresenter;
  *
  * @author Stefan
  */
-public class TournamentQualificationPhaseController implements Initializable
+public class TournamentQualificationPhaseController implements Initializable, Observer
 {
 
     @FXML
@@ -61,8 +64,10 @@ public class TournamentQualificationPhaseController implements Initializable
     TableColumn GroupTableColumn;
     @FXML
     TableColumn EditTableColumn;
-    @FXML 
+    @FXML
     TableColumn StatusTableColumn;
+    @FXML
+    Button CreateQualificationRoundsButton;
 
     iTournament Tournament;
     ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
@@ -73,14 +78,15 @@ public class TournamentQualificationPhaseController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
+        iSync.getInstance().addObserver(this);
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
         FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
-        //FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
+        FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
         SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
-        //SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
+        SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
         GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
-        //StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
+        StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
         Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory
@@ -125,7 +131,7 @@ public class TournamentQualificationPhaseController implements Initializable
                                             }
                                             catch (IOException ex)
                                             {
-                                                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                                                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                             }
 
                                 });
@@ -150,76 +156,126 @@ public class TournamentQualificationPhaseController implements Initializable
     {
         if (Tournament != null)
         {
+            UpdateData();
+        }
+    }
+
+    @FXML
+    private void HandleCreateQualificationRoundsButtonAction(ActionEvent event)
+    {
+        if (Tournament != null)
+        {
             try
             {
                 Tournament.createPreliminaryTiming();
-                UpdateData();
             }
             catch (SQLException ex)
             {
-                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
 
     private void UpdateData()
     {
-        if(Tournament != null)
+        if (Tournament != null)
         {
             try
             {
+                CreateQualificationRoundsButton.setDisable(Tournament.preliminaryWithoutTiming() == 0 || Tournament.isPreliminaryFinished());
                 GroupControllers.clear();
                 FightsTableView.getItems().clear();
                 GroupsPane.getChildren().clear();
-                List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
-                if (qualificationFights != null)
+                if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount())
                 {
-                    qualificationFights.sort((a, b)
-                            ->
+                    List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
+                    if (qualificationFights != null)
                     {
-                        return Integer.compare(a.getGroup(), b.getGroup());
-                    });
-                    try
-                    {
-                        for (int groupNumber = 1; groupNumber <= Tournament.getGroups(); groupNumber++)
+                        qualificationFights.sort((a, b)
+                                -> 
+                                {
+                                    try
+                                    {
+                                        return Integer.compare(a.getGroup(), b.getGroup());
+                                    }
+                                    catch (ObjectDeprecatedExeption ex)
+                                    {
+                                        LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                                        return -1;
+                                    }
+                        });
+                        try
                         {
+                            for (int groupNumber = 1; groupNumber <= Tournament.getGroups(); groupNumber++)
+                            {
 
-                            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-                            Node groupTable = loader.load();
-                            GroupTableController controller = loader.getController();
-                            controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
-                            controller.SetTournament(Tournament);
+                                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
+                                Node groupTable = loader.load();
+                                GroupTableController controller = loader.getController();
+                                controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
+                                controller.SetTournament(Tournament);
 
-                            GroupControllers.add(controller);
-                            GroupsPane.getChildren().add(groupTable);
+                                GroupControllers.add(controller);
+                                GroupsPane.getChildren().add(groupTable);
+                            }
+
                         }
-
-                    }
-                    catch (IOException ex)
-                    {
-                        Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    qualificationFights.sort((a,b)
-                            -> 
-                    {
-                        return Integer.compare(a.getRound(), b.getRound());
-                    });
-                    for (iPreliminary qualificationFight : qualificationFights)
-                    {
-                        int groupNumber = qualificationFight.getGroup();
-                        if (groupNumber <= GroupControllers.size())
+                        catch (IOException ex)
                         {
-                            GroupTableController controller = GroupControllers.get(groupNumber - 1);
-                            controller.AddFencer(qualificationFight.getFencer());
+                            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                         }
-                        FightsTableView.getItems().add(new QualificationFightPresenter(qualificationFight));
+                        qualificationFights.sort((a, b)
+                                -> 
+                                {
+                                    try
+                                    {
+                                        return Integer.compare(a.getRound(), b.getRound());
+                                    }
+                                    catch (ObjectDeprecatedExeption ex)
+                                    {
+                                        LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                                        return -1;
+                                    }
+                        });
+                        for (iPreliminary qualificationFight : qualificationFights)
+                        {
+                            int groupNumber;
+                            try
+                            {
+                                groupNumber = qualificationFight.getGroup();
+                            }
+                            catch (ObjectDeprecatedExeption ex)
+                            {
+                                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                                groupNumber = Integer.MAX_VALUE;
+                            }
+                            if (groupNumber <= GroupControllers.size())
+                            {
+                                GroupTableController controller = GroupControllers.get(groupNumber - 1);
+                                try
+                                {
+                                    controller.AddFencer(qualificationFight.getFencer());
+                                }
+                                catch (ObjectDeprecatedExeption ex)
+                                {
+                                    LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                            FightsTableView.getItems().add(new QualificationFightPresenter(qualificationFight));
+                        }
                     }
                 }
             }
             catch (SQLException ex)
             {
-                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    @Override
+    public void update(Observable o, Object o1)
+    {
+        UpdateData();
     }
 }

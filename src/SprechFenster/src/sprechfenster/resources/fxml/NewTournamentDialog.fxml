@@ -19,29 +19,35 @@
             <Image url="@../images/FencerDefaultPicture.png" />
          </image>
       </ImageView>
-      <Label layoutX="38.0" layoutY="174.0" text="Vorgruppen">
+      <Label layoutX="37.0" layoutY="135.0" text="Vorgruppen" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="136.0">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label layoutX="39.0" layoutY="103.0" text="Startdatum">
+      <Label layoutX="38.0" layoutY="74.0" text="Datum" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="75.0">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label layoutX="38.0" layoutY="37.0" text="Turniername">
+      <Label layoutX="36.0" layoutY="14.0" text="Turniername" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="14.0">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <ComboBox fx:id="GroupsComboBox" layoutX="38.0" layoutY="201.0" prefHeight="25.0" prefWidth="174.0" />
-      <DatePicker fx:id="StartingDatePicker" layoutX="38.0" layoutY="130.0" promptText="TT.MM.JJJJ" />
-      <TextField fx:id="NameTextField" layoutX="38.0" layoutY="64.0" prefHeight="25.0" prefWidth="174.0" />
-      <Label layoutX="38.0" layoutY="244.0" text="Finalrunden">
+      <ComboBox fx:id="GroupsComboBox" layoutX="38.0" layoutY="162.0" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="162.0" />
+      <DatePicker fx:id="StartingDatePicker" layoutX="38.0" layoutY="101.0" promptText="TT.MM.JJJJ" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="101.0" />
+      <TextField fx:id="NameTextField" layoutX="38.0" layoutY="41.0" prefHeight="25.0" prefWidth="174.0" AnchorPane.topAnchor="40.0" />
+      <Label layoutX="38.0" layoutY="244.0" text="Finalrunden" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="197.0">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <ComboBox fx:id="FinalRoundsComboBox" layoutX="38.0" layoutY="271.0" prefHeight="25.0" prefWidth="174.0" />
+      <ComboBox fx:id="FinalRoundsComboBox" layoutX="38.0" layoutY="271.0" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="223.0" />
+      <ComboBox fx:id="LanesComboBox" layoutX="38.0" layoutY="285.0" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="284.0" />
+      <Label layoutX="38.0" layoutY="258.0" text="Fechtplätze" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="258.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

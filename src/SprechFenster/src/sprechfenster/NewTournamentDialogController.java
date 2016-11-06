@@ -12,7 +12,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,82 +29,104 @@ import javafx.stage.Stage;
  *
  * @author Stefan
  */
-public class NewTournamentDialogController implements Initializable {
+public class NewTournamentDialogController implements Initializable
+{
 
-    @FXML AnchorPane MainDialogPane;
-    @FXML TextField NameTextField;
-    @FXML DatePicker StartingDatePicker;
-    @FXML ComboBox GroupsComboBox;
-    @FXML ComboBox FinalRoundsComboBox;
-    @FXML ImageView TournamentImageView;
-    
+    @FXML
+    AnchorPane MainDialogPane;
+    @FXML
+    TextField NameTextField;
+    @FXML
+    DatePicker StartingDatePicker;
+    @FXML
+    ComboBox GroupsComboBox;
+    @FXML
+    ComboBox FinalRoundsComboBox;
+    @FXML
+    ComboBox LanesComboBox;
+    @FXML
+    ImageView TournamentImageView;
+
     /**
      * Initializes the controller class.
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb)
+    {
         GUIUtilities.FillNumberComboBox(GroupsComboBox, 1, 20);
         GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
-    }    
-    
+        GUIUtilities.FillNumberComboBox(LanesComboBox, 1, 10);
+    }
+
     @FXML
-    private void handleCanceledButtonAction(ActionEvent event) {
+    private void handleCanceledButtonAction(ActionEvent event)
+    {
         CloseDialog();
     }
-    
+
     @FXML
-    private void handleChangeImageButtonAction(ActionEvent event) {
+    private void handleChangeImageButtonAction(ActionEvent event)
+    {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         fileChooser.getExtensionFilters().add(
-        new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"));
         File selectedFile = fileChooser.showOpenDialog(GetDialogStage());
         Image image = new Image(selectedFile.toURI().toString());
         TournamentImageView.setImage(image);
     }
-    
+
     @FXML
-    private void handleFinishedButtonAction(ActionEvent event) {
+    private void handleFinishedButtonAction(ActionEvent event)
+    {
         boolean allFieldsFilled = true;
-        if(NameTextField.getText().isEmpty())
+        if (NameTextField.getText().isEmpty())
         {
-         allFieldsFilled = false;
+            allFieldsFilled = false;
         }
-        if(StartingDatePicker.getValue() == null)
+        if (StartingDatePicker.getValue() == null)
         {
-         allFieldsFilled = false;
+            allFieldsFilled = false;
         }
-        if(GroupsComboBox.getValue() == null)
+        if (GroupsComboBox.getValue() == null)
         {
-         allFieldsFilled = false;
+            allFieldsFilled = false;
         }
-        if(FinalRoundsComboBox.getValue() == null)
+        if (FinalRoundsComboBox.getValue() == null)
         {
-         allFieldsFilled = false;
+            allFieldsFilled = false;
         }
-        if(allFieldsFilled)
+        if(LanesComboBox.getValue() == null)
+        {
+            allFieldsFilled = false;
+        }
+        if (allFieldsFilled)
         {
             iSync dataModel = iSync.getInstance();
-            try { 
+            try
+            {
                 iTournament newTournament = dataModel.createTournament(NameTextField.getText());
                 newTournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartingDatePicker));
-                newTournament.setGroups(GroupsComboBox.getSelectionModel().getSelectedIndex());
-                newTournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex());
-            } catch (SQLException ex) {
-                Logger.getLogger(NewFencerDialogController.class.getName()).log(Level.SEVERE, null, ex);
+                newTournament.setGroups(GroupsComboBox.getSelectionModel().getSelectedIndex()+1);
+                newTournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex()+1);
+                newTournament.setLanes(LanesComboBox.getSelectionModel().getSelectedIndex()+1);
+            }
+            catch (SQLException ex)
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
         CloseDialog();
     }
-    
+
     private void CloseDialog()
     {
         GetDialogStage().close();
     }
-    
+
     private Stage GetDialogStage()
     {
-        return (Stage)MainDialogPane.getScene().getWindow();
+        return (Stage) MainDialogPane.getScene().getWindow();
     }
-    
+
 }

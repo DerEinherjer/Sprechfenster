@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -57,10 +57,11 @@ public class TournamentParticipantsController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        ParticipantsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         ParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         GUIUtilities.FillNumberComboBox(FencingLanesComboBox, 1, 10);
-        GUIUtilities.FillNumberComboBox(QualificationGroupsComboBox, 0, 20);
-        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 0, 20);
+        GUIUtilities.FillNumberComboBox(QualificationGroupsComboBox, 1, 20);
+        GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
     }    
     
     public void setFencerSelectionInterface(iFencerSelection selectionInterface)
@@ -76,8 +77,8 @@ public class TournamentParticipantsController implements Initializable {
             NameTextField.setText(Tournament.getName());
             StartDatePicker.setValue(LocalDate.parse(Tournament.getDate(), DateTimeFormatter.ISO_DATE));
             setComboBoxSelection(FencingLanesComboBox, 1, Tournament.getLanes());
-            setComboBoxSelection(QualificationGroupsComboBox, 0, Tournament.getGroups());
-            setComboBoxSelection(FinalRoundsComboBox, 0, Tournament.getFinalRounds());
+            setComboBoxSelection(QualificationGroupsComboBox, 1, Tournament.getGroups());
+            setComboBoxSelection(FinalRoundsComboBox, 1, Tournament.getFinalRounds());
             UpdateParticipantsList();
         }
     }
@@ -95,7 +96,7 @@ public class TournamentParticipantsController implements Initializable {
                 }
                 ParticipantsTableView.getItems().setAll(presenters);
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -118,7 +119,7 @@ public class TournamentParticipantsController implements Initializable {
             {
                 Tournament.setName(NameTextField.getText());
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -132,7 +133,7 @@ public class TournamentParticipantsController implements Initializable {
             {
                 Tournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartDatePicker));
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -143,9 +144,9 @@ public class TournamentParticipantsController implements Initializable {
         if(Tournament != null)
         {
             try {
-                Tournament.setLanes(FencingLanesComboBox.getSelectionModel().getSelectedIndex());
+                Tournament.setLanes(FencingLanesComboBox.getSelectionModel().getSelectedIndex()+1);
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -157,9 +158,9 @@ public class TournamentParticipantsController implements Initializable {
         {
             try 
             {
-                Tournament.setGroups(QualificationGroupsComboBox.getSelectionModel().getSelectedIndex());
+                Tournament.setGroups(QualificationGroupsComboBox.getSelectionModel().getSelectedIndex()+1);
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -171,9 +172,9 @@ public class TournamentParticipantsController implements Initializable {
         {
             try 
             {
-                Tournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex());
+                Tournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex()+1);
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -189,7 +190,9 @@ public class TournamentParticipantsController implements Initializable {
 
                 if(FencerSelection != null)
                 {
-                    for(FencerPresenter fencerPresenter : FencerSelection.GetSelectedFencers())
+                    List<FencerPresenter> selectedFencers = new ArrayList<FencerPresenter>();
+                    selectedFencers.addAll(FencerSelection.GetSelectedFencers());
+                    for(FencerPresenter fencerPresenter : selectedFencers)
                     {
                         if(!participants.contains(fencerPresenter.getFencer()))
                         {
@@ -199,7 +202,7 @@ public class TournamentParticipantsController implements Initializable {
                     UpdateParticipantsList();
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -223,7 +226,7 @@ public class TournamentParticipantsController implements Initializable {
                 }
                 UpdateParticipantsList();
             } catch (SQLException ex) {
-                Logger.getLogger(TournamentParticipantsController.class.getName()).log(Level.SEVERE, null, ex);
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }

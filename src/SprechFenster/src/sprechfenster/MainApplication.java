@@ -5,6 +5,12 @@
  */
 package sprechfenster;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,7 +26,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/MainFXML.fxml"));
-        
         Scene scene = new Scene(root);
         stage.setTitle("Sprechfenster");
         stage.setScene(scene);
@@ -31,6 +36,25 @@ public class MainApplication extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        try
+        {
+            File configFile = new File("dist/SprechFensterLogging.config"); 
+            if(!configFile.exists())
+            {
+                configFile = new File("SprechFensterLogging.config");
+            }
+            FileInputStream configStream = new FileInputStream(configFile);
+            LogManager.getLogManager().readConfiguration(configStream);
+            LoggingUtilities.LOGGER.log(Level.INFO, "Logging configuration file loaded");
+            System.out.println(System.getProperty("java.io.tmpdir"));
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+            System.out.println("WARNING: Could not open configuration file");
+            System.out.println("WARNING: Logging not configured (console output only)");
+        }
+        LoggingUtilities.LOGGER.log(Level.INFO, "Starting SprechFenster");
         launch(args);
     }
     

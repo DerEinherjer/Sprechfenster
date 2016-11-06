@@ -491,7 +491,7 @@ class Tournament implements iTournament
 		finishedPreliminary = true;
 	}
 	
-	boolean isPrelimFinished()
+	public boolean isPreliminaryFinished()
 	{
 		return finishedPreliminary;
 	}
