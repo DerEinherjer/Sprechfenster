@@ -107,9 +107,9 @@ public class NewTournamentDialogController implements Initializable
             {
                 iTournament newTournament = dataModel.createTournament(NameTextField.getText());
                 newTournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartingDatePicker));
-                newTournament.setGroups(GroupsComboBox.getSelectionModel().getSelectedIndex()+1);
-                newTournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex()+1);
-                newTournament.setLanes(LanesComboBox.getSelectionModel().getSelectedIndex()+1);
+                newTournament.setGroups(GUIUtilities.GetIntegerFromStringComboBox(GroupsComboBox));
+                newTournament.setFinalRounds(GUIUtilities.GetIntegerFromStringComboBox(FinalRoundsComboBox));
+                newTournament.setLanes(GUIUtilities.GetIntegerFromStringComboBox(LanesComboBox));
             }
             catch (SQLException ex)
             {

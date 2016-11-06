@@ -5,6 +5,7 @@
  */
 package sprechfenster;
 
+import Model.iFinalround;
 import Model.iSync;
 import Model.iTournament;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import sprechfenster.Presenters.FinalRoundFightPresenter;
 import sprechfenster.Presenters.QualificationFightPresenter;
 
 /**
@@ -48,7 +50,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     @FXML
     FlowPane FencersPane;
     @FXML
-    TableView<QualificationFightPresenter> FightsTableView;
+    TableView<FinalRoundFightPresenter> FightsTableView;
     @FXML
     TableColumn RoundTableColumn;
     @FXML
@@ -190,6 +192,10 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 FencersPane.getChildren().add(groupTable);
                 controller.AddFencer(Tournament.getAllParticipants());
                 CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
+                for(iFinalround finalRound : Tournament.getAllFinalrounds())
+                {
+                    FightsTableView.getItems().add(new FinalRoundFightPresenter(finalRound));
+                }
             }
             catch (IOException | SQLException ex)
             {

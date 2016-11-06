@@ -107,7 +107,7 @@ public class TournamentParticipantsController implements Initializable {
         {
             GUIUtilities.FillNumberComboBox(box, startNumber, selectedNumber);
         }
-        box.getSelectionModel().select(selectedNumber);
+        box.getSelectionModel().select(selectedNumber-1);
     }
     
     @FXML
@@ -144,7 +144,7 @@ public class TournamentParticipantsController implements Initializable {
         if(Tournament != null)
         {
             try {
-                Tournament.setLanes(FencingLanesComboBox.getSelectionModel().getSelectedIndex()+1);
+                Tournament.setLanes(GUIUtilities.GetIntegerFromStringComboBox(FencingLanesComboBox));
             } catch (SQLException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -158,7 +158,7 @@ public class TournamentParticipantsController implements Initializable {
         {
             try 
             {
-                Tournament.setGroups(QualificationGroupsComboBox.getSelectionModel().getSelectedIndex()+1);
+                Tournament.setGroups(GUIUtilities.GetIntegerFromStringComboBox(QualificationGroupsComboBox));
             } catch (SQLException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -172,7 +172,7 @@ public class TournamentParticipantsController implements Initializable {
         {
             try 
             {
-                Tournament.setFinalRounds(FinalRoundsComboBox.getSelectionModel().getSelectedIndex()+1);
+                Tournament.setFinalRounds(GUIUtilities.GetIntegerFromStringComboBox(FinalRoundsComboBox));
             } catch (SQLException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

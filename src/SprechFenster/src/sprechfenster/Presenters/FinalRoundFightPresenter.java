@@ -5,9 +5,8 @@
  */
 package sprechfenster.Presenters;
 
-import Model.ObjectDeprecatedExeption;
 import Model.iFencer;
-import Model.iPreliminary;
+import Model.iFinalround;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,137 +16,104 @@ import sprechfenster.LoggingUtilities;
  *
  * @author Stefan
  */
-public class QualificationFightPresenter
+public class FinalRoundFightPresenter
 {
-    iPreliminary Fight;
-    
-    public QualificationFightPresenter(iPreliminary fightToPresent)
+
+    iFinalround Fight;
+
+    public FinalRoundFightPresenter(iFinalround fightToPresent)
     {
-        if(fightToPresent == null)
+        if (fightToPresent == null)
         {
             throw new IllegalArgumentException("fightToPresent must not be null");
         }
         Fight = fightToPresent;
     }
-    
-    public iPreliminary getFight()
+
+    public iFinalround getFight()
     {
         return Fight;
     }
-    
+
     @Override
     public boolean equals(Object other)
     {
-        if(other == this)
+        if (other == this)
         {
             return true;
         }
         else
         {
-            if(!(other instanceof QualificationFightPresenter))
+            if (!(other instanceof FinalRoundFightPresenter))
             {
                 return false;
             }
             else
             {
-                return Fight.equals(((QualificationFightPresenter)other).Fight);
+                return Fight.equals(((FinalRoundFightPresenter) other).Fight);
             }
         }
     }
-    
-    @Override 
+
+    @Override
     public int hashCode()
     {
         return Fight.hashCode();
     }
-    
+
     public String getFirstFencerName()
     {
         iFencer fencer = getFencer(0);
         return getFencerName(fencer);
     }
-    
+
     public String getFirstFencerPoints()
     {
         return getFencerPoints(getFencer(0));
     }
-    
+
     public String getSecondFencerName()
     {
         iFencer fencer = getFencer(1);
         return getFencerName(fencer);
     }
-    
+
     public String getSecondFencerPoints()
     {
         return getFencerPoints(getFencer(1));
     }
-    
+
     public String getLane()
     {
         String lane = "";
-        try
-        {
-            lane = Integer.toString(Fight.getLane());
-        }
-        catch (ObjectDeprecatedExeption ex)
-        {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-        }
+        lane = Integer.toString(Fight.getLane());
         return lane;
     }
-    
+
     public String getRound()
     {
         String round = "";
-        try
-        {
-            round = Integer.toString(Fight.getRound());
-        }
-        catch (ObjectDeprecatedExeption ex)
-        {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-        }
+        round = Integer.toString(Fight.getRound());
         return round;
     }
-    
-    public String getGroup()
-    {
-        String group = "";
-        try
-        {
-            group = Integer.toString(Fight.getGroup());
-        }
-        catch (ObjectDeprecatedExeption ex)
-        {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-        }
-        return group;
-    }
-    
+
     public String getStatus()
     {
-        try
+
+        if (Fight.isFinished())
         {
-            if(Fight.isFinished())
-            {
-                return "Beendet";
-            }
-            else
-            {
-                return "Offen";
-            }
+            return "Beendet";
         }
-        catch (ObjectDeprecatedExeption ex)
+        else
         {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-            return "-";
+            return "Offen";
         }
+
     }
-    
+
     private String getFencerName(iFencer fencer)
     {
-        if(fencer != null)
+        if (fencer != null)
         {
             return fencer.getFullName();
         }
@@ -156,11 +122,12 @@ public class QualificationFightPresenter
             return "-";
         }
     }
-    
+
     private String getFencerPoints(iFencer fencer)
     {
-        if(fencer != null)
+        if (fencer != null)
         {
+
             try
             {
                 return Integer.toString(Fight.getPoints(fencer));
@@ -169,33 +136,24 @@ public class QualificationFightPresenter
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
-            catch (ObjectDeprecatedExeption ex)
-            {
-                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-            }
+
         }
         return "-";
     }
-    
+
     private iFencer getFencer(int index)
     {
-        try
+
+        List<iFencer> fencers = Fight.getFencer();
+        if (fencers != null && fencers.size() > index)
         {
-            List<iFencer> fencers = Fight.getFencer();
-            if(fencers != null && fencers.size() > index)
-            {
-                iFencer fencer = fencers.get(index);
-                return fencer;
-            }
-            else
-            {
-                return null;
-            }
+            iFencer fencer = fencers.get(index);
+            return fencer;
         }
-        catch (ObjectDeprecatedExeption ex)
+        else
         {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             return null;
         }
+
     }
 }
