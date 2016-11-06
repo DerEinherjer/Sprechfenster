@@ -241,7 +241,7 @@ public class Finalround implements iFinalround
 		String line = "";
 		for(int i = 0; i< deep; i++)
 			line+="\t";
-		line+=ID;
+		line+=ID+"("+getFencer().size()+")";
 		System.out.println(line);
 		if(preround2!=null)
 			deep = preround2.printTree();
