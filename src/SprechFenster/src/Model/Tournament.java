@@ -552,8 +552,10 @@ class Tournament implements iTournament
 			
 			for(Finalround tmp : f)
 			{
-				scoresFinal.put((Fencer)tmp.getFencer().get(0), new Score((Fencer)tmp.getFencer().get(0)));
-				scoresFinal.put((Fencer)tmp.getFencer().get(1), new Score((Fencer)tmp.getFencer().get(1)));
+				if(tmp.getFencer().size()>0)
+					scoresFinal.put((Fencer)tmp.getFencer().get(0), new Score((Fencer)tmp.getFencer().get(0)));
+				if(tmp.getFencer().size()>1)
+					scoresFinal.put((Fencer)tmp.getFencer().get(1), new Score((Fencer)tmp.getFencer().get(1)));
 			}
 			
 					
