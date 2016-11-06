@@ -6,7 +6,7 @@ public interface iFencer
 {
 	public String getName();
 	public String getFamilyName();
-        public String getFullName();
+    public String getFullName();
 	public String getBirthday();
 	public String getFencingSchool();
 	public String getNationality();
