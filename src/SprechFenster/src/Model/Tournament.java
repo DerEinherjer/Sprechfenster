@@ -448,10 +448,10 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
-	private Finalround createFinalround() throws SQLException
+	private void createFinalrounds() throws SQLException
 	{
-		sync.createFinalRounds(this);
-		return null;
+		sync.createFinalRounds(this);//TODO
+		setTimingForFinals();
 	}
 	
 	private boolean isFinalroundsCreated() throws SQLException
@@ -500,7 +500,7 @@ class Tournament implements iTournament
 	{
 		if(allPreliminaryFinished())
 		{
-			createFinalround();
+			createFinalrounds();
 			
 			int finalist = (int) Math.pow(2, numberFinalrounds);
 			int finalistPerGroup = finalist/groups;
@@ -629,6 +629,47 @@ class Tournament implements iTournament
 			}
 		}
 	}
+	
+	private void setTimingForFinals() throws SQLException
+	{
+		List<Finalround> f = new ArrayList<>();
+		for(Finalround tmp : Finalround.getFinalrounds(this))
+			if(tmp.getPre1()==null&&tmp.getPre2()==null)
+				f.add(tmp);
+		
+		while(true)
+		{
+			int round = 1;
+			int lane = 1;
+			List<Finalround> next = new ArrayList<>();
+			Finalround losersround = null;
+			
+			for(Finalround tmp : f)
+			{
+				tmp.setTime(round, lane);
+				lane++;
+				if(lane>this.lanes)
+				{
+					lane=1;
+					round++;
+				}
+				if(tmp.getLoserRound()!=null)
+					losersround = tmp.getLoserRound();
+				if(tmp.getWinnerround()!=null&&!next.contains(tmp.getWinnerround()))
+					next.add(tmp.getWinnerround());
+			}
+			lane = 1;
+			round++;
+			if(losersround!=null)
+				losersround.setTime(round++, lane);
+			
+			if(next.isEmpty())
+				break;
+			else
+				f = next;
+		}
+			
+ 	}
 	
 	@Override
 	public boolean equals(Object other){

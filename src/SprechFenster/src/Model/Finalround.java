@@ -241,7 +241,7 @@ public class Finalround implements iFinalround
 		String line = "";
 		for(int i = 0; i< deep; i++)
 			line+="\t";
-		line+=ID+"("+getFencer().size()+")";
+		line+=ID+"("+round+"/"+lane+")";
 		System.out.println(line);
 		if(preround2!=null)
 			deep = preround2.printTree();
@@ -402,5 +402,20 @@ public class Finalround implements iFinalround
 		if(fencer1.equals(f)||fencer2.equals(f))
 			return true;
 		return false;
+	}
+	
+	Finalround getPre1()
+	{
+		return preround1;
+	}
+	
+	Finalround getPre2()
+	{
+		return preround2;
+	}
+	
+	Finalround getLoserRound()
+	{
+		return losersround;
 	}
 }
