@@ -44,9 +44,13 @@ public interface iTournament
 	public List<iScore>[] getScoresInGroups() throws SQLException;
 	
 	public boolean finishPreliminary() throws SQLException;
-        public boolean isPreliminaryFinished();
+    public boolean isPreliminaryFinished();
 	
 	public List<iFinalround> getAllFinalrounds();
 	
+	public int getYellowFor(iFencer f) throws ObjectDeprecatedExeption;
+	public int getRedFor(iFencer f) throws ObjectDeprecatedExeption;
+	public int getBlackFor(iFencer f) throws ObjectDeprecatedExeption;
 	
+	public void dropOut(iFencer f) throws SQLException;
 }

@@ -594,7 +594,7 @@ class Tournament implements iTournament
 			{
 				try
 				{
-					if(p.isFencer((Fencer)f))
+					if(p.isFencer((Fencer)f)&&!p.isFinished())
 					{
 						for(iFencer tmp : p.getFencer())
 						{
@@ -614,7 +614,7 @@ class Tournament implements iTournament
 		{
 			for(Finalround fr : Finalround.getFinalrounds(this))
 			{
-				if(fr.isFencer(f))
+				if(fr.isFencer(f)&&!fr.isFinished())
 				{
 					for(iFencer tmp : fr.getFencer())
 					{
@@ -670,6 +670,61 @@ class Tournament implements iTournament
 		}
 			
  	}
+	
+	public int getYellowFor(iFencer f) throws ObjectDeprecatedExeption
+	{
+		int ret = 0;
+		
+		for(Preliminary p : Preliminary.getPreliminarys(this))
+		{
+			if(p.isFencer((Fencer)f))
+				ret+=p.getYellow(f);
+		}
+		
+		for(Finalround fr : Finalround.getFinalrounds(this))
+		{
+			if(fr.isFencer(f))
+				ret+=fr.getYellow(f);
+		}
+		return ret;
+	}
+	
+	public int getRedFor(iFencer f) throws ObjectDeprecatedExeption
+	{
+		int ret = 0;
+		
+		for(Preliminary p : Preliminary.getPreliminarys(this))
+		{
+			if(p.isFencer((Fencer)f))
+				ret+=p.getRed(f);
+		}
+		
+		for(Finalround fr : Finalround.getFinalrounds(this))
+		{
+			if(fr.isFencer(f))
+				ret+=fr.getRed(f);
+		}
+		return ret;
+	}
+	
+	public int getBlackFor(iFencer f) throws ObjectDeprecatedExeption
+	{
+		int ret = 0;
+		
+		for(Preliminary p : Preliminary.getPreliminarys(this))
+		{
+			if(p.isFencer((Fencer)f))
+				ret+=p.getBlack(f);
+		}
+		
+		for(Finalround fr : Finalround.getFinalrounds(this))
+		{
+			if(fr.isFencer(f))
+				ret+=fr.getBlack(f);
+		}
+		return ret;
+	}
+	
 	
 	@Override
 	public boolean equals(Object other){
