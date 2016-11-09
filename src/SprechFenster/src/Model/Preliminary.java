@@ -111,6 +111,8 @@ class Preliminary implements iPreliminary
 		this.pointsFor1 = (Integer) set.get("PunkteVon1".toUpperCase());
 		this.pointsFor2 = (Integer) set.get("PunkteVon2".toUpperCase());
 		this.finished = (Boolean) set.get("Beendet".toUpperCase());
+		
+		propagateScore();
 	}
 	
 	int getID() throws ObjectDeprecatedExeption
