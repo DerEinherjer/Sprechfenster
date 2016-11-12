@@ -168,6 +168,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
             try
             {
                 Tournament.createPreliminaryTiming();
+                UpdateData();
             }
             catch (SQLException ex)
             {

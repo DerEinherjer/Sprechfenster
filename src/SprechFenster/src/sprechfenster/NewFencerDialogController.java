@@ -10,6 +10,8 @@ import Model.iSync;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -60,7 +62,11 @@ public class NewFencerDialogController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         FencingSchoolComboBox.getItems().addAll("7 Schwerter", "Krîfon", "Asteria", "Schwert und Bogen");
+        FencingSchoolComboBox.getSelectionModel().selectFirst();
         NationalityComboBox.getItems().addAll("Deutschland", "Österreich", "Schweiz");
+        NationalityComboBox.getSelectionModel().selectFirst();
+        BirthdayDatePicker.setValue(LocalDate.of(1986, Month.MARCH, 14));
+        
     }   
     
     @FXML

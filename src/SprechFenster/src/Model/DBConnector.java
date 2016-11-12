@@ -909,6 +909,7 @@ class DBConnector
 	void createFinalRounds(Tournament t) throws SQLException
 	{
 		removeFinalrounds(t);
+                Finalround.deleteFinalrounds(t);
 		createFinalRounds(t.getFinalRounds()-1, t, -1, -1);
 	}
 	private void createFinalRounds(int n,Tournament t, int winner, int loser) throws SQLException
