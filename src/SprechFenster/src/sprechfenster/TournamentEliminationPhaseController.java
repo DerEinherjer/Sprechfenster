@@ -194,10 +194,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
                 for(iFinalround finalRound : Tournament.getAllFinalrounds())
                 {
-                    if(finalRound.getFencer().size() == 2)
-                    {
-                        FightsTableView.getItems().add(new FinalRoundFightPresenter(finalRound));
-                    }
+                    FightsTableView.getItems().add(new FinalRoundFightPresenter(finalRound));
                 }
             }
             catch (IOException | SQLException ex)
