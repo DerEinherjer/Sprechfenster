@@ -35,7 +35,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import sprechfenster.Presenters.FinalRoundFightPresenter;
-import sprechfenster.Presenters.QualificationFightPresenter;
 
 /**
  * FXML Controller class
@@ -87,12 +86,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory
+        Callback<TableColumn<FinalRoundFightPresenter, String>, TableCell<FinalRoundFightPresenter, String>> editCellFactory
                 = //
-                (final TableColumn<QualificationFightPresenter, String> param)
+                (final TableColumn<FinalRoundFightPresenter, String> param)
                 -> 
                 {
-                    final TableCell<QualificationFightPresenter, String> cell = new TableCell<QualificationFightPresenter, String>()
+                    final TableCell<FinalRoundFightPresenter, String> cell = new TableCell<FinalRoundFightPresenter, String>()
                     {
                         final Button EditButton = new Button("Ändern");
 
@@ -112,12 +111,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                                         {
                                             try
                                             {
-                                                QualificationFightPresenter fight = getTableView().getItems().get(getIndex());
+                                                FinalRoundFightPresenter fight = getTableView().getItems().get(getIndex());
                                                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                                                        "sprechfenster/resources/fxml/EditQualificationFightDialog.fxml"
+                                                        "sprechfenster/resources/fxml/EditFinalRoundFightDialog.fxml"
                                                 ));
                                                 Parent dialog = loader.<Parent>load();
-                                                EditQualificationFightDialogController controller = loader.getController();
+                                                EditFinalRoundFightDialogController controller = loader.getController();
                                                 controller.SetData(fight.getFight(), Tournament);
                                                 Stage stage = new Stage();
                                                 stage.setTitle("Gefecht bearbeiten");
