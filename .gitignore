@@ -1,0 +1,8 @@
+*.class
+src/SprechFenster/build/
+src/SprechFenster/build/classes/sprechfenster/resources/fxml/TournamentQualificationPhase.fxml
+src/SprechFenster/dist/SprechFenster.html
+src/SprechFenster/dist/SprechFenster.jnlp
+src/SprechFenster/dist/SprechFenster.jar
+src/SprechFenster/nbproject/private/private.xml
+src/SprechFenster/dist/SprechFensterLogging.config

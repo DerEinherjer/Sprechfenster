@@ -28,6 +28,19 @@ public class Finalround implements iFinalround
 				ret.add(f);
 		return ret;
 	}
+        
+        static void deleteFinalrounds(Tournament tournamentToDelete)
+        {
+            List<Finalround> roundsToDelete = new ArrayList<Finalround>();
+            roundsToDelete.addAll(finalrounds.values());
+            for(Finalround f : roundsToDelete)
+            {
+                if(f.t.equals(tournamentToDelete))
+                {
+                    finalrounds.remove(f.ID);
+                }
+            }
+        }
 	
 	// -----
 	private int ID;

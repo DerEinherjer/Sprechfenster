@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="SprechFenster.jar" size="60633" download="eager" />
+    <jar href="SprechFenster.jar" size="106378" download="eager" />
     <jar href="lib\controlsfx-8.40.11.jar" size="985420" download="eager" />
     <jar href="lib\h2-1.4.192.jar" size="1775801" download="eager" />
   </resources>

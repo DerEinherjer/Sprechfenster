@@ -50,4 +50,7 @@
     nbproject/build-impl.xml and nbproject/jfx-impl.xml.
 
     -->
+    <target name="-post-compile">
+        <copy file="src/sprechfenster/resources/SprechFensterLogging.config" todir="${dist.dir}"/>        
+    </target>
 </project>

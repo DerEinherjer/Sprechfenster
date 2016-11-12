@@ -106,7 +106,7 @@ public class EditQualificationFightDialogController implements Initializable
                 RoundComboBox.getSelectionModel().select(Fight.getRound()-1);
                 FirstFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(0)));
                 SecondFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(1)));
-                FightFinishedCheckBox.setSelected(false);
+                FightFinishedCheckBox.setSelected(Fight.isFinished());
             }
             catch (SQLException ex)
             {
