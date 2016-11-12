@@ -502,41 +502,67 @@ class Tournament implements iTournament
 		{
 			createFinalrounds();
 			
-			int finalist = (int) Math.pow(2, numberFinalrounds);
-			int finalistPerGroup = finalist/groups;
-			int wildcards = finalist - (finalistPerGroup*groups);
-			List<Finalround> f = new ArrayList<>();
+			int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
+			int wildcards = 0;
+			List<Finalround> leafFinalRounds = new ArrayList<>();
 			
-			List<iScore>[] s = getScoresInGroups();
+			List<iScore>[] groupScores = getScoresInGroups();
 			
-			//Find the round in the leaves of the tree and collect them in f
-			for(Finalround tmp : Finalround.getFinalrounds(this))
+			//Find the round in the leaves of the tree and collect them in leafFinalRounds
+			for(Finalround finalRound : Finalround.getFinalrounds(this))
 			{
-				if(!tmp.hasPrerounds())
-					f.add(tmp);
+				if(!finalRound.hasPrerounds())
+					leafFinalRounds.add(finalRound);
 			}
 			
-			//First part of selection:
-			//As long as I can take 1 from every group (have more groups than free places) take one from every group
-			for(int i = 0; i<finalist-wildcards; i++)
+			int groupIndex;
+                        int roundIndex;
+                        int scoreIndex;
+                        iFinalround leafFinalRound;
+                        iScore fencerScore;
+			for(int i = 0; i< numberOfFinalists; i++)
 			{
-				if(s[i%groups].size()>i/groups)//Has that group enouth members?
-					f.get((i+1)%(f.size())).addParticipant(s[i%groups].get(i/groups).getFencer());
+                            //we iterate through groups and scores in the following way:
+                            //take the best fencer score from each group until every group has been visited once.
+                            //The first fencer is added to the first round, the second fencer to the second, and so on.
+                            //then take the second best fencer score from each group until every group has been visited twice.
+                            //And so on until we have enough fencers for the Finalists.
+                            //If we can't get a score from a group because it doesn't have enough, we add a wildcard.
+                            //The wildcard score is taken from a different group later (if posssible). Otherwise, it's a free win wildcard.
+                            
+                            //this index iterates through the groups
+                            groupIndex = i%groups;
+                            //this index is 0 for the first iteration through the groups, 1 for the second, etc.
+                            scoreIndex = i/groups;
+                            //this index iterates through the final rounds. We add 1 to i to mix the different groups.
+                            //Otherwise it could happen that if two fencers from the same group advance into the finals,
+                            //they would have to fight each other in the first round.
+                            roundIndex = (i+1)%leafFinalRounds.size();  
+                            
+                            if(groupScores[groupIndex].size()>scoreIndex)//if group has enough scores
+                                {
+                                    leafFinalRound = leafFinalRounds.get(roundIndex);
+                                    fencerScore = groupScores[groupIndex].get(scoreIndex);
+                                    leafFinalRound.addParticipant(fencerScore.getFencer());
+                                }
 				else
-					wildcards++;
+                                {
+                                    //else we need to get a fencer from a different group later. Or add a free win if no fencer is available.
+                                    wildcards++;
+                                }
 			}
 			
 			//Sort everyone out who is allready in the finals
-			for(int i = 0; i<finalist-wildcards; i++)
-				if(s[i%groups].size()>i/groups)
-					s[i%groups].remove(s[i%groups].get(i/groups));
+			for(int i = 0; i<numberOfFinalists-wildcards; i++)
+				if(groupScores[i%groups].size()>i/groups)
+					groupScores[i%groups].remove(groupScores[i%groups].get(i/groups));
 			
 			List<iScore> wilds = new ArrayList<>();
 			
 			//Collect everyone who is NOT in the final in wilds
 			for(int i = 0; i< groups; i++)
-				for(int c = 0; c < s[i].size(); c++)
-					wilds.add(s[i].get(c));
+				for(int c = 0; c < groupScores[i].size(); c++)
+					wilds.add(groupScores[i].get(c));
 			
 			//Get from all who are not allready in the final those who have the best hit-gotHit
 			for(int i = 0; i < wildcards; i++)
@@ -547,10 +573,10 @@ class Tournament implements iTournament
 						best = c;
 				
 				int c = 0;
-				while(!f.get(c++).addParticipant(wilds.get(best).getFencer()));
+				while(!leafFinalRounds.get(c++).addParticipant(wilds.get(best).getFencer()));
 			}
 			
-			for(Finalround tmp : f)
+			for(Finalround tmp : leafFinalRounds)
 			{
 				if(tmp.getFencer().size()>0)
 					scoresFinal.put((Fencer)tmp.getFencer().get(0), new Score((Fencer)tmp.getFencer().get(0)));
