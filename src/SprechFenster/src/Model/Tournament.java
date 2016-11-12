@@ -125,10 +125,10 @@ class Tournament implements iTournament
 	
 	public void setFinalRounds(int rounds) throws SQLException
 	{
+		if(finishedPreliminary) return;
+		
 		sync.tournamentSetFinalRounds(rounds, ID);
 		this.numberFinalrounds = rounds;
-		
-		sync.createFinalrounds(this);
 	}
 	
 	public void setLanes(int lanes) throws SQLException
