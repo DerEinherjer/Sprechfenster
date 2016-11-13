@@ -53,4 +53,7 @@ public interface iTournament
 	public int getBlackFor(iFencer f) throws ObjectDeprecatedExeption;
 	
 	public void dropOut(iFencer f) throws SQLException;
+	
+	public String getComment(iFencer f);
+	public void setComment(iFencer f, String comment);
 }

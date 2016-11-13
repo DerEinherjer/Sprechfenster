@@ -17,10 +17,15 @@ public class Test
 			
 			iFencer[] f = new iFencer[8];
 			
+			String comment = "A Test";
+			
 			for(char i = 'A'; i < 'I'; i++)
 			{
 				f[i-'A'] = sync.createFencer(i+"", i+"");
+				t.setComment(f[i-'A'], comment);
 				t.addParticipant(f[i-'A']);
+				if(comment.equals(t.getComment(f[i-'A'])))
+					System.out.println("Commentarfunktion funktioniert nicht.");
 			}
 			
 			int points = 0;
@@ -48,9 +53,14 @@ public class Test
 					System.out.println("Final Schwarz 2");
 				p.setFinished(true);
 			}
+
+			System.out.println("Anzahl Finalrunden: "+Finalround.getFinalrounds((Tournament)t).size());
 			
 			if(t.finishPreliminary())
 				System.out.println("Konnte vorrunden nicht beenden.");
+			
+
+			System.out.println("Anzahl Finalrunden: "+Finalround.getFinalrounds((Tournament)t).size());
 			
 			((Tournament)t).printTree();
 			

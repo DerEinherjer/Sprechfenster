@@ -751,6 +751,17 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
+	public String getComment(iFencer f)
+	{
+		if(isParticipant(f))
+			return sync.getComment((Fencer) f);
+		return "";
+	}
+	
+	public void setComment(iFencer f, String comment)
+	{
+		sync.setComment((Fencer) f, comment);
+	}
 	
 	@Override
 	public boolean equals(Object other){
@@ -761,5 +772,4 @@ class Tournament implements iTournament
 	    	return true;
 	    return false;
 	}
-
 }

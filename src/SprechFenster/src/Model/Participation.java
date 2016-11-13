@@ -9,6 +9,7 @@ class Participation
 				 + "Gruppe int,"
 				 + "Startgeld boolean DEFAULT FALSE,"
 				 + "Ausruestungskontrolle boolean DEFAULT FALSE,"
-				 + "Ausgeschieden boolean DEFAULT FALSE);";
+				 + "Ausgeschieden boolean DEFAULT FALSE,"
+				 + "Kommentar memo);";
 	}
 }

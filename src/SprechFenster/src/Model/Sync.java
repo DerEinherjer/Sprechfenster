@@ -393,4 +393,14 @@ public class Sync extends iSync
 	{
 		return con.getDropedOut(t, f);
 	}
+	
+	String getComment(Tournament t,Fencer f) throws SQLException
+	{
+		return con.getComment(t, f);
+	}
+	
+	void setComment(Tournament t, Fencer f, String comment) throws SQLException
+	{
+		con.setComment(t, f, comment);
+	}
 }

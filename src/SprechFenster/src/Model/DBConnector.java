@@ -1217,4 +1217,42 @@ class DBConnector
 		rs.close();
 		return ret;
 	}
+	
+	private PreparedStatement gcStmt = null;
+	String getComment(Tournament t, Fencer f) throws SQLException
+	{
+		if(gcStmt == null)
+		{
+			String sql = "SELECT Kommentar FROM Teilnahme WHERE TurnierID = ? AND FechterID = ?;";
+			gcStmt = con.prepareStatement(sql);
+		}
+		
+		gcStmt.setInt(1, t.getID());
+		gcStmt.setInt(2, f.getID());
+		ResultSet rs = gcStmt.executeQuery();
+		
+		if(!rs.next())
+			throw new SQLException("Could not get comment.");
+		
+		String ret = rs.getString("Kommentar");
+		rs.close();
+		
+		return ret;
+	}
+	
+	private PreparedStatement scStmt = null;
+	void setComment(Tournament t, Fencer f, String comment) throws SQLException
+	{
+		if(scStmt == null)
+		{
+			String sql = "UPDATE Teilnahme SET Kommentar = ? WHERE TurnierID = ? AND FechterID = ?;";
+			scStmt = con.prepareStatement(sql);
+		}
+		
+		scStmt.setString(1, comment);
+		scStmt.setInt(2, t.getID());
+		scStmt.setInt(3, f.getID());
+		
+		scStmt.executeUpdate();
+	}
 }
