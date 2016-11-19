@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Tournament implements iTournament
 {
@@ -751,16 +753,16 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
-	public String getComment(iFencer f)
+	public String getComment(iFencer f) throws SQLException
 	{
-		if(isParticipant(f))
-			return sync.getComment((Fencer) f);
-		return "";
+            if(isParticipant(f))
+                return sync.getComment(this, (Fencer) f);
+            return "";
 	}
 	
-	public void setComment(iFencer f, String comment)
+	public void setComment(iFencer f, String comment) throws SQLException
 	{
-		sync.setComment((Fencer) f, comment);
+		sync.setComment(this, (Fencer) f, comment);
 	}
 	
 	@Override

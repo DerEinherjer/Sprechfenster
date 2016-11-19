@@ -54,6 +54,6 @@ public interface iTournament
 	
 	public void dropOut(iFencer f) throws SQLException;
 	
-	public String getComment(iFencer f);
-	public void setComment(iFencer f, String comment);
+	public String getComment(iFencer f) throws SQLException;
+	public void setComment(iFencer f, String comment) throws SQLException;
 }
