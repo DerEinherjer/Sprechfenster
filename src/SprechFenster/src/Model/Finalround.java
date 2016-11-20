@@ -191,7 +191,7 @@ public class Finalround implements iFinalround
 		return null;
 	}
 	
-	public void setFinished(boolean finish) throws SQLException
+	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedExeption
 	{
 		if(finished!=finish)
 		{
@@ -210,6 +210,8 @@ public class Finalround implements iFinalround
 				
 				t.addGotHitFinal(fencer1, pointsFor2);
 				t.addGotHitFinal(fencer2, pointsFor1);
+				
+				sync.setFinalroundFinished(this, finished);
 			}
 			else
 			{
@@ -225,6 +227,8 @@ public class Finalround implements iFinalround
 				
 				t.addGotHitFinal(fencer1, -pointsFor2);
 				t.addGotHitFinal(fencer2, -pointsFor1);
+
+				sync.setFinalroundFinished(this, finished);
 			}
 		}
 	}

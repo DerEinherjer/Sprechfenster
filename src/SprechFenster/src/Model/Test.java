@@ -8,6 +8,7 @@ public class Test
 {
 	public static void main(String args[])
 	{
+		System.out.println("Hallo?");
 		try 
 		{
 			
@@ -18,13 +19,16 @@ public class Test
 			iFencer[] f = new iFencer[8];
 			
 			String comment = "A Test";
-			
+			System.out.println("HIER?");
 			for(char i = 'A'; i < 'I'; i++)
 			{
+				System.out.println("Fechter "+i+" wird erstellt.");
 				f[i-'A'] = sync.createFencer(i+"", i+"");
 				t.setComment(f[i-'A'], comment);
 				t.addParticipant(f[i-'A']);
-				if(comment.equals(t.getComment(f[i-'A'])))
+				if(!comment.equals(t.getComment(f[i-'A'])))
+					System.out.println("Commentarfunktion funktioniert nicht.");
+				else
 					System.out.println("Commentarfunktion funktioniert nicht.");
 			}
 			

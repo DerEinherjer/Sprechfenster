@@ -23,7 +23,11 @@ public class Sync extends iSync
 		changedPreliminary,
 		changedFinalround,
 		createdPreliminary,
-		changedCards
+		changedCards,
+		finishedPreliminary,
+		finishedFinalround,
+		unfinishedPreliminary,
+		unfinishedFinalround,
 	}
 	
 	Sync() throws SQLException
@@ -402,5 +406,25 @@ public class Sync extends iSync
 	void setComment(Tournament t, Fencer f, String comment) throws SQLException
 	{
 		con.setComment(t, f, comment);
+	}
+
+	public void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	{
+		con.setPrelimFinished(p, finished);
+		setChanged();
+		if(finished)
+			notifyObservers(change.finishedPreliminary);
+		else
+			notifyObservers(change.unfinishedPreliminary);
+	}
+	
+	public void setFinalroundFinished(Finalround p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	{
+		con.setFinalroundFinished(p, finished);
+		setChanged();
+		if(finished)
+			notifyObservers(change.finishedFinalround);
+		else
+			notifyObservers(change.unfinishedFinalround);
 	}
 }

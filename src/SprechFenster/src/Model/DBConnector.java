@@ -1255,4 +1255,32 @@ class DBConnector
 		
 		scStmt.executeUpdate();
 	}
+
+	private PreparedStatement spfStmt = null;
+	void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	{
+		if(spfStmt == null)
+		{
+			String sql = "UPDATE Vorrunden SET Beendet = ? WHERE ID = ?;";
+			spfStmt = con.prepareStatement(sql);
+		}
+		
+		spfStmt.setBoolean(1, finished);
+		spfStmt.setInt(2, p.getID());
+		spfStmt.executeUpdate();
+	}
+	
+	private PreparedStatement sfrfStmt = null;
+	void setFinalroundFinished(Finalround f, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	{
+		if(sfrfStmt == null)
+		{
+			String sql = "UPDATE Finalrunden SET Beendet = ? WHERE ID = ?;";
+			sfrfStmt = con.prepareStatement(sql);
+		}
+		
+		sfrfStmt.setBoolean(1, finished);
+		sfrfStmt.setInt(2, f.getID());
+		sfrfStmt.executeUpdate();
+	}
 }

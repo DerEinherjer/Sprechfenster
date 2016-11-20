@@ -234,6 +234,8 @@ class Preliminary implements iPreliminary
 				t.addHitsPrelim(fencer2, pointsFor2);
 				t.addGotHitPrelim(fencer1, pointsFor2);
 				t.addGotHitPrelim(fencer2, pointsFor1);
+				
+				sync.setPrelimFinished(this, finished);
 			}
 			else
 			{
@@ -248,6 +250,8 @@ class Preliminary implements iPreliminary
 					t.addHitsPrelim(fencer2, -pointsFor2);
 					t.addGotHitPrelim(fencer1, -pointsFor2);
 					t.addGotHitPrelim(fencer2, -pointsFor1);
+					
+					sync.setPrelimFinished(this, finished);
 				}
 			}
 		}
