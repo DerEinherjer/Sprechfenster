@@ -91,7 +91,7 @@ public class FencerPresenter {
         return Integer.toString(age.getYears());
     }
     
-    public String getPoints()
+    public String getQualificationRoundPoints()
     {
         if(Tournament != null)
         {
@@ -104,11 +104,37 @@ public class FencerPresenter {
         return "-/-";
     }
     
-    public String getWins()
+    public String getQualificationRoundWins()
     {
         if(Tournament != null)
         {
             iScore score = Tournament.getScoreFromPrelim(Fencer);
+            if(score != null)
+            {
+                return Integer.toString(score.getWins());
+            }
+        }
+        return "-";
+    }
+    
+    public String getFinalRoundScore()
+    {
+        if(Tournament != null)
+        {
+            iScore score = Tournament.getScoreFromFinal(Fencer);
+            if(score != null)
+            {
+                return String.format("%d/%d", score.getHits(), score.getGotHit());
+            }
+        }
+        return "-";
+    }
+    
+    public String getFinalRoundWins()
+    {
+        if(Tournament != null)
+        {
+            iScore score = Tournament.getScoreFromFinal(Fencer);
             if(score != null)
             {
                 return Integer.toString(score.getWins());

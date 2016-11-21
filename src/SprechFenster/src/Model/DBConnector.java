@@ -583,7 +583,7 @@ class DBConnector
 			stfp1Stmt.executeUpdate();
 			return true;
 		}
-		catch(ObjectDeprecatedExeption e)
+		catch(ObjectDeprecatedException e)
 		{
 			return false;
 		}
@@ -808,7 +808,7 @@ class DBConnector
 			rpfpStmt.setInt(3, p.getID());
 			rpfpStmt.executeUpdate();
 		}
-		catch (ObjectDeprecatedExeption e) {}
+		catch (ObjectDeprecatedException e) {}
 	}
 	
 	private PreparedStatement rpffStmt = null;
@@ -843,7 +843,7 @@ class DBConnector
 			aptpStmt.setInt(3, p.getID());
 			aptpStmt.executeUpdate();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	
 	private PreparedStatement aptfStmt = null;
@@ -881,7 +881,7 @@ class DBConnector
 			spipStmt.setInt(7, p.getID());
 			spipStmt.executeUpdate();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	
 	private PreparedStatement spifStmt = null; 
@@ -1089,7 +1089,7 @@ class DBConnector
 			
 			sypStmt.executeUpdate();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	
 	private PreparedStatement syfStmt = null;
@@ -1132,7 +1132,7 @@ class DBConnector
 			
 			srpStmt.executeUpdate();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	
 	private PreparedStatement srfStmt = null;
@@ -1175,7 +1175,7 @@ class DBConnector
 			
 			sbpStmt.executeUpdate();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	
 	private PreparedStatement sbfStmt = null;
@@ -1257,7 +1257,7 @@ class DBConnector
 	}
 
 	private PreparedStatement spfStmt = null;
-	void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedException 
 	{
 		if(spfStmt == null)
 		{
@@ -1271,7 +1271,7 @@ class DBConnector
 	}
 	
 	private PreparedStatement sfrfStmt = null;
-	void setFinalroundFinished(Finalround f, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	void setFinalroundFinished(Finalround f, Boolean finished) throws SQLException, ObjectDeprecatedException 
 	{
 		if(sfrfStmt == null)
 		{

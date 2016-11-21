@@ -47,7 +47,7 @@ class Preliminary implements iPreliminary
 			for(Preliminary p : remove)
 				p.delete();
 		}
-		catch(ObjectDeprecatedExeption e){}
+		catch(ObjectDeprecatedException e){}
 	}
 	// -----
 	private boolean isValid =true;
@@ -115,29 +115,29 @@ class Preliminary implements iPreliminary
 		propagateScore();
 	}
 	
-	int getID() throws ObjectDeprecatedExeption
+	int getID() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return ID;
 	}
-	public int getGroup() throws ObjectDeprecatedExeption
+	public int getGroup() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return group;
 	}
-	public int getRound() throws ObjectDeprecatedExeption
+	public int getRound() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return round;
 	}
-	public int getLane() throws ObjectDeprecatedExeption
+	public int getLane() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return lane;
 	}
-	public List<iFencer> getFencer() throws ObjectDeprecatedExeption
+	public List<iFencer> getFencer() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		List<iFencer> ret = new ArrayList<>();
 		if(fencer1 != null)
 			ret.add(fencer1);
@@ -152,9 +152,9 @@ class Preliminary implements iPreliminary
 		return group + " | " + fencer1.getFamilyName() + " | " + fencer2.getFamilyName();
 	}
 
-	public boolean setTime(int round, int lane) throws SQLException, ObjectDeprecatedExeption
+	public boolean setTime(int round, int lane) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return false;
 		if(sync.setTimeForPreliminary(this, round, lane))
 		{
@@ -165,9 +165,9 @@ class Preliminary implements iPreliminary
 		return false;
 	}
 	
-	public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedExeption
+	public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return;
 		
 		if(!finished)
@@ -180,9 +180,9 @@ class Preliminary implements iPreliminary
 		}
 	}
 	
-	public int getPoints(iFencer f) throws SQLException, ObjectDeprecatedExeption
+	public int getPoints(iFencer f) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(fencer1.equals(f))
 			return pointsFor1;
 		if(fencer2.equals(f))
@@ -190,9 +190,9 @@ class Preliminary implements iPreliminary
 		return -1;
 	}
 	
-	public int getOpponentPoints(iFencer f) throws SQLException, ObjectDeprecatedExeption
+	public int getOpponentPoints(iFencer f) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(fencer1.equals(f))
 			return pointsFor2;
 		if(fencer2.equals(f))
@@ -200,9 +200,9 @@ class Preliminary implements iPreliminary
 		return -1;
 	}
 	
-	public iFencer getWinner() throws ObjectDeprecatedExeption
+	public iFencer getWinner() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished)
 		{
 			if(pointsFor1>pointsFor2)
@@ -213,9 +213,9 @@ class Preliminary implements iPreliminary
 		return null;
 	}
 	
-	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedExeption 
+	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedException 
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(t.isPreliminaryFinished()) return;
 		
 		if(finish != finished)
@@ -275,21 +275,21 @@ class Preliminary implements iPreliminary
 		}
 	}
 	
-	public boolean isFinished() throws ObjectDeprecatedExeption
+	public boolean isFinished() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return finished;
 	}
 	
-	public iTournament getTournament() throws ObjectDeprecatedExeption
+	public iTournament getTournament() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		return t;
 	}
 	
-	public boolean removeParticipant(iFencer f) throws SQLException, ObjectDeprecatedExeption
+	public boolean removeParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1!=null && fencer1.equals(f))
@@ -309,9 +309,9 @@ class Preliminary implements iPreliminary
 		return false;
 	}
 	
-	public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedExeption
+	public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1 == null)
@@ -329,9 +329,9 @@ class Preliminary implements iPreliminary
 		return false;
 	}
 	
-	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException, ObjectDeprecatedExeption
+	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return false;
 		
 		if(fencer1.equals(out)&&!fencer2.equals(in))
@@ -351,18 +351,18 @@ class Preliminary implements iPreliminary
 		return false;
 	}
 	
-	public void delete() throws ObjectDeprecatedExeption
+	public void delete() throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(finished || t.isPreliminaryFinished()) return; //TODO Finished trotzdem löschen??
 		
 		preliminarys.remove(this.ID);
 		this.ID = -1;
 	}
 	
-	public boolean isFencer(Fencer f) throws ObjectDeprecatedExeption
+	public boolean isFencer(Fencer f) throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(fencer1!=null && fencer1.equals(f))
 			return true;
 		if(fencer1!=null && fencer2.equals(f))
@@ -370,9 +370,9 @@ class Preliminary implements iPreliminary
 		return false;
 	}
 	
-	public void setYellow(iFencer f, int count) throws SQLException, ObjectDeprecatedExeption
+	public void setYellow(iFencer f, int count) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 		{
 			sync.setYellowPrelim(this, (Fencer)f, count);
@@ -385,9 +385,9 @@ class Preliminary implements iPreliminary
 		}
 	}
 	
-	public void setRed(iFencer f, int count) throws SQLException, ObjectDeprecatedExeption
+	public void setRed(iFencer f, int count) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 		{
 			sync.setRedPrelim(this, (Fencer)f, count);
@@ -400,9 +400,9 @@ class Preliminary implements iPreliminary
 		}
 	}
 	
-	public void setBlack(iFencer f, int count) throws SQLException, ObjectDeprecatedExeption
+	public void setBlack(iFencer f, int count) throws SQLException, ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 		{
 			sync.setBlackPrelim(this, (Fencer)f, count);
@@ -415,9 +415,9 @@ class Preliminary implements iPreliminary
 		}
 	}
 	
-	public int getYellow(iFencer f) throws ObjectDeprecatedExeption
+	public int getYellow(iFencer f) throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 			return yellowFor1;
 		if(f.equals(fencer2))
@@ -425,9 +425,9 @@ class Preliminary implements iPreliminary
 		return -1;
 	}
 	
-	public int getRed(iFencer f) throws ObjectDeprecatedExeption
+	public int getRed(iFencer f) throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 			return redFor1;
 		if(f.equals(fencer2))
@@ -435,9 +435,9 @@ class Preliminary implements iPreliminary
 		return -1;
 	}
 	
-	public int getBlack(iFencer f) throws ObjectDeprecatedExeption
+	public int getBlack(iFencer f) throws ObjectDeprecatedException
 	{
-		if(!isValid) throw new ObjectDeprecatedExeption();
+		if(!isValid) throw new ObjectDeprecatedException();
 		if(f.equals(fencer1))
 			return blackFor1;
 		if(f.equals(fencer2))
@@ -454,7 +454,7 @@ class Preliminary implements iPreliminary
 	    {
 			if(((Preliminary)other).getID()==ID)
 				return true;
-		} catch (ObjectDeprecatedExeption e) {}
+		} catch (ObjectDeprecatedException e) {}
 	    
 	    return false;
 	}

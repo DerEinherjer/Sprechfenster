@@ -191,7 +191,7 @@ public class Finalround implements iFinalround
 		return null;
 	}
 	
-	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedExeption
+	public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedException
 	{
 		if(finished!=finish)
 		{

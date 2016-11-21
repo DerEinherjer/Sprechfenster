@@ -142,7 +142,7 @@ class Tournament implements iTournament
 				if(p.getLane()>lanes)
 					p.setTime(0, 0);
 			}
-			catch(ObjectDeprecatedExeption e){}
+			catch(ObjectDeprecatedException e){}
 		}
 		sync.tournamentSetLanes(lanes, ID);
 		this.lanes = lanes;
@@ -223,7 +223,7 @@ class Tournament implements iTournament
 						lastForPrelim.put(p, i/lanes);
 				}
 			}
-			catch(ObjectDeprecatedExeption e){}
+			catch(ObjectDeprecatedException e){}
 		}
 	}
 	
@@ -237,7 +237,7 @@ class Tournament implements iTournament
 				if(p.getRound()>last)
 					last = p.getRound();
 			}
-			catch(ObjectDeprecatedExeption e){list.remove(p);}
+			catch(ObjectDeprecatedException e){list.remove(p);}
 		
 		iPreliminary[][] ret = new iPreliminary[last][lanes];
 		
@@ -248,7 +248,7 @@ class Tournament implements iTournament
 				if(p.getRound()<1||p.getLane()<1) continue; //Noch nicht angesetzte begegnungen werden ignoriert
 				ret[p.getRound()-1][p.getLane()-1]=p;
 			}
-			catch(ObjectDeprecatedExeption e){list.remove(p);}
+			catch(ObjectDeprecatedException e){list.remove(p);}
 		}
 		
 		return ret;
@@ -478,7 +478,7 @@ class Tournament implements iTournament
 				if(p.getLane()<1||p.getRound()<1)
 					ret ++;
 			}
-			catch(ObjectDeprecatedExeption e){}
+			catch(ObjectDeprecatedException e){}
 		return ret;
 	}
 	
@@ -601,7 +601,7 @@ class Tournament implements iTournament
 				if(!p.isFinished())
 					return false;
 			}
-			catch(ObjectDeprecatedExeption e){}
+			catch(ObjectDeprecatedException e){}
 		}
 		return true;
 	}
@@ -635,7 +635,7 @@ class Tournament implements iTournament
 						dropedOut.put((Fencer) f, true);
 					}
 				}
-				catch(ObjectDeprecatedExeption e){}
+				catch(ObjectDeprecatedException e){}
 			}
 		}
 		else
@@ -651,8 +651,12 @@ class Tournament implements iTournament
 						else
 							fr.setPoints(tmp, 5);
 					}
-					fr.setFinished(true);
-					dropedOut.put((Fencer) f, true);
+                                        try{
+                                            fr.setFinished(true);
+                                        }
+                                        catch (ObjectDeprecatedException ex)
+                                        {}
+                                        dropedOut.put((Fencer) f, true);
 				}
 			}
 		}
@@ -699,7 +703,7 @@ class Tournament implements iTournament
 			
  	}
 	
-	public int getYellowFor(iFencer f) throws ObjectDeprecatedExeption
+	public int getYellowFor(iFencer f) throws ObjectDeprecatedException
 	{
 		int ret = 0;
 		
@@ -717,7 +721,7 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
-	public int getRedFor(iFencer f) throws ObjectDeprecatedExeption
+	public int getRedFor(iFencer f) throws ObjectDeprecatedException
 	{
 		int ret = 0;
 		
@@ -735,7 +739,7 @@ class Tournament implements iTournament
 		return ret;
 	}
 	
-	public int getBlackFor(iFencer f) throws ObjectDeprecatedExeption
+	public int getBlackFor(iFencer f) throws ObjectDeprecatedException
 	{
 		int ret = 0;
 		

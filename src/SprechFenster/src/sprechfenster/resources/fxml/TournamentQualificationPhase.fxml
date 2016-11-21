@@ -6,22 +6,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<SplitPane fx:id="MainSplitPane" dividerPositions="0.32398753894080995" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
+<SplitPane fx:id="MainSplitPane" dividerPositions="0.3395638629283489" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="965.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
   <items>
-      <ScrollPane prefViewportHeight="398.0" prefViewportWidth="433.0">
+      <ScrollPane prefHeight="398.0" prefViewportHeight="398.0" prefViewportWidth="433.0" prefWidth="79.0">
          <content>
-            <FlowPane fx:id="GroupsPane" prefHeight="398.0" prefWidth="433.0" prefWrapLength="1.0E12" />
+            <FlowPane fx:id="GroupsPane" prefHeight="398.0" prefWidth="314.0" prefWrapLength="1.0E12" />
          </content>
       </ScrollPane>
     <AnchorPane fx:id="FightsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
-            <TableView fx:id="FightsTableView" prefHeight="398.0" prefWidth="501.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-24.0" AnchorPane.topAnchor="30.0">
+            <TableView fx:id="FightsTableView" editable="true" prefHeight="398.0" prefWidth="501.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-24.0" AnchorPane.topAnchor="30.0">
               <columns>
                   <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
+                  <TableColumn fx:id="FinishedTableColumn" prefWidth="75.0" text="Beendet" />
                 <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
                 <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
-                  <TableColumn fx:id="GroupTableColumn" prefWidth="73.0" text="Gruppe" />
-                  <TableColumn fx:id="StatusTableColumn" prefWidth="75.0" text="Status" />
+                  <TableColumn fx:id="GroupTableColumn" editable="false" prefWidth="73.0" text="Gruppe" />
                   <TableColumn fx:id="FirstFencerTableColumn" prefWidth="164.0" text="Fechter A" />
                   <TableColumn fx:id="FirstFencerPointsTableColumn" prefWidth="60.0" text="Punkte A" />
                   <TableColumn fx:id="SecondFencerTableColumn" prefWidth="136.0" text="Fechter B" />

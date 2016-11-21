@@ -74,9 +74,13 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     Button ShowGroupsButton;
     @FXML
     Button ShowFinalRoundsButton;
+    @FXML
+    Button DeleteFencerButton;
+    @FXML
+    Button DeleteTournamentButton;
 
     @FXML
-    TableView TournamentTableView;
+    TableView<TournamentPresenter> TournamentTableView;
     @FXML
     TableColumn TournamentColumn;
     @FXML
@@ -87,7 +91,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     TableColumn TournamentFightsColumn;
 
     @FXML
-    TableView FencerTableView;
+    TableView<FencerPresenter> FencerTableView;
     @FXML
     TableColumn FencerColumn;
     @FXML
@@ -171,6 +175,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         items.add(NewTournamentButton);
         items.add(LoadTournamentButton);
         items.add(NewFencerButton);
+        items.add(DeleteFencerButton);
+        items.add(DeleteTournamentButton);
         ActiveTournament = null;
     }
 
@@ -273,6 +279,26 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         }
     }
 
+    @FXML
+    private void handleDeleteTournamentButtonAction(ActionEvent event)
+    {
+        for(TournamentPresenter presenter : TournamentTableView.getSelectionModel().getSelectedItems())
+        {
+           
+        }
+        TournamentTableView.getItems().remove(TournamentTableView.getSelectionModel().getSelectedItems());
+    }
+    
+    @FXML
+    private void handleDeleteFencerButtonAction(ActionEvent event)
+    {
+        for(FencerPresenter presenter : FencerTableView.getSelectionModel().getSelectedItems())
+        {
+           
+        }
+        FencerTableView.getItems().remove(FencerTableView.getSelectionModel().getSelectedItems());
+    }
+    
     @FXML
     private void handleShowGroupsButtonAction(ActionEvent event)
     {

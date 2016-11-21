@@ -5,7 +5,7 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedExeption;
+import Model.ObjectDeprecatedException;
 import Model.iFencer;
 import Model.iPreliminary;
 import Model.iTournament;
@@ -112,7 +112,7 @@ public class EditQualificationFightDialogController implements Initializable
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
-            catch (ObjectDeprecatedExeption ex)
+            catch (ObjectDeprecatedException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -161,7 +161,7 @@ public class EditQualificationFightDialogController implements Initializable
                         Fight.setTime(round, lane);
                         Fight.setFinished(fightIsFinished);
                     }
-                    catch (ObjectDeprecatedExeption ex)
+                    catch (ObjectDeprecatedException ex)
                     {
                         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                     }

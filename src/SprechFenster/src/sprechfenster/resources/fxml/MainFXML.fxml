@@ -12,21 +12,9 @@
          <children>
             <MenuBar prefHeight="25.0" prefWidth="832.0" AnchorPane.bottomAnchor="48.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <menus>
-                  <Menu mnemonicParsing="false" text="Datei">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Import/Export">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Hilfe">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
+                  <Menu mnemonicParsing="false" text="Datei" />
+                  <Menu mnemonicParsing="false" text="Import/Export" />
+                  <Menu mnemonicParsing="false" text="Hilfe" />
                </menus>
             </MenuBar>
             <ToolBar fx:id="MainToolBar" layoutY="25.0" prefHeight="48.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
@@ -38,6 +26,8 @@
                   <Button fx:id="ShowParticipantsButton" mnemonicParsing="false" onAction="#handleShowParticipantsButtonAction" text="Teilnehmer" />
                   <Button fx:id="ShowGroupsButton" mnemonicParsing="false" onAction="#handleShowGroupsButtonAction" text="Vorgruppen" />
                   <Button fx:id="ShowFinalRoundsButton" mnemonicParsing="false" onAction="#handleShowFinalRoundsButtonAction" text="Finalrunden" />
+                  <Button fx:id="DeleteFencerButton" mnemonicParsing="false" onAction="#handleDeleteFencerButtonAction" text="Fechter löschen" visible="false" />
+                  <Button fx:id="DeleteTournamentButton" mnemonicParsing="false" onAction="#handleDeleteTournamentButtonAction" text="Turnier löschen" visible="false" />
                </items>
             </ToolBar>
          </children>

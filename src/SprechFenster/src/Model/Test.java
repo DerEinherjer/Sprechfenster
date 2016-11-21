@@ -109,7 +109,7 @@ public class Test
 		}	
 	}
 	
-	static void printSchedule(iPreliminary schedule[][]) throws ObjectDeprecatedExeption
+	static void printSchedule(iPreliminary schedule[][]) throws ObjectDeprecatedException
 	{
 		for(int x = 0; x < schedule.length; x++)
 		{

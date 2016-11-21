@@ -5,21 +5,34 @@
  */
 package sprechfenster.Presenters;
 
+import Model.ObjectDeprecatedException;
 import Model.iFencer;
 import Model.iFinalround;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import sprechfenster.LoggingUtilities;
 
 /**
  *
  * @author Stefan
  */
-public class FinalRoundFightPresenter
+public final class FinalRoundFightPresenter
 {
 
     iFinalround Fight;
+    private IntegerProperty Round = new SimpleIntegerProperty();
+    private IntegerProperty Lane = new SimpleIntegerProperty();
+    private IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
+    private IntegerProperty SecondFencerPoints = new SimpleIntegerProperty();
+    private BooleanProperty Finished = new SimpleBooleanProperty();
 
     public FinalRoundFightPresenter(iFinalround fightToPresent)
     {
@@ -28,6 +41,17 @@ public class FinalRoundFightPresenter
             throw new IllegalArgumentException("fightToPresent must not be null");
         }
         Fight = fightToPresent;
+        Fight = fightToPresent;
+        Round.setValue(Fight.getRound());
+        Round.addListener((ChangeListener<Number>) this::setRound);
+        Lane.setValue(Fight.getLane());
+        Lane.addListener((ChangeListener<Number>) this::setLane);
+        FirstFencerPoints.setValue(getFirstFencerPoints());
+        FirstFencerPoints.addListener((ChangeListener<Number>) this::setFirstFencerPoints);
+        SecondFencerPoints.setValue(getSecondFencerPoints());
+        SecondFencerPoints.addListener((ChangeListener<Number>) this::setSecondFencerPoints);
+        Finished.setValue(Fight.isFinished());
+        Finished.addListener((ChangeListener<Boolean>) this::setFinished);
     }
 
     public iFinalround getFight()
@@ -61,13 +85,85 @@ public class FinalRoundFightPresenter
         return Fight.hashCode();
     }
 
+    public IntegerProperty RoundProperty()
+    {
+        return Round;
+    }
+
+    private void setRound(ObservableValue ov, Number oldValue, Number newValue)
+    {
+        try
+        {
+            Fight.setTime(newValue.intValue(), Fight.getLane());
+            Round.setValue(newValue);
+        }
+        catch (SQLException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public IntegerProperty LaneProperty()
+    {
+        return Lane;
+    }
+
+    private void setLane(ObservableValue ov, Number oldValue, Number newValue)
+    {
+        try
+        {
+            Fight.setTime(Fight.getRound(), newValue.intValue());
+            Lane.setValue(newValue);
+        }
+        catch (SQLException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public IntegerProperty FirstFencerPoints()
+    {
+        return FirstFencerPoints;
+    }
+
+    private void setFirstFencerPoints(ObservableValue ov, Number oldValue, Number newValue)
+    {
+        try
+        {
+            Fight.setPoints(getFencer(0), newValue.intValue());
+            FirstFencerPoints.setValue(getFirstFencerPoints());
+        }
+        catch (SQLException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public IntegerProperty SecondFencerPoints()
+    {
+        return SecondFencerPoints;
+    }
+
+    private void setSecondFencerPoints(ObservableValue ov, Number oldValue, Number newValue)
+    {
+        try
+        {
+            Fight.setPoints(getFencer(1), newValue.intValue());
+            FirstFencerPoints.setValue(getSecondFencerPoints());
+        }
+        catch (SQLException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
     public String getFirstFencerName()
     {
         iFencer fencer = getFencer(0);
         return getFencerName(fencer);
     }
 
-    public String getFirstFencerPoints()
+    public int getFirstFencerPoints()
     {
         return getFencerPoints(getFencer(0));
     }
@@ -78,37 +174,9 @@ public class FinalRoundFightPresenter
         return getFencerName(fencer);
     }
 
-    public String getSecondFencerPoints()
+    public int getSecondFencerPoints()
     {
         return getFencerPoints(getFencer(1));
-    }
-
-    public String getLane()
-    {
-        String lane = "";
-        lane = Integer.toString(Fight.getLane());
-        return lane;
-    }
-
-    public String getRound()
-    {
-        String round = "";
-        round = Integer.toString(Fight.getRound());
-        return round;
-    }
-
-    public String getStatus()
-    {
-
-        if (Fight.isFinished())
-        {
-            return "Beendet";
-        }
-        else
-        {
-            return "Offen";
-        }
-
     }
 
     private String getFencerName(iFencer fencer)
@@ -123,14 +191,14 @@ public class FinalRoundFightPresenter
         }
     }
 
-    private String getFencerPoints(iFencer fencer)
+    private int getFencerPoints(iFencer fencer)
     {
         if (fencer != null)
         {
 
             try
             {
-                return Integer.toString(Fight.getPoints(fencer));
+                return Fight.getPoints(fencer);
             }
             catch (SQLException ex)
             {
@@ -138,7 +206,20 @@ public class FinalRoundFightPresenter
             }
 
         }
-        return "-";
+        return 0;
+    }
+
+    private void setFinished(ObservableValue ov, Boolean oldValue, Boolean newValue)
+    {
+        try
+        {
+            Fight.setFinished(newValue);
+            Finished.setValue(newValue);
+        }
+        catch (SQLException | ObjectDeprecatedException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
     }
 
     private iFencer getFencer(int index)

@@ -5,7 +5,7 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedExeption;
+import Model.ObjectDeprecatedException;
 import Model.iFencer;
 import Model.iFinalround;
 import Model.iTournament;
@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -160,7 +161,7 @@ public class EditFinalRoundFightDialogController implements Initializable
             {
 
             }
-            catch (SQLException ex)
+            catch (SQLException | ObjectDeprecatedException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

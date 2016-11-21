@@ -48,9 +48,9 @@ public interface iTournament
 	
 	public List<iFinalround> getAllFinalrounds();
 	
-	public int getYellowFor(iFencer f) throws ObjectDeprecatedExeption;
-	public int getRedFor(iFencer f) throws ObjectDeprecatedExeption;
-	public int getBlackFor(iFencer f) throws ObjectDeprecatedExeption;
+	public int getYellowFor(iFencer f) throws ObjectDeprecatedException;
+	public int getRedFor(iFencer f) throws ObjectDeprecatedException;
+	public int getBlackFor(iFencer f) throws ObjectDeprecatedException;
 	
 	public void dropOut(iFencer f) throws SQLException;
 	

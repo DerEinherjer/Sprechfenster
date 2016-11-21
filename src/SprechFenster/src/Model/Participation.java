@@ -10,6 +10,6 @@ class Participation
 				 + "Startgeld boolean DEFAULT FALSE,"
 				 + "Ausruestungskontrolle boolean DEFAULT FALSE,"
 				 + "Ausgeschieden boolean DEFAULT FALSE,"
-				 + "Kommentar memo);";
+				 + "Kommentar clob);";
 	}
 }

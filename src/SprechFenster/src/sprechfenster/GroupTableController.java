@@ -28,7 +28,14 @@ import sprechfenster.Presenters.FencerPresenter;
  */
 public class GroupTableController implements Initializable
 {
-
+    public enum TournamentPhase
+    {
+        Invalid,
+        FinalPhase,
+        QualificationPhase
+    }
+    
+    private TournamentPhase Phase = TournamentPhase.QualificationPhase;
     @FXML
     private AnchorPane MainAnchorPane;
     @FXML
@@ -53,8 +60,8 @@ public class GroupTableController implements Initializable
     public void initialize(URL url, ResourceBundle rb)
     {
         FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Wins"));
-        PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("Points"));
+        WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundWins"));
+        PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundPoints"));
         FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
         GroupTableView.setFixedCellSize(25);
         GroupTableView.prefHeightProperty().bind(GroupTableView.fixedCellSizeProperty().multiply(Bindings.size(GroupTableView.getItems()).add(1.01)));
@@ -70,6 +77,21 @@ public class GroupTableController implements Initializable
     public void SetTournament(iTournament tournament)
     {
         Tournament = tournament;
+    }
+    
+    public void SetPhase(TournamentPhase phase)
+    {
+        Phase = phase;
+        if(Phase == TournamentPhase.FinalPhase)
+        {
+            WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundWins"));
+            PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundPoints"));
+        }
+        else
+        {
+            WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundWins"));
+            PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundPoints"));
+        }
     }
     
     public void AddFencer(List<iFencer> fencers)

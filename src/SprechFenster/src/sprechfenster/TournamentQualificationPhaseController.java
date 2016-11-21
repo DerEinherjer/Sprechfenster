@@ -5,7 +5,7 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedExeption;
+import Model.ObjectDeprecatedException;
 import Model.iPreliminary;
 import Model.iSync;
 import Model.iTournament;
@@ -18,6 +18,9 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,10 +29,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -49,29 +55,31 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     @FXML
     TableView<QualificationFightPresenter> FightsTableView;
     @FXML
-    TableColumn RoundTableColumn;
+    TableColumn<QualificationFightPresenter, Integer> RoundTableColumn;
     @FXML
-    TableColumn LaneTableColumn;
+    TableColumn<QualificationFightPresenter, Integer> LaneTableColumn;
     @FXML
-    TableColumn FirstFencerTableColumn;
+    TableColumn<QualificationFightPresenter, String> FirstFencerTableColumn;
     @FXML
-    TableColumn FirstFencerPointsTableColumn;
+    TableColumn<QualificationFightPresenter, Integer> FirstFencerPointsTableColumn;
     @FXML
-    TableColumn SecondFencerPointsTableColumn;
+    TableColumn<QualificationFightPresenter, Integer> SecondFencerPointsTableColumn;
     @FXML
-    TableColumn SecondFencerTableColumn;
+    TableColumn<QualificationFightPresenter, String> SecondFencerTableColumn;
     @FXML
-    TableColumn GroupTableColumn;
+    TableColumn<QualificationFightPresenter, Integer> GroupTableColumn;
     @FXML
     TableColumn EditTableColumn;
     @FXML
-    TableColumn StatusTableColumn;
+    TableColumn<QualificationFightPresenter, Boolean> FinishedTableColumn;
     @FXML
     Button CreateQualificationRoundsButton;
 
-    iTournament Tournament;
-    ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
-
+    private iTournament Tournament;
+    private final ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
+    private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1,1);
+    private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1,1);
+    private final LimitedIntegerStringConverter StringToPointsConverter = new LimitedIntegerStringConverter(Integer.MAX_VALUE, 0);
     /**
      * Initializes the controller class.
      */
@@ -80,13 +88,18 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     {
         iSync.getInstance().addObserver(this);
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
+        RoundTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToRoundNumber));
         LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
+        LaneTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToLaneNumber));
         FirstFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerName"));
         FirstFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FirstFencerPoints"));
+        FirstFencerPointsTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToPointsConverter));
         SecondFencerTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerName"));
         SecondFencerPointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("SecondFencerPoints"));
+        SecondFencerPointsTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToPointsConverter));
         GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
-        StatusTableColumn.setCellValueFactory(new PropertyValueFactory<>("Status"));
+        FinishedTableColumn.setCellFactory(CheckBoxTableCell.forTableColumn(FinishedTableColumn));
+        FinishedTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
         Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory
@@ -149,15 +162,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     public void SetTournament(iTournament tournament)
     {
         Tournament = tournament;
-        SetupGroupsView();
-    }
-
-    private void SetupGroupsView()
-    {
-        if (Tournament != null)
-        {
-            UpdateData();
-        }
+        UpdateData();
     }
 
     @FXML
@@ -199,7 +204,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                     {
                                         return Integer.compare(a.getGroup(), b.getGroup());
                                     }
-                                    catch (ObjectDeprecatedExeption ex)
+                                    catch (ObjectDeprecatedException ex)
                                     {
                                         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                         return -1;
@@ -215,7 +220,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                 GroupTableController controller = loader.getController();
                                 controller.SetGroupName("Gruppe " + Integer.toString(groupNumber));
                                 controller.SetTournament(Tournament);
-
+                                controller.SetPhase(GroupTableController.TournamentPhase.QualificationPhase);
                                 GroupControllers.add(controller);
                                 GroupsPane.getChildren().add(groupTable);
                             }
@@ -232,20 +237,22 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                     {
                                         return Integer.compare(a.getRound(), b.getRound());
                                     }
-                                    catch (ObjectDeprecatedExeption ex)
+                                    catch (ObjectDeprecatedException ex)
                                     {
                                         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                         return -1;
                                     }
                         });
+                        int MaxRound = 0;
                         for (iPreliminary qualificationFight : qualificationFights)
                         {
+                            MaxRound = Math.max(MaxRound, qualificationFight.getRound());
                             int groupNumber;
                             try
                             {
                                 groupNumber = qualificationFight.getGroup();
                             }
-                            catch (ObjectDeprecatedExeption ex)
+                            catch (ObjectDeprecatedException ex)
                             {
                                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                 groupNumber = Integer.MAX_VALUE;
@@ -257,19 +264,25 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                 {
                                     controller.AddFencer(qualificationFight.getFencer());
                                 }
-                                catch (ObjectDeprecatedExeption ex)
+                                catch (ObjectDeprecatedException ex)
                                 {
                                     LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                                 }
                             }
                             FightsTableView.getItems().add(new QualificationFightPresenter(qualificationFight));
                         }
+                        StringToRoundNumber.setMinAndMaxValues(MaxRound, 1);
+                        StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
                     }
                 }
             }
             catch (SQLException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
+            catch (ObjectDeprecatedException ex)
+            {
+                Logger.getLogger(TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

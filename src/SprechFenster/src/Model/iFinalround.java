@@ -14,7 +14,7 @@ public interface iFinalround
 	public boolean addParticipant(iFencer f) throws SQLException;
 	public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException; 
 	
-	public void setFinished(boolean finisch) throws SQLException, ObjectDeprecatedExeption;
+	public void setFinished(boolean finisch) throws SQLException, ObjectDeprecatedException;
 	public boolean isFinished();
 	
 	public void setPoints(iFencer f, int points) throws SQLException;

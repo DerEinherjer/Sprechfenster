@@ -408,7 +408,7 @@ public class Sync extends iSync
 		con.setComment(t, f, comment);
 	}
 
-	public void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	public void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedException 
 	{
 		con.setPrelimFinished(p, finished);
 		setChanged();
@@ -418,7 +418,7 @@ public class Sync extends iSync
 			notifyObservers(change.unfinishedPreliminary);
 	}
 	
-	public void setFinalroundFinished(Finalround p, Boolean finished) throws SQLException, ObjectDeprecatedExeption 
+	public void setFinalroundFinished(Finalround p, Boolean finished) throws SQLException, ObjectDeprecatedException 
 	{
 		con.setFinalroundFinished(p, finished);
 		setChanged();
