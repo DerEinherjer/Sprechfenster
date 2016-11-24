@@ -5,6 +5,7 @@
  */
 package sprechfenster;
 
+import Model.Sync;
 import Model.iFinalround;
 import Model.iSync;
 import Model.iTournament;
@@ -139,7 +140,6 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                                                 stage.initModality(Modality.APPLICATION_MODAL);
                                                 stage.initOwner(EditButton.getScene().getWindow());
                                                 stage.showAndWait();
-                                                UpdateData();
                                             }
                                             catch (IOException ex)
                                             {
@@ -178,7 +178,6 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 if(result.isPresent() && result.get() == ButtonType.YES)
                 {
                     Tournament.finishPreliminary();
-                    UpdateData();
                 }
             }
             catch (SQLException ex)
@@ -228,7 +227,18 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     @Override
     public void update(Observable o, Object o1)
     {
-        UpdateData();
+        if(o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change)o1;
+            if(changeType == Sync.change.beganFinalPhase)
+            {
+                UpdateData();
+            }
+        }
+        else
+        {
+            UpdateData();
+        }
     }
 
 }

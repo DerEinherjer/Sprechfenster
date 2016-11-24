@@ -5,6 +5,7 @@
  */
 package sprechfenster;
 
+import Model.Sync;
 import Model.iFencer;
 import Model.iSync;
 import Model.iTournament;
@@ -323,12 +324,12 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         DataModel = iSync.getInstance();
         DataModel.addObserver(this);
 
-        FencerColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        FencingSchoolColumn.setCellValueFactory(new PropertyValueFactory<>("fencingSchool"));
-        AgeColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
+        FencerColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
+        FencingSchoolColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
+        AgeColumn.setCellValueFactory(new PropertyValueFactory<>("Age"));
 
-        TournamentColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        DateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        TournamentColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        DateColumn.setCellValueFactory(new PropertyValueFactory<>("Date"));
 
         FencerTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         
@@ -340,7 +341,22 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     @Override
     public void update(Observable o, Object o1)
     {
-        UpdateOverview();
+        if(o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change)o1;
+            if(changeType == Sync.change.createdFencer
+                    || changeType == Sync.change.createdTournament
+                    || changeType == Sync.change.changedFencerValue
+                    || changeType == Sync.change.changedTournamentValue)
+            {
+                UpdateOverview();
+            }
+        }
+        else
+        {
+            UpdateOverview();
+        }
+        
     }
 
     private void UpdateOverview()
@@ -351,7 +367,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             List<FencerPresenter> fencers = new ArrayList<>();
             for (iFencer fencer : DataModel.getAllFencer())
             {
-                fencers.add(new FencerPresenter(fencer));
+                fencers.add(new FencerPresenter(fencer, null));
             }
             for (iTournament tournament : DataModel.getAllTournaments())
             {

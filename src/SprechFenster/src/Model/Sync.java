@@ -28,6 +28,7 @@ public class Sync extends iSync
 		finishedFinalround,
 		unfinishedPreliminary,
 		unfinishedFinalround,
+                beganFinalPhase,
 	}
 	
 	Sync() throws SQLException
@@ -349,6 +350,8 @@ public class Sync extends iSync
 	void setFinishedPreliminary(Tournament t) throws SQLException 
 	{
 		con.setFinishedPreliminary(t);
+                setChanged();
+                notifyObservers(change.beganFinalPhase);
 	}
 	
 	void setYellowFinal(Finalround fr, Fencer f, int count) throws SQLException

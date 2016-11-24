@@ -8,6 +8,7 @@ package sprechfenster;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -47,6 +48,12 @@ public class MainApplication extends Application {
             LogManager.getLogManager().readConfiguration(configStream);
             LoggingUtilities.LOGGER.log(Level.INFO, "Logging configuration file loaded");
             System.out.println(System.getProperty("java.io.tmpdir"));
+            //rebind stdout/stderr to logger                                  
+            LoggingOutputStream los;                                               
+            los = new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDOUT);          
+            System.setOut(new PrintStream(los, true));                             
+            los= new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDERR);           
+            System.setErr(new PrintStream(los, true));                             
         }
         catch (IOException ex)
         {

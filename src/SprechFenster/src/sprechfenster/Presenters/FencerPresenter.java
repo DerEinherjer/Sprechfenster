@@ -5,67 +5,61 @@
  */
 package sprechfenster.Presenters;
 
+import Model.Sync;
 import Model.iFencer;
 import Model.iScore;
+import Model.iSync;
 import Model.iTournament;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Observable;
+import java.util.Observer;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author Stefan
  */
-public class FencerPresenter {
+public class FencerPresenter implements Observer {
     
     private iFencer Fencer;
     private iTournament Tournament;
+    private SimpleStringProperty QualificationRoundPoints = new SimpleStringProperty();
+    private SimpleStringProperty FinalRoundScore = new SimpleStringProperty();
+    private SimpleStringProperty QualificationRoundWins = new SimpleStringProperty();
+    private SimpleStringProperty FinalRoundWins = new SimpleStringProperty();
+    private SimpleStringProperty FullName = new SimpleStringProperty();
+    private SimpleStringProperty FencingSchool = new SimpleStringProperty();
+    private SimpleStringProperty Age = new SimpleStringProperty();
     
-    public FencerPresenter(iFencer fencerToPresent)
+    public FencerPresenter(iFencer fencerToPresent, iTournament tournament)
     {
         if(fencerToPresent == null)
         {
             throw new IllegalArgumentException("fencerToPresent must not be null");
         }
         Fencer = fencerToPresent;
-    }
-    
-    public FencerPresenter(iFencer fencerToPresent, iTournament tournament)
-    {
-        this(fencerToPresent);
         Tournament = tournament;
+        UpdateData();
+        RegisterObserver();
     }
     
-    
-    public void AssignTournament(iTournament tournament)
+    private void RegisterObserver()
     {
-        Tournament = tournament;
+        iSync.getInstance().addObserver(this);
     }
     
-    @Override
-    public boolean equals(Object other)
+    private void UpdateData()
     {
-        if(other == this)
-        {
-            return true;
-        }
-        else
-        {
-            if(!(other instanceof FencerPresenter))
-            {
-                return false;
-            }
-            else
-            {
-                return Fencer.equals(((FencerPresenter)other).Fencer);
-            }
-        }
-    }
-    
-    @Override 
-    public int hashCode()
-    {
-        return Fencer.hashCode();
+        QualificationRoundPoints.setValue(getQualificationRoundPoints());
+        FinalRoundScore.setValue(getFinalRoundScore());
+        QualificationRoundWins.setValue(getQualificationRoundWins());
+        FinalRoundWins.setValue(getFinalRoundWins());
+        FullName.setValue(Fencer.getFullName());
+        FencingSchool.setValue(Fencer.getFencingSchool());
+        Age.setValue(getAge());
     }
     
     public iFencer getFencer()
@@ -73,17 +67,42 @@ public class FencerPresenter {
         return Fencer;
     }
     
-    public String getFullName()
+    public StringProperty FullNameProperty()
     {
-        return Fencer.getFullName();
+        return FullName;
     }
     
-    public String getFencingSchool()
+    public StringProperty FencingSchoolProperty()
     {
-        return Fencer.getFencingSchool();
+        return FencingSchool;
+    }
+
+    public StringProperty AgeProperty()
+    {
+        return Age;
     }
     
-    public String getAge()
+    public StringProperty QualificationRoundPointsProperty()
+    {
+        return QualificationRoundPoints;
+    }
+    
+    public StringProperty QualificationRoundWinsProperty()
+    {
+        return QualificationRoundWins;
+    }
+    
+    public StringProperty FinalRoundScoreProperty()
+    {
+        return FinalRoundScore;
+    }
+    
+    public StringProperty FinalRoundWinsProperty()
+    {
+        return FinalRoundWins;
+    }
+    
+    private String getAge()
     {
         LocalDate birthday = LocalDate.parse(Fencer.getBirthday(), DateTimeFormatter.ISO_DATE);
         LocalDate now = LocalDate.now();
@@ -91,7 +110,7 @@ public class FencerPresenter {
         return Integer.toString(age.getYears());
     }
     
-    public String getQualificationRoundPoints()
+    private String getQualificationRoundPoints()
     {
         if(Tournament != null)
         {
@@ -104,7 +123,7 @@ public class FencerPresenter {
         return "-/-";
     }
     
-    public String getQualificationRoundWins()
+    private String getQualificationRoundWins()
     {
         if(Tournament != null)
         {
@@ -117,7 +136,7 @@ public class FencerPresenter {
         return "-";
     }
     
-    public String getFinalRoundScore()
+    private String getFinalRoundScore()
     {
         if(Tournament != null)
         {
@@ -130,7 +149,7 @@ public class FencerPresenter {
         return "-";
     }
     
-    public String getFinalRoundWins()
+    private String getFinalRoundWins()
     {
         if(Tournament != null)
         {
@@ -141,5 +160,26 @@ public class FencerPresenter {
             }
         }
         return "-";
+    }
+
+    @Override
+    public void update(Observable o, Object o1)
+    {
+        if (o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change) o1;
+            if (changeType == Sync.change.changedFencerValue
+                    || changeType == Sync.change.finishedPreliminary
+                    || changeType == Sync.change.unfinishedPreliminary
+                    || changeType == Sync.change.finishedFinalround
+                    ||changeType == Sync.change.unfinishedFinalround)
+            {
+                UpdateData();
+            }
+        }
+        else
+        {
+            UpdateData();
+        }
     }
 }

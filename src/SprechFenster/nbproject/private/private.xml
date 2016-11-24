@@ -3,9 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/Presenters/FinalRoundFightPresenter.java</file>
             <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/MainApplication.java</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/MainFXMLController.java</file>
-            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/Model/iSync.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/Presenters/QualificationFightPresenter.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/TournamentEliminationPhaseController.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/Presenters/FencerPresenter.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/NewFencerDialogController.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/StdOutErrLevel.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/Model/Sync.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/Model/DBConnector.java</file>
+            <file>file:/F:/Sprechfenster/Sprechfenster/src/SprechFenster/src/sprechfenster/LoggingUtilities.java</file>
         </group>
     </open-files>
 </project-private>

@@ -58,7 +58,7 @@ public class TournamentParticipantsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ParticipantsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        ParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        ParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
         GUIUtilities.FillNumberComboBox(FencingLanesComboBox, 1, 10);
         GUIUtilities.FillNumberComboBox(QualificationGroupsComboBox, 1, 20);
         GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
@@ -92,7 +92,7 @@ public class TournamentParticipantsController implements Initializable {
                 List<FencerPresenter> presenters = new ArrayList<>();
                 for(iFencer fencer : Tournament.getAllParticipants())
                 {
-                    presenters.add(new FencerPresenter(fencer));
+                    presenters.add(new FencerPresenter(fencer, Tournament));
                 }
                 ParticipantsTableView.getItems().setAll(presenters);
             } catch (SQLException ex) {

@@ -6,6 +6,7 @@
 package sprechfenster;
 
 import Model.ObjectDeprecatedException;
+import Model.Sync;
 import Model.iPreliminary;
 import Model.iSync;
 import Model.iTournament;
@@ -140,7 +141,6 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                                 stage.initModality(Modality.APPLICATION_MODAL);
                                                 stage.initOwner(EditButton.getScene().getWindow());
                                                 stage.showAndWait();
-                                                UpdateData();
                                             }
                                             catch (IOException ex)
                                             {
@@ -290,6 +290,17 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     @Override
     public void update(Observable o, Object o1)
     {
-        UpdateData();
+        if(o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change)o1;
+            if(changeType == Sync.change.createdPreliminary)
+            {
+                UpdateData();
+            }
+        }
+        else
+        {
+            UpdateData();
+        }
     }
 }

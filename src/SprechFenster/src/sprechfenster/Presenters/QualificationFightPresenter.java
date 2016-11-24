@@ -6,10 +6,14 @@
 package sprechfenster.Presenters;
 
 import Model.ObjectDeprecatedException;
+import Model.Sync;
 import Model.iFencer;
 import Model.iPreliminary;
+import Model.iSync;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
@@ -24,8 +28,9 @@ import sprechfenster.LoggingUtilities;
  *
  * @author Stefan
  */
-public final class QualificationFightPresenter
+public final class QualificationFightPresenter implements Observer
 {
+
     iPreliminary Fight;
     private IntegerProperty Round = new SimpleIntegerProperty();
     private IntegerProperty Group = new SimpleIntegerProperty();
@@ -33,70 +38,85 @@ public final class QualificationFightPresenter
     private IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
     private IntegerProperty SecondFencerPoints = new SimpleIntegerProperty();
     private BooleanProperty Finished = new SimpleBooleanProperty();
-    
+
     public QualificationFightPresenter(iPreliminary fightToPresent)
+    {
+
+        if (fightToPresent == null)
+        {
+            throw new IllegalArgumentException("fightToPresent must not be null");
+        }
+        Fight = fightToPresent;
+        UpdateData();
+        AddListeners();
+        iSync.getInstance().addObserver(this);
+    }
+    
+    private void AddListeners()
+    {
+        Round.addListener((ChangeListener<Number>) this::setRound);
+        Lane.addListener((ChangeListener<Number>) this::setLane);
+        FirstFencerPoints.addListener((ChangeListener<Number>) this::setFirstFencerPoints);
+        SecondFencerPoints.addListener((ChangeListener<Number>) this::setSecondFencerPoints);
+        Finished.addListener((ChangeListener<Boolean>) this::setFinished);
+    } 
+    private void RemoveListeners()
+    {
+        Round.removeListener((ChangeListener<Number>) this::setRound);
+        Lane.removeListener((ChangeListener<Number>) this::setLane);
+        FirstFencerPoints.removeListener((ChangeListener<Number>) this::setFirstFencerPoints);
+        SecondFencerPoints.removeListener((ChangeListener<Number>) this::setSecondFencerPoints);
+        Finished.removeListener((ChangeListener<Boolean>) this::setFinished);
+    }
+
+    private void UpdateData()
     {
         try
         {
-            if(fightToPresent == null)
-            {
-                throw new IllegalArgumentException("fightToPresent must not be null");
-            }
-            Fight = fightToPresent;
+            RemoveListeners();
             Round.setValue(Fight.getRound());
-            Round.addListener((ChangeListener<Number>)this::setRound);
             Group.setValue(Fight.getGroup());
             Lane.setValue(Fight.getLane());
-            Lane.addListener((ChangeListener<Number>)this::setLane);
             FirstFencerPoints.setValue(getFirstFencerPoints());
-            FirstFencerPoints.addListener((ChangeListener<Number>)this::setFirstFencerPoints);
             SecondFencerPoints.setValue(getSecondFencerPoints());
-            SecondFencerPoints.addListener((ChangeListener<Number>)this::setSecondFencerPoints);
             Finished.setValue(Fight.isFinished());
-            Finished.addListener((ChangeListener<Boolean>)this::setFinished);
+            AddListeners();
         }
         catch (ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
+    @Override
+    public void update(Observable o, Object o1)
+    {
+        if (o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change) o1;
+            if (changeType == Sync.change.changedPreliminary
+                    || changeType == Sync.change.finishedPreliminary
+                    || changeType == Sync.change.unfinishedPreliminary)
+            {
+                UpdateData();
+            }
+        }
+        else
+        {
+            UpdateData();
+        }
+    }
+
     public iPreliminary getFight()
     {
         return Fight;
     }
-    
-    @Override
-    public boolean equals(Object other)
-    {
-        if(other == this)
-        {
-            return true;
-        }
-        else
-        {
-            if(!(other instanceof QualificationFightPresenter))
-            {
-                return false;
-            }
-            else
-            {
-                return Fight.equals(((QualificationFightPresenter)other).Fight);
-            }
-        }
-    }
-    
-    @Override 
-    public int hashCode()
-    {
-        return Fight.hashCode();
-    }
-    
+
     public IntegerProperty RoundProperty()
     {
         return Round;
     }
-    
+
     private void setRound(ObservableValue ov, Number oldValue, Number newValue)
     {
         try
@@ -109,17 +129,17 @@ public final class QualificationFightPresenter
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public IntegerProperty GroupProperty()
     {
         return Group;
     }
-    
+
     public IntegerProperty LaneProperty()
     {
         return Lane;
     }
-    
+
     private void setLane(ObservableValue ov, Number oldValue, Number newValue)
     {
         try
@@ -132,12 +152,12 @@ public final class QualificationFightPresenter
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
-    public IntegerProperty FirstFencerPoints()
+
+    public IntegerProperty FirstFencerPointsProperty()
     {
         return FirstFencerPoints;
     }
-    
+
     private void setFirstFencerPoints(ObservableValue ov, Number oldValue, Number newValue)
     {
         try
@@ -150,25 +170,25 @@ public final class QualificationFightPresenter
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
-    public IntegerProperty SecondFencerPoints()
+
+    public IntegerProperty SecondFencerPointsProperty()
     {
         return SecondFencerPoints;
     }
-    
+
     private void setSecondFencerPoints(ObservableValue ov, Number oldValue, Number newValue)
     {
         try
         {
             Fight.setPoints(getFencer(1), newValue.intValue());
-            FirstFencerPoints.setValue(getSecondFencerPoints());
+            SecondFencerPoints.setValue(getSecondFencerPoints());
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public BooleanProperty FinishedProperty()
     {
         return Finished;
@@ -186,34 +206,34 @@ public final class QualificationFightPresenter
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public String getFirstFencerName()
     {
         iFencer fencer = getFencer(0);
         return getFencerName(fencer);
     }
-    
+
     public int getFirstFencerPoints()
     {
         return getFencerPoints(getFencer(0));
     }
-    
+
     public String getSecondFencerName()
     {
         iFencer fencer = getFencer(1);
         return getFencerName(fencer);
     }
-    
+
     public int getSecondFencerPoints()
     {
         return getFencerPoints(getFencer(1));
     }
-    
+
     public Boolean getFinished()
     {
         try
         {
-            if(Fight.isFinished())
+            if (Fight.isFinished())
             {
                 return true;
             }
@@ -228,7 +248,7 @@ public final class QualificationFightPresenter
             return false;
         }
     }
-    
+
     public void setFinished(Boolean isFightFinished)
     {
         try
@@ -237,13 +257,13 @@ public final class QualificationFightPresenter
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
-           LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private String getFencerName(iFencer fencer)
     {
-        if(fencer != null)
+        if (fencer != null)
         {
             return fencer.getFullName();
         }
@@ -252,10 +272,10 @@ public final class QualificationFightPresenter
             return "-";
         }
     }
-    
+
     private int getFencerPoints(iFencer fencer)
     {
-        if(fencer != null)
+        if (fencer != null)
         {
             try
             {
@@ -272,13 +292,13 @@ public final class QualificationFightPresenter
         }
         return 0;
     }
-    
+
     private iFencer getFencer(int index)
     {
         try
         {
             List<iFencer> fencers = Fight.getFencer();
-            if(fencers != null && fencers.size() > index)
+            if (fencers != null && fencers.size() > index)
             {
                 iFencer fencer = fencers.get(index);
                 return fencer;

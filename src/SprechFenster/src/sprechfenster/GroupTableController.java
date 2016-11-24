@@ -39,15 +39,15 @@ public class GroupTableController implements Initializable
     @FXML
     private AnchorPane MainAnchorPane;
     @FXML
-    private TableView GroupTableView;
+    private TableView<FencerPresenter> GroupTableView;
     @FXML
-    private TableColumn FencerNameTableColumn;
+    private TableColumn<FencerPresenter, String> FencerNameTableColumn;
     @FXML
-    private TableColumn PointsTableColumn;
+    private TableColumn<FencerPresenter, String> PointsTableColumn;
     @FXML
-    private TableColumn WinsTableColumn;
+    private TableColumn<FencerPresenter, String> WinsTableColumn;
     @FXML
-    private TableColumn FencingSchoolTableColumn;
+    private TableColumn<FencerPresenter, String> FencingSchoolTableColumn;
     @FXML
     private Label GroupNameLabel;
     @FXML
@@ -59,7 +59,7 @@ public class GroupTableController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
-        FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+        FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
         WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundWins"));
         PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundPoints"));
         FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
@@ -85,7 +85,7 @@ public class GroupTableController implements Initializable
         if(Phase == TournamentPhase.FinalPhase)
         {
             WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundWins"));
-            PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundPoints"));
+            PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundScore"));
         }
         else
         {
@@ -100,7 +100,7 @@ public class GroupTableController implements Initializable
         for(iFencer fencer : fencers)
         {
             FencerPresenter fencerPresenter = new FencerPresenter(fencer, Tournament);
-            if(!items.contains(fencerPresenter))
+            if(items.filtered( presenter -> ((FencerPresenter)presenter).getFencer() == fencer).isEmpty())
             {
                 items.add(fencerPresenter);
             }
