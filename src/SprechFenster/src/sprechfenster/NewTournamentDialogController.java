@@ -10,6 +10,7 @@ import Model.iTournament;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javafx.event.ActionEvent;
@@ -56,6 +57,7 @@ public class NewTournamentDialogController implements Initializable
         GUIUtilities.FillNumberComboBox(GroupsComboBox, 1, 20);
         GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
         GUIUtilities.FillNumberComboBox(LanesComboBox, 1, 10);
+        StartingDatePicker.setValue(LocalDate.now());
     }
 
     @FXML
@@ -111,7 +113,7 @@ public class NewTournamentDialogController implements Initializable
                 newTournament.setFinalRounds(GUIUtilities.GetIntegerFromStringComboBox(FinalRoundsComboBox));
                 newTournament.setLanes(GUIUtilities.GetIntegerFromStringComboBox(LanesComboBox));
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

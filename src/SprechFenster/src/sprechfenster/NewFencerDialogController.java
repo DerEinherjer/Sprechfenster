@@ -10,6 +10,7 @@ import Model.iSync;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -100,7 +101,7 @@ public class NewFencerDialogController implements Initializable {
                 newFencer.setBirthday(BirthdayDatePicker.getValue().format(DateTimeFormatter.ISO_DATE));
                 newFencer.setNationality(NationalityComboBox.getValue().toString());
                 newFencer.setFencingSchool(FencingSchoolComboBox.getValue().toString());
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }

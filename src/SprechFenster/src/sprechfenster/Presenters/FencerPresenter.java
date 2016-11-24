@@ -13,10 +13,13 @@ import Model.iTournament;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import sprechfenster.LoggingUtilities;
 
 /**
  *
@@ -104,10 +107,18 @@ public class FencerPresenter implements Observer {
     
     private String getAge()
     {
-        LocalDate birthday = LocalDate.parse(Fencer.getBirthday(), DateTimeFormatter.ISO_DATE);
-        LocalDate now = LocalDate.now();
-        Period age = Period.between(birthday, now);
-        return Integer.toString(age.getYears());
+        try
+        {
+            LocalDate birthday = LocalDate.parse(Fencer.getBirthday(), DateTimeFormatter.ISO_DATE);
+            LocalDate now = LocalDate.now();
+            Period age = Period.between(birthday, now);
+            return Integer.toString(age.getYears());
+        }
+        catch(DateTimeParseException e)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
+        }
+        return "-";
     }
     
     private String getQualificationRoundPoints()
