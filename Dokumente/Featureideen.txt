@@ -1,0 +1,14 @@
+﻿
+----------------------------------------
+1) Aus E-Mail von Michael am 7.10.2016:
+----------------------------------------
+"Ein Punkt noch für das Programm:
+
+Jeder soll nach dem Turnier Punkte bekommen, diese sollen im Fechtprofil erkennbar sein. Zudem wäre dann eine Rangliste super, die eben nach Punkten geordnet ist."
+
+----------------------------------------
+-"Rangliste" von Fechtern, in denen alle Turniererfolge wiedergespiegelt werden
+-Turnierergebnisse geben Punkte, die dem Fechter zugeordnet werden
+-Am besten alle Turnierplatzierungen für jeden Fechter speichern?
+-Wie lang sind Punkte für die Rangliste gültig?
+----------------------------------------
