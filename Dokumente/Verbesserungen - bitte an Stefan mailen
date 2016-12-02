@@ -1,0 +1,30 @@
+-Gewichtsklasse für Fechter speichern (besser als genaues Gewicht, da sich das ständig ändert?)
+-Gewichtsklassen für Fechter (erstmal nur grob, 2 Klassen)
+-Option, in den Vorrunden Gewichte möglichst gleichmäßig zu verteilen
+-Drag&Drop in Fechtlisten mit recht hoher Priorität
+-Gruppen nach Größe sortieren
+-Tabellenzeilen besser markieren, so dass das Lesen einfacher wird (Abstand zwischen Zeilen erhöhen? Zebraeinfärbung)
+
+-Michael sortiert nach Gruppe und beachtet die Rundenzuordnung dann nicht, sondern macht die Kämpfe in der Reihenfolge wie sie dann erscheinen
+
+-Punkte beim Editieren in der Liste werden nicht übernommen wenn nicht Enter gedrückt wird
+-Ändern über Tabelle führt zum Aufhängen (Endlosschleife mit Listener)
+
+-Fechter in Gruppen nach Siegen sortieren (als Standard, Michael stellt das manuell ein)
+
+-Gefechte pro Gruppe in einzelne Tabellen
+
+-Druckfeature für Gefechtszettel		//Da dies erst kurz vor beginn durckreif ist und in der regel kein drucker verfügbar sein dürfte sehr niedrige priorität
+
+-Gruppen vielleicht farblich zuordnen
+
+-Ändern über Dialog verlangsamt System
+
+-Ergebnisse des Turniers in Gesamtwertung eingeben, sobald verfügbar
+
+-beendete Kämpfe besser kennzeichnen (ausgrauen/andere Tabelle)
+
+-Treffer gegeben/erhalten ist nicht klar	// Mir ist die Aussage nicht klar
+-Wenn nach Siegen sortiert wird, sekundäre Sortierung nach Treffern gegeben/erhalten machen
+
+-Im Finale fechtet bester gegen schlechtesten usw. - kontrollieren dass das richtig gemacht wird	//Nicht ganz aber so ähnlich
