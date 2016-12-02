@@ -33,12 +33,17 @@ public final class QualificationFightPresenter implements Observer
 
     iPreliminary Fight;
     private IntegerProperty Round = new SimpleIntegerProperty();
+    private ChangeListener<Number> RoundListener = this::setRound;
     private IntegerProperty Group = new SimpleIntegerProperty();
     private IntegerProperty Lane = new SimpleIntegerProperty();
+    private ChangeListener<Number> LaneListener = this::setLane;
     private IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
+    private ChangeListener<Number> FirstFencerPointsListener = this::setFirstFencerPoints;
     private IntegerProperty SecondFencerPoints = new SimpleIntegerProperty();
+    private ChangeListener<Number> SecondFencerPointsListener = this::setSecondFencerPoints;
     private BooleanProperty Finished = new SimpleBooleanProperty();
-
+    private ChangeListener<Boolean> FinishedListener = this::setFinished;
+    
     public QualificationFightPresenter(iPreliminary fightToPresent)
     {
 
@@ -48,25 +53,24 @@ public final class QualificationFightPresenter implements Observer
         }
         Fight = fightToPresent;
         UpdateData();
-        AddListeners();
         iSync.getInstance().addObserver(this);
     }
     
     private void AddListeners()
     {
-        Round.addListener((ChangeListener<Number>) this::setRound);
-        Lane.addListener((ChangeListener<Number>) this::setLane);
-        FirstFencerPoints.addListener((ChangeListener<Number>) this::setFirstFencerPoints);
-        SecondFencerPoints.addListener((ChangeListener<Number>) this::setSecondFencerPoints);
-        Finished.addListener((ChangeListener<Boolean>) this::setFinished);
+        Round.addListener(RoundListener);
+        Lane.addListener(LaneListener);
+        FirstFencerPoints.addListener(FirstFencerPointsListener);
+        SecondFencerPoints.addListener(SecondFencerPointsListener);
+        Finished.addListener(FinishedListener);
     } 
     private void RemoveListeners()
     {
-        Round.removeListener((ChangeListener<Number>) this::setRound);
-        Lane.removeListener((ChangeListener<Number>) this::setLane);
-        FirstFencerPoints.removeListener((ChangeListener<Number>) this::setFirstFencerPoints);
-        SecondFencerPoints.removeListener((ChangeListener<Number>) this::setSecondFencerPoints);
-        Finished.removeListener((ChangeListener<Boolean>) this::setFinished);
+        Round.removeListener(RoundListener);
+        Lane.removeListener(LaneListener);
+        FirstFencerPoints.removeListener(FirstFencerPointsListener);
+        SecondFencerPoints.removeListener(SecondFencerPointsListener);
+        Finished.removeListener(FinishedListener);
     }
 
     private void UpdateData()
@@ -122,7 +126,6 @@ public final class QualificationFightPresenter implements Observer
         try
         {
             Fight.setTime(newValue.intValue(), Fight.getLane());
-            Round.setValue(newValue);
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
@@ -145,7 +148,6 @@ public final class QualificationFightPresenter implements Observer
         try
         {
             Fight.setTime(Fight.getRound(), newValue.intValue());
-            Lane.setValue(newValue);
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
@@ -163,7 +165,6 @@ public final class QualificationFightPresenter implements Observer
         try
         {
             Fight.setPoints(getFencer(0), newValue.intValue());
-            FirstFencerPoints.setValue(getFirstFencerPoints());
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
@@ -181,7 +182,6 @@ public final class QualificationFightPresenter implements Observer
         try
         {
             Fight.setPoints(getFencer(1), newValue.intValue());
-            SecondFencerPoints.setValue(getSecondFencerPoints());
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
@@ -199,7 +199,6 @@ public final class QualificationFightPresenter implements Observer
         try
         {
             Fight.setFinished(newValue);
-            Finished.setValue(newValue);
         }
         catch (SQLException | ObjectDeprecatedException ex)
         {
