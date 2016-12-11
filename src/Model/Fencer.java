@@ -69,10 +69,10 @@ class Fencer implements iFencer
 		this.nationality = (String) set.get("Nationalitaet".toUpperCase());
 	}
 	
-	int getID(){return ID;}
+	public int getID(){return ID;}
 	public String getName(){return name;}
 	public String getFamilyName(){return familyName;}
-    public String getFullName() {return name+" "+familyName;}
+        public String getFullName() {return name+" "+familyName;}
 	public String getBirthday(){return birthday;}
 	public String getFencingSchool(){return fencingSchool;}
 	public String getNationality(){return nationality;}

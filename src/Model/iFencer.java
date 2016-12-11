@@ -4,9 +4,10 @@ import java.sql.SQLException;
 
 public interface iFencer 
 {
+        public int getID();
 	public String getName();
 	public String getFamilyName();
-    public String getFullName();
+        public String getFullName();
 	public String getBirthday();
 	public String getFencingSchool();
 	public String getNationality();

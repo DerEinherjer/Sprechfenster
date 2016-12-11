@@ -25,6 +25,7 @@ public abstract class iSync extends Observable
 	
 	public iFencer createFencer(String name, String familyName) throws SQLException{return null;}
 	public List<iFencer> getAllFencer() throws SQLException{return null;}
+        public iFencer getFencerByID(int fencerID) throws SQLException {return null;}
 	
 	public iTournament createTournament(String name) throws SQLException{return null;}
 	public List<iTournament> getAllTournaments() throws SQLException{return null;}
