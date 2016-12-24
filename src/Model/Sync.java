@@ -81,6 +81,11 @@ public class Sync extends iSync
 			ret.add(f);
 		return ret;
 	}
+        
+        public iFencer getFencerByID(int fencerID) throws SQLException
+        {
+            return Fencer.getFencer(fencerID);
+        }
 	
 	Fencer loadFencer(int id) throws SQLException
 	{

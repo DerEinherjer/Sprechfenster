@@ -40,7 +40,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TableView fx:id="ParticipantsTableView" layoutX="236.0" layoutY="41.0" prefHeight="672.0" prefWidth="255.0" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="19.0" AnchorPane.topAnchor="41.0">
+      <TableView fx:id="ParticipantsTableView" layoutX="236.0" layoutY="41.0" onDragDropped="#ParticipantsTableViewDragDropped" onDragOver="#ParticipantsTableViewDragOver" prefHeight="672.0" prefWidth="255.0" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="19.0" AnchorPane.topAnchor="41.0">
         <columns>
           <TableColumn fx:id="ParticipantColumn" maxWidth="1.7976931348623157E308" prefWidth="250.0" text="Teilnehmer" />
         </columns>

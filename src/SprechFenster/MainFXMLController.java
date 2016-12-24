@@ -33,6 +33,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -160,6 +164,25 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             }
         }
         SetupTournamentParticipants(tournament);
+    }
+    
+    @FXML
+    private void FencerTableViewOnDragDetected(MouseEvent event)
+    {
+        
+        
+        Dragboard db = FencerTableView.startDragAndDrop(TransferMode.ANY);
+        StringBuilder fencerIdsBuilder = new StringBuilder();
+        fencerIdsBuilder.append("FencerIDs;");
+        for(FencerPresenter presenter : GetSelectedFencers())
+        {
+            fencerIdsBuilder.append(presenter.getFencer().getID());
+            fencerIdsBuilder.append(';');
+        }
+        ClipboardContent draggedContent = new ClipboardContent();
+        draggedContent.putString(fencerIdsBuilder.toString());
+        db.setContent(draggedContent);
+        event.consume();
     }
 
     private void SetupOverview()

@@ -6,6 +6,7 @@
 package sprechfenster;
 
 import Model.iFencer;
+import Model.iSync;
 import Model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,6 +29,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import sprechfenster.Presenters.FencerPresenter;
 
 /**
@@ -108,6 +113,66 @@ public class TournamentParticipantsController implements Initializable {
             GUIUtilities.FillNumberComboBox(box, startNumber, selectedNumber);
         }
         box.getSelectionModel().select(selectedNumber-1);
+    }
+    
+    @FXML
+    private void ParticipantsTableViewDragOver(DragEvent event)
+    {
+        if (event.getGestureSource() != ParticipantsTableView &&
+                event.getDragboard().hasString() &&
+                Tournament != null) 
+        {
+            String dragContent = event.getDragboard().getString();
+            if(dragContent != null)
+            {
+                if(dragContent.startsWith("FencerIDs;"))
+                {
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                }
+            }
+        }
+        event.consume();
+    }
+    
+     @FXML
+    private void ParticipantsTableViewDragDropped(DragEvent event)
+    {
+        Boolean successfulDrop = false;
+        if (event.getDragboard().hasString()) 
+        {
+            String dragContent = event.getDragboard().getString();
+            if(dragContent != null)
+            {
+                if(dragContent.startsWith("FencerIDs;"))
+                {
+                    StringTokenizer tokenizer = new StringTokenizer(dragContent, ";");
+                    while(tokenizer.hasMoreTokens())
+                    {
+                        String token = tokenizer.nextToken();
+                        try
+                        {
+                            int fencerId = Integer.parseInt(token);
+                            iFencer fencer = iSync.getInstance().getFencerByID(fencerId);
+                            if(fencer != null && Tournament != null)
+                            {
+                                if(!Tournament.isParticipant(fencer))
+                                {
+                                    Tournament.addParticipant(fencer);
+                                }
+                            }
+                        }
+                        catch(SQLException | NumberFormatException ex)
+                        {
+                            //do nothing
+                        }
+                    }
+                    successfulDrop = true;
+                    UpdateParticipantsList();
+                }
+            }
+        }
+        event.setDropCompleted(successfulDrop);
+        event.consume();
     }
     
     @FXML
