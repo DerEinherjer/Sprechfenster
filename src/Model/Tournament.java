@@ -1,5 +1,9 @@
 package Model;
 
+import Model.Rounds.Preliminary;
+import Model.Rounds.Finalround;
+import Model.Rounds.iFinalround;
+import Model.Rounds.iPreliminary;
 import java.sql.SQLException;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
@@ -10,13 +14,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class Tournament implements iTournament
+public class Tournament implements iTournament
 {
 	// -----
 	private static Map<Integer, Tournament> tournaments = new HashMap<>();
 	static Sync sync;
 	
-	static Tournament getTournament(int id) throws SQLException
+	public static Tournament getTournament(int id) throws SQLException
 	{
 		if(!tournaments.containsKey(id))
 			sync.loadTournament(id);
@@ -305,7 +309,7 @@ class Tournament implements iTournament
 		return equipmentChecked.get((Fencer)f);
 	}
 	
-	void addWinPrelim(Fencer f) throws SQLException
+	public void addWinPrelim(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -315,7 +319,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void addWinFinal(Fencer f) throws SQLException
+	public void addWinFinal(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -325,7 +329,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void subWinPrelim(Fencer f) throws SQLException
+	public void subWinPrelim(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -335,7 +339,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void subWinFinal(Fencer f) throws SQLException
+	public void subWinFinal(Fencer f) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -345,7 +349,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void addHitsPrelim(Fencer f, int points) throws SQLException
+	public void addHitsPrelim(Fencer f, int points) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -355,7 +359,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void addHitsFinal(Fencer f, int points) throws SQLException
+	public void addHitsFinal(Fencer f, int points) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -365,7 +369,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void addGotHitPrelim(Fencer f, int points) throws SQLException
+	public void addGotHitPrelim(Fencer f, int points) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -375,7 +379,7 @@ class Tournament implements iTournament
 		}
 	}
 	
-	void addGotHitFinal(Fencer f, int points) throws SQLException
+	public void addGotHitFinal(Fencer f, int points) throws SQLException
 	{
 		if(isParticipant(f))
 		{
@@ -461,13 +465,13 @@ class Tournament implements iTournament
 		return sync.finalroundsCount(this) != 0;
 	}
 	
-	void printTree()
+	/*void printTree()
 	{
 		Finalround f = Finalround.getFinalrounds(this).get(0);
 		while(f.getWinner()!=null)
-			f = ((Finalround) f).getWinnerround();
+			f = ((Finalround) f).getWinnerRound();
 		f.printTree();
-	}
+	}*/
 
 	public int preliminaryWithoutTiming() throws SQLException 
 	{
@@ -497,12 +501,79 @@ class Tournament implements iTournament
 	{
 		return finishedPreliminary;
 	}
+        
+        public boolean finishPreliminary() throws SQLException
+        {
+            if(allPreliminaryFinished())
+            {
+                createFinalrounds();
+                setFinishedPreliminary();
+                
+                List<iScore>[] groupScores = getScoresInGroups();
+                List<iScore> finalists = new ArrayList<>();
+                List<iScore> wildcards = new ArrayList<>();
+                
+                int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
+                
+                //Get the first x fencers all groups 
+                for(int i = 0;i< groups;i++)
+                {
+                    for(int c = 0; c <groupScores[i].size();c++)
+                    {
+                        if(c<(int)(numberOfFinalists/groups))
+                            finalists.add(groupScores[i].get(c));
+                        else
+                            wildcards.add(groupScores[i].get(c));
+                    }
+                }
+                
+                //If need%groups != 0: take the best, out of all groups, who are
+                //not participating in the finals yet
+                for(int i = 0; i < (numberOfFinalists%groups);i++)
+                {
+                    finalists.add(wildcards.get(i));
+                }
+                //Sort the list so that best Fencer is first
+                Collections.sort(finalists);
+                
+                //Get all Finalrounds wich are part of the first/lowest level
+		List<Finalround> leafFinalRounds = new ArrayList<>();
+                for(Finalround finalRound : Finalround.getFinalrounds(this))
+		{
+                    if(!finalRound.hasPrerounds())
+                        leafFinalRounds.add(finalRound);
+		}
+                
+                int c = 0;
+                for(Finalround round : leafFinalRounds)
+                {
+                    try 
+                    {
+                        //Take the best remaining fencer
+                        round.addParticipant(finalists.get(c).getFencer());
+                        //Take the worst remaining fencer
+                        round.addParticipant(finalists.get(finalists.size()-c).getFencer());
+                    } 
+                    catch (ObjectDeprecatedException ex) 
+                    {
+                        //We can ignore that because we created them a few lines above
+                        Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 	
-	public boolean finishPreliminary() throws SQLException
+	/*public boolean finishPreliminary() throws SQLException
 	{
 		if(allPreliminaryFinished())
 		{
 			createFinalrounds();
+			setFinishedPreliminary();
 			
 			int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
 			int wildcards = 0;
@@ -545,7 +616,15 @@ class Tournament implements iTournament
                                 {
                                     leafFinalRound = leafFinalRounds.get(roundIndex);
                                     fencerScore = groupScores[groupIndex].get(scoreIndex);
-                                    leafFinalRound.addParticipant(fencerScore.getFencer());
+                                    try 
+                                    {
+                                        leafFinalRound.addParticipant(fencerScore.getFencer());
+                                    } 
+                                    catch (ObjectDeprecatedException ex) 
+                                    {
+                                        //A deleted finalround is still in the finalround hash.
+                                        Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 }
 				else
                                 {
@@ -587,10 +666,10 @@ class Tournament implements iTournament
 			}
 			
 					
-			setFinishedPreliminary();
+                        return true;
 		}
 		return false;
-	}
+	}*/
 	
 	boolean allPreliminaryFinished()
 	{
@@ -642,22 +721,27 @@ class Tournament implements iTournament
 		{
 			for(Finalround fr : Finalround.getFinalrounds(this))
 			{
-				if(fr.isFencer(f)&&!fr.isFinished())
+                            try
+                            {
+                                if(fr.isFencer(f)&&!fr.isFinished())
 				{
-					for(iFencer tmp : fr.getFencer())
-					{
-						if(tmp.equals(f))
-							fr.setPoints(tmp, 0);
-						else
-							fr.setPoints(tmp, 5);
-					}
-                                        try{
-                                            fr.setFinished(true);
-                                        }
-                                        catch (ObjectDeprecatedException ex)
-                                        {}
-                                        dropedOut.put((Fencer) f, true);
+                                    for(iFencer tmp : fr.getFencer())
+                                    {
+					if(tmp.equals(f))
+                                            fr.setPoints(tmp, 0);
+                                        else
+                                            fr.setPoints(tmp, 5);
+                                    }
+                                    fr.setFinished(true);
+                                    dropedOut.put((Fencer) f, true);
 				}
+                            } 
+                            catch (ObjectDeprecatedException ex) 
+                            {
+                                //Can be ignored safly because we don't need to 
+                                //remove a droped out fencer from a depricated fight
+                            }
+				
 			}
 		}
 	}
@@ -666,8 +750,18 @@ class Tournament implements iTournament
 	{
 		List<Finalround> f = new ArrayList<>();
 		for(Finalround tmp : Finalround.getFinalrounds(this))
-			if(tmp.getPre1()==null&&tmp.getPre2()==null)
-				f.add(tmp);
+                {
+                    try
+                    {
+                        if(tmp.getPrerounds().isEmpty())//Alt: tmp.getPre1()==null&&tmp.getPre2()==null
+                            f.add(tmp);
+                    } 
+                    catch (ObjectDeprecatedException ex) 
+                    {
+                        //Can be ignored safly because deleted finals don't need a timing // trust me they realy do not
+                    }
+                }
+			
 		
 		while(true)
 		{
@@ -678,6 +772,8 @@ class Tournament implements iTournament
 			
 			for(Finalround tmp : f)
 			{
+                            try
+                            {
 				tmp.setTime(round, lane);
 				lane++;
 				if(lane>this.lanes)
@@ -687,13 +783,28 @@ class Tournament implements iTournament
 				}
 				if(tmp.getLoserRound()!=null)
 					losersround = tmp.getLoserRound();
-				if(tmp.getWinnerround()!=null&&!next.contains(tmp.getWinnerround()))
-					next.add(tmp.getWinnerround());
+				if(tmp.getWinnerRound()!=null&&!next.contains(tmp.getWinnerRound()))
+					next.add(tmp.getWinnerRound());
+                            } 
+                            catch (ObjectDeprecatedException ex) 
+                            {
+                                //Can be ignored safely because we sorted them out last loop so if we have
+                                //one now some 	idiot tinkers with threads 
+                            }
+                            
 			}
 			lane = 1;
 			round++;
 			if(losersround!=null)
+                            try
+                            {
 				losersround.setTime(round++, lane);
+                            } 
+                            catch (ObjectDeprecatedException ex) 
+                            {
+                                //like I sad ignor it //that Exeption in annoying
+                            }
+                        
 			
 			if(next.isEmpty())
 				break;

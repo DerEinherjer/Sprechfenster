@@ -9,19 +9,19 @@ public abstract class iSync extends Observable
 {
 	private static Sync sync = null;
 	
-	public static iSync getInstance()
-	{
-		try 
-		{
-			if(sync==null)
-				sync = new Sync();
-		} 
-		catch (SQLException e) 
-		{
-			e.printStackTrace();
-		}
-		return sync;
-	}
+    public static iSync getInstance()
+    {
+        try 
+        {
+            if(sync==null)
+            sync = new Sync();
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return sync;
+    }
 	
 	public iFencer createFencer(String name, String familyName) throws SQLException{return null;}
 	public List<iFencer> getAllFencer() throws SQLException{return null;}

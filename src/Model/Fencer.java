@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class Fencer implements iFencer
+public class Fencer implements iFencer
 {
 	// -----
 	static Sync sync;
 	private static Map<Integer, Fencer> fencers = new HashMap<>();
 	
-	static Fencer getFencer(int id) throws SQLException
+	public static Fencer getFencer(int id) throws SQLException
 	{
 		if(!fencers.containsKey(id))
 			sync.loadFencer(id);
@@ -69,7 +69,7 @@ class Fencer implements iFencer
 		this.nationality = (String) set.get("Nationalitaet".toUpperCase());
 	}
 	
-	int getID(){return ID;}
+	public int getID(){return ID;}
 	public String getName(){return name;}
 	public String getFamilyName(){return familyName;}
     public String getFullName() {return name+" "+familyName;}

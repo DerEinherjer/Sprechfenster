@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Rounds.iFinalround;
+import Model.Rounds.iPreliminary;
 import java.sql.SQLException;
 import java.util.List;
 

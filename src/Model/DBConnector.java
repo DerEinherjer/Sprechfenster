@@ -1,16 +1,22 @@
 package Model;
 
+import Model.Rounds.Preliminary;
+import Model.Rounds.Finalround;
+import Model.Rounds.Round;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -67,7 +73,7 @@ class DBConnector
 		
 		try
 		{
-			con.prepareStatement(Preliminary.getSQLString()).executeUpdate();
+			con.prepareStatement(Round.getSQLString()).executeUpdate();
 			
 		}
 		catch (SQLException e) {System.out.println(e.getMessage());e.printStackTrace();}
@@ -538,14 +544,14 @@ class DBConnector
 		if(id<0) return;
 		if(lpStmt == null)
 		{
-			String sql = "SELECT * FROM Vorrunden WHERE ID = ?;";
+			String sql = "SELECT * FROM Vorrunden WHERE ID = ? AND FinalStrucktur = -1;";
 			lpStmt = con.prepareStatement(sql);
 		}
 		
 		lpStmt.setInt(1, id);
 		ResultSet rs = lpStmt.executeQuery();
-		if(!rs.next())//TODO
-			throw new SQLException("Didn't found preliminary");
+		if(!rs.next())
+			throw new SQLException("Didn't found preliminary. (ID: "+id+")");
 		
 		try 
 		{
@@ -557,7 +563,7 @@ class DBConnector
 	
 	private PreparedStatement stfp1Stmt = null;
 	private PreparedStatement stfp2Stmt = null;
-	boolean setTimeForPreliminary(Preliminary p, int round, int lane) throws SQLException
+	boolean setTime(Round p, int round, int lane) throws SQLException
 	{
 		if(stfp1Stmt == null)
 		{
@@ -674,25 +680,6 @@ class DBConnector
 		spStmt.executeUpdate();
 	}
 	
-	private PreparedStatement spfrStmt = null;
-	void setPointsFR(int prelimID, int fencerID, int points) throws SQLException
-	{
-		if(spfrStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET PunkteVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE PunkteVon1 END, "
-					                           +"PunkteVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE PunkteVon2 END WHERE ID = ?;";
-			spfrStmt = con.prepareStatement(sql);
-		}
-		
-		spfrStmt.setInt(1, fencerID);
-		spfrStmt.setInt(2, points);
-		spfrStmt.setInt(3, fencerID);
-		spfrStmt.setInt(4, points);
-		spfrStmt.setInt(5, prelimID);
-		spfrStmt.executeUpdate();
-	}
-	
-	
 	private PreparedStatement gpStmt = null;
 	int getPoints(int prelimID, int fencerID) throws SQLException
 	{
@@ -741,59 +728,55 @@ class DBConnector
 		return rs.getBoolean("Ausruestungskontrolle");
 	}
 	
-	private PreparedStatement stff1Stmt = null;
-	private PreparedStatement stff2Stmt = null;
-	boolean setTimeForFinalround(Finalround p, int round, int lane) throws SQLException
-	{
-		if(stff1Stmt == null)
-		{
-			String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
-			stff1Stmt = con.prepareStatement(sql);
-			
-			sql = "SELECT Bahnen FROM Turniere AS t, Vorrunden AS v WHERE v.TurnierID = t.ID AND v.ID = ?;";
-			stff2Stmt = con.prepareStatement(sql);
-		}
-		
-		stff2Stmt.setInt(1, p.getID());
-		ResultSet rs = stff2Stmt.executeQuery();
-		rs.next(); //TODO
-		if(lane<1||lane>rs.getInt("Bahnen")) return false;
-		
-		
-		stff1Stmt.setInt(1, round);
-		stff1Stmt.setInt(2, lane);
-		stff1Stmt.setInt(3, p.getID());
-		stff1Stmt.executeUpdate();
-		return true;
-	}
-	
-	
-	
-	private PreparedStatement lfStmt = null;
-	void loadFinalround(int id) throws SQLException
-	{
-		if(id < 0)return;
-		if(lfStmt == null)
-		{
-			String sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
-			lfStmt = con.prepareStatement(sql);
-		}
-		
-		lfStmt.setInt(1, id);
-		ResultSet rs = lfStmt.executeQuery();
-		if(!rs.next())
-			throw new SQLException("Didn't found the finalround. (ID: "+id+")");
-
-		try 
-		{
-			new Finalround(rowToHash(rs));
-		} 
-		catch (ObjectExistExeption e) {}
-		rs.close();
-	}
+	private PreparedStatement lnf1Stmt = null;
+	private PreparedStatement lnf2Stmt = null;
+        void loadFinalround(int id) throws SQLException
+        {
+            if(lnf1Stmt == null)
+            {
+                String sql = "SELECT * FROM Vorrunden WHERE ID = ? AND FinalStrucktur != -1;";
+                lnf1Stmt = con.prepareStatement(sql);
+                
+                sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
+                lnf2Stmt = con.prepareStatement(sql);
+            }
+            
+            lnf1Stmt.setInt(1, id);
+            ResultSet rs = lnf1Stmt.executeQuery();
+            
+            if(!rs.next())
+                throw new SQLException("Didn't found the finalround. (ID: "+id+")");
+            
+            int fsindex = rs.getInt("FinalStrucktur");
+            if(fsindex == -1)
+                throw new SQLException("The ID is not a Finalround. (ID: "+id+")");
+            
+            Map<String, Object> set = rowToHash(rs);
+            set.remove("FinalStrucktur");
+            rs.close();
+            
+            lnf2Stmt.setInt(1, fsindex);
+            rs = lnf2Stmt.executeQuery();
+            
+            if(!rs.next())
+                throw new SQLException("Didn't found the finalroundstruckture. (ID: "+id+")");
+            
+            Map<String, Object> tmp = rowToHash(rs);
+            rs.close();
+            tmp.remove("ID");
+            set.putAll(tmp);
+            try
+            {
+                new Finalround(set);
+            } 
+            catch (ObjectExistExeption ex) 
+            {
+                Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 	
 	private PreparedStatement rpfpStmt = null;
-	void removeParticipantFromPrelim(Preliminary p, Fencer f) throws SQLException
+	void removeParticipantFromPrelim(Round p, Fencer f) throws SQLException
 	{
 		if(rpfpStmt == null)
 		{
@@ -811,24 +794,8 @@ class DBConnector
 		catch (ObjectDeprecatedException e) {}
 	}
 	
-	private PreparedStatement rpffStmt = null;
-	void removeParticipantFromFinal(Finalround p, Fencer f) throws SQLException
-	{
-		if(rpffStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? THEN -1 ELSE Teilnehmer1 END, "
-                                               +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? THEN -1 ELSE Teilnehmer2 END WHERE ID = ?;";
-			rpffStmt = con.prepareStatement(sql);
-		}
-		
-		rpffStmt.setInt(1, f.getID());
-		rpffStmt.setInt(2, f.getID());
-		rpffStmt.setInt(3, p.getID());
-		rpffStmt.executeUpdate();
-	}
-	
 	private PreparedStatement aptpStmt = null;
-	void addParticipantToPrelim(Preliminary p, Fencer f) throws SQLException
+	void addParticipantToPrelim(Round p, Fencer f) throws SQLException
 	{
 		if(aptpStmt == null)
 		{
@@ -846,23 +813,8 @@ class DBConnector
 		catch(ObjectDeprecatedException e){}
 	}
 	
-	private PreparedStatement aptfStmt = null;
-	void addParticipantToFinal(Finalround p, Fencer f) throws SQLException
-	{
-		if(aptfStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = -1 THEN ? ELSE Teilnehmer1 END, "
-                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = -1 AND Teilnehmer1 != -1 THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
-			aptfStmt = con.prepareStatement(sql);
-		}
-		aptfStmt.setInt(1, f.getID());
-		aptfStmt.setInt(2, f.getID());
-		aptfStmt.setInt(3, p.getID());
-		aptfStmt.executeUpdate();
-	}
-	
 	private PreparedStatement spipStmt = null; 
-	void switchParticipantsInPrelim(Preliminary p, Fencer out, Fencer in) throws SQLException
+	void switchParticipantsInPrelim(Round p, Fencer out, Fencer in) throws SQLException
 	{
 		if(spipStmt == null)
 		{
@@ -884,81 +836,12 @@ class DBConnector
 		catch(ObjectDeprecatedException e){}
 	}
 	
-	private PreparedStatement spifStmt = null; 
-	void switchParticipantsInFinal(Finalround p, Fencer out, Fencer in) throws SQLException
-	{
-		if(spifStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? AND Teilnehmer2 != ? THEN ? ELSE Teilnehmer1 END, "
-                                             +"Teilnehmer2 = CASE WHEN Teilnehmer2 = ? AND Teilnehmer1 != ? THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
-			spifStmt = con.prepareStatement(sql);
-		}
-		
-		spifStmt.setInt(1, out.getID());
-		spifStmt.setInt(2, in.getID());
-		spifStmt.setInt(3, in.getID());
-		spifStmt.setInt(4, out.getID());
-		spifStmt.setInt(5, in.getID());
-		spifStmt.setInt(6, in.getID());
-		spifStmt.setInt(7, p.getID());
-		spifStmt.executeUpdate();
-	}
-	
-	
-	private PreparedStatement cfrStmt = null;
-	void createFinalRounds(Tournament t) throws SQLException
-	{
-		removeFinalrounds(t);
-                Finalround.deleteFinalrounds(t);
-		createFinalRounds(t.getFinalRounds()-1, t, -1, -1);
-	}
-	private void createFinalRounds(int n,Tournament t, int winner, int loser) throws SQLException
-	{
-		if(cfrStmt == null)
-		{
-			String sql = "INSERT INTO Finalrunden (TurnierID, Gewinner, Verlierer) VALUES (?,?,?);";
-			cfrStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-		}
-
-		cfrStmt.setInt(1, t.getID());
-		cfrStmt.setInt(2, winner);
-		cfrStmt.setInt(3, loser);
-		
-		cfrStmt.executeUpdate();
-		ResultSet rs = cfrStmt.getGeneratedKeys();
-		if(!rs.next())
-			throw new SQLException("Could not generate finalround.");
-		int tmp = rs.getInt(1);
-		rs.close();
-		int newloser = -1;
-		
-		if(winner==-1)
-		{
-			cfrStmt.executeUpdate();
-			rs = cfrStmt.getGeneratedKeys();
-			if(!rs.next())
-				throw new SQLException("Could not generate finalround");
-			newloser = rs.getInt(1);
-		}
-		
-		
-		if(n!=0)
-		{
-			createFinalRounds(n-1, t,tmp, newloser);
-			createFinalRounds(n-1, t,tmp, newloser);
-		}
-		else
-		{
-			loadFinalround(tmp);
-		}
-	}
-	
 	private PreparedStatement frcStmt = null;
 	int finalroundsCount(Tournament t) throws SQLException
 	{
 		if(frcStmt == null)
 		{
-			String sql = "SELECT SUM(ID) AS Count FROM Finalrunden WHERE TurnierID = ?;";
+			String sql = "SELECT SUM(ID) AS Count FROM Vorrunden WHERE TurnierID = ? AND FinalStrucktur != -1;";
 			frcStmt = con.prepareStatement(sql);
 		}
 		
@@ -971,35 +854,56 @@ class DBConnector
 		return rs.getInt("Count");
 	}
 	
-	private PreparedStatement rfrStmt = null;
-	private void removeFinalrounds(Tournament t) throws SQLException
+	private PreparedStatement rfrStmt1 = null;
+	private PreparedStatement rfrStmt2 = null;
+	private PreparedStatement rfrStmt3 = null;
+	private void removeFinalrounds(int tournamentID) throws SQLException
 	{
-		if(rfrStmt == null)
-		{
-			String sql = "DELETE FROM Finalrunden WHERE TurnierID = ?;";
-			rfrStmt = con.prepareStatement(sql);
-		}
+            if(rfrStmt1 == null)
+            {
+                String sql = "SELECT FinalStrucktur FROM Vorrunden WHERE TurnierID = ? AND FinalStrucktur != -1;";
+                rfrStmt1 = con.prepareStatement(sql);
+
+                sql = "DELETE FROM Vorrunden WHERE TurnierID = ? AND FinalStrucktur != -1;";
+                rfrStmt1 = con.prepareStatement(sql);
+
+		sql = "DELETE FROM Finalrunden WHERE ID = ?;";
+		rfrStmt3 = con.prepareStatement(sql);
+            }
 		
-		rfrStmt.setInt(1, t.getID());
-		rfrStmt.executeUpdate();
+            rfrStmt1.setInt(1, tournamentID);
+            ResultSet rs = rfrStmt1.executeQuery();
+            List<Integer> ids = new ArrayList<>();
+            while(rs.next())
+                ids.add(rs.getInt("FinalStrucktur"));
+            rs.close();
+                
+            rfrStmt2.setInt(1, tournamentID);
+            rfrStmt2.executeUpdate();
+                
+            for(Integer id : ids)
+            {
+                rfrStmt3.setInt(1, id);
+                rfrStmt3.executeUpdate();
+            }
 	}
 	
 	private PreparedStatement lapStmt = null;//gapStmt allread in use -> LoadAllPreliminary -> lapStmt
 	List<Integer> getAllPreliminarys() throws SQLException
 	{
-		if(lapStmt == null)
-		{
-			String sql = "SELECT ID FROM Vorrunden";
-			lapStmt= con.prepareStatement(sql);
-		}
+            if(lapStmt == null)
+            {
+                String sql = "SELECT ID FROM Vorrunden WHERE FinalStrucktur = -1";
+                lapStmt= con.prepareStatement(sql);
+            }
 		
-		ResultSet rs = lapStmt.executeQuery();
+            ResultSet rs = lapStmt.executeQuery();
 		
-		List<Integer> ret  = new ArrayList<>();
-		while(rs.next())
-			ret.add(rs.getInt(1));
+            List<Integer> ret  = new ArrayList<>();
+            while(rs.next())
+                ret.add(rs.getInt(1));
 		
-		return ret;
+            return ret;
 	}
 	
 	private PreparedStatement gafrStmt = null;
@@ -1007,7 +911,7 @@ class DBConnector
 	{
 		if(gafrStmt == null)
 		{
-			String sql = "SELECT ID FROM Finalrunden";
+			String sql = "SELECT ID FROM Vorrunden WHERE FinalStrucktur != -1;";
 			gafrStmt = con.prepareStatement(sql);
 		}
 		
@@ -1070,7 +974,7 @@ class DBConnector
 	}
 	
 	private PreparedStatement sypStmt = null;
-	void setYellowPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	void setYellowPrelim(Round p, Fencer f, int count) throws SQLException
 	{
 		if(sypStmt == null)
 		{
@@ -1092,28 +996,8 @@ class DBConnector
 		catch(ObjectDeprecatedException e){}
 	}
 	
-	private PreparedStatement syfStmt = null;
-	void setYellowFinal(Finalround p, Fencer f, int count) throws SQLException
-	{
-		if(syfStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET GelbVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE GelbVon1 END,"
-						                      +"GelbVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE GelbVon2 END "
-						                      +"WHERE ID = ?";
-			syfStmt = con .prepareStatement(sql);
-		}
-		
-		syfStmt.setInt(1, f.getID());
-		syfStmt.setInt(2, count);
-		syfStmt.setInt(3, f.getID());
-		syfStmt.setInt(4, count);
-		syfStmt.setInt(5, p.getID());
-		
-		syfStmt.executeUpdate();
-	}
-	
 	private PreparedStatement srpStmt = null;
-	void setRedPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	void setRedPrelim(Round p, Fencer f, int count) throws SQLException
 	{
 		if(srpStmt == null)
 		{
@@ -1135,28 +1019,8 @@ class DBConnector
 		catch(ObjectDeprecatedException e){}
 	}
 	
-	private PreparedStatement srfStmt = null;
-	void setRedFinal(Finalround p, Fencer f, int count) throws SQLException
-	{
-		if(srfStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET RotVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE RotVon1 END,"
-						                      +"RotVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE RotVon2 END "
-						                      +"WHERE ID = ?";
-			srfStmt = con .prepareStatement(sql);
-		}
-		
-		srfStmt.setInt(1, f.getID());
-		srfStmt.setInt(2, count);
-		srfStmt.setInt(3, f.getID());
-		srfStmt.setInt(4, count);
-		srfStmt.setInt(5, p.getID());
-		
-		srfStmt.executeUpdate();
-	}
-	
 	private PreparedStatement sbpStmt = null;
-	void setBlackPrelim(Preliminary p, Fencer f, int count) throws SQLException
+	void setBlackPrelim(Round p, Fencer f, int count) throws SQLException
 	{
 		if(sbpStmt == null)
 		{
@@ -1176,26 +1040,6 @@ class DBConnector
 			sbpStmt.executeUpdate();
 		}
 		catch(ObjectDeprecatedException e){}
-	}
-	
-	private PreparedStatement sbfStmt = null;
-	void setBlackFinal(Finalround p, Fencer f, int count) throws SQLException
-	{
-		if(sbfStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET SchwarzVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE SchwarzVon1 END,"
-						                      +"SchwarzVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE SchwarzVon2 END "
-						                      +"WHERE ID = ?";
-			sbfStmt = con .prepareStatement(sql);
-		}
-		
-		sbfStmt.setInt(1, f.getID());
-		sbfStmt.setInt(2, count);
-		sbfStmt.setInt(3, f.getID());
-		sbfStmt.setInt(4, count);
-		sbfStmt.setInt(5, p.getID());
-		
-		sbfStmt.executeUpdate();
 	}
 	
 	private PreparedStatement gdoStmt = null;
@@ -1256,31 +1100,89 @@ class DBConnector
 		scStmt.executeUpdate();
 	}
 
-	private PreparedStatement spfStmt = null;
-	void setPrelimFinished(Preliminary p, Boolean finished) throws SQLException, ObjectDeprecatedException 
+    private PreparedStatement spfStmt = null;
+    void setPrelimFinished(Round p, Boolean finished) throws SQLException, ObjectDeprecatedException 
+    {
+	if(spfStmt == null)
 	{
-		if(spfStmt == null)
-		{
-			String sql = "UPDATE Vorrunden SET Beendet = ? WHERE ID = ?;";
-			spfStmt = con.prepareStatement(sql);
-		}
-		
-		spfStmt.setBoolean(1, finished);
-		spfStmt.setInt(2, p.getID());
-		spfStmt.executeUpdate();
+            String sql = "UPDATE Vorrunden SET Beendet = ? WHERE ID = ?;";
+            spfStmt = con.prepareStatement(sql);
 	}
-	
-	private PreparedStatement sfrfStmt = null;
-	void setFinalroundFinished(Finalround f, Boolean finished) throws SQLException, ObjectDeprecatedException 
-	{
-		if(sfrfStmt == null)
-		{
-			String sql = "UPDATE Finalrunden SET Beendet = ? WHERE ID = ?;";
-			sfrfStmt = con.prepareStatement(sql);
-		}
 		
-		sfrfStmt.setBoolean(1, finished);
-		sfrfStmt.setInt(2, f.getID());
-		sfrfStmt.executeUpdate();
-	}
+	spfStmt.setBoolean(1, finished);
+	spfStmt.setInt(2, p.getID());
+	spfStmt.executeUpdate();
+    }
+
+    private PreparedStatement rpStmt = null;
+    void removePreliminary(int id) throws SQLException 
+    {
+        if(rpStmt == null)
+        {
+            String sql = "DELETE FROM Vorrunden WHERE ID = ?;";
+            rpStmt = con.prepareStatement(sql);
+        }
+        
+        rpStmt.setInt(1, id);
+        rpStmt.executeUpdate();
+    } 
+    
+    void createFinalRounds(Tournament t) throws SQLException
+    {
+        createFinalRounds(t.getID(), -1, -1, t.getFinalRounds());
+    }
+    
+    private void createFinalRounds(int tournamentid, int winnerround, int loserround, int deepth) throws SQLException
+    {
+        if(deepth<=0)
+            return;
+        
+        int newwinnerround = createFinalRound(tournamentid , winnerround, loserround);
+        int newloserround = -1;
+        
+        if(winnerround == -1)
+            loserround = createFinalRound(tournamentid , -1, -1);
+        
+        createFinalRounds(tournamentid, winnerround, loserround, deepth-1);
+        
+    }
+    
+    private PreparedStatement cfrStmt1 = null;
+    private PreparedStatement cfrStmt2 = null;
+    private int createFinalRound(int tournamentid, int winnerround, int loserround) throws SQLException
+    {
+        if(cfrStmt1 == null)
+        {
+            String sql = "INSERT INTO Finalrunden (GewinnerRunde, VerliererRunde) "+
+                         "VALUES (? ,?);";
+            cfrStmt1 = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            
+            sql = "INSERT INTO Vorrunden (TurnierID, FinalStrucktur) VALUES (? ,?);";
+            cfrStmt2 = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        }
+        int ret;
+        
+        cfrStmt1.setInt(1, winnerround);
+        cfrStmt1.setInt(2, loserround);
+        cfrStmt1.executeUpdate();
+        
+        ResultSet rs = cfrStmt1.getGeneratedKeys();
+        if(!rs.next())
+            throw new SQLException("Cloud not create FinalroundStructur.");
+        
+        int finalroundstructur = rs.getInt(1);
+        rs.close();
+        
+        cfrStmt2.setInt(1, tournamentid);
+        cfrStmt2.setInt(2, finalroundstructur);
+        cfrStmt2.executeUpdate();
+        
+        rs = cfrStmt2.getGeneratedKeys();
+        if(!rs.next())
+            throw new SQLException("Cloud not create Round for finalround.");
+        
+        ret = rs.getInt(1);
+        
+        return ret;
+    }
 }

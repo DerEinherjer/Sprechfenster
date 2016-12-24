@@ -1,6 +1,11 @@
 package Model;
 
-class ObjectExistExeption extends Exception 
+/**
+ * The main objectiv of this Exception is to get out the construcktor with
+ * out creating an object.
+ * @author deus
+ */
+public class ObjectExistExeption extends Exception 
 {
 	private Object object;
 	
