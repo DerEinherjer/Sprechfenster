@@ -7,7 +7,7 @@ package sprechfenster;
 
 import Model.ObjectDeprecatedException;
 import Model.iFencer;
-import Model.iFinalround;
+import Model.Rounds.iRound;
 import Model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
@@ -29,7 +29,7 @@ import javafx.stage.Stage;
  *
  * @author Stefan
  */
-public class EditFinalRoundFightDialogController implements Initializable
+public class EditFightDialogController implements Initializable
 {
 
     @FXML
@@ -53,7 +53,7 @@ public class EditFinalRoundFightDialogController implements Initializable
     @FXML
     private Button CanceledButton;
 
-    private iFinalround Fight;
+    private iRound Fight;
     private iTournament Tournament;
 
     /**
@@ -67,7 +67,7 @@ public class EditFinalRoundFightDialogController implements Initializable
         GUIUtilities.FillNumberComboBox(SecondFencerPointsComboBox, 0, 30);
     }
 
-    public void SetData(iFinalround fight, iTournament tournament)
+    public void SetData(iRound fight, iTournament tournament)
     {
         Fight = fight;
         Tournament = tournament;
@@ -89,26 +89,30 @@ public class EditFinalRoundFightDialogController implements Initializable
                 }
                 FirstFencerComboBox.getItems().setAll(fencerNames);
                 SecondFencerComboBox.getItems().setAll(fencerNames);
-                for (String name : fencerNames)
+                for(String name : fencerNames)
                 {
-                    if (name.equals(firstFencer.getFullName()))
+                    if(name.equals(firstFencer.getFullName()))
                     {
                         FirstFencerComboBox.getSelectionModel().select(name);
                     }
-                    if (name.equals(secondFencer.getFullName()))
+                    if(name.equals(secondFencer.getFullName()))
                     {
                         SecondFencerComboBox.getSelectionModel().select(name);
                     }
                 }
                 GUIUtilities.FillNumberComboBox(LaneComboBox, 1, Tournament.getLanes());
-                LaneComboBox.getSelectionModel().select(Fight.getLane() - 1);
+                LaneComboBox.getSelectionModel().select(Fight.getLane()-1);
                 GUIUtilities.FillNumberComboBox(RoundComboBox, 1, 20);
-                RoundComboBox.getSelectionModel().select(Fight.getRound() - 1);
+                RoundComboBox.getSelectionModel().select(Fight.getRound()-1);
                 FirstFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(0)));
                 SecondFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(1)));
                 FightFinishedCheckBox.setSelected(Fight.isFinished());
             }
             catch (SQLException ex)
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
+            catch (ObjectDeprecatedException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -150,18 +154,24 @@ public class EditFinalRoundFightDialogController implements Initializable
 
                 if (allValuesOk)
                 {
-                    Fight.setPoints(firstFencer, firstFencerPoints);
-                    Fight.setPoints(secondFencer, secondFencerPoints);
-                    Fight.setTime(round, lane);
-                    Fight.setFinished(fightIsFinished);
-
+                    try
+                    {
+                        Fight.setPoints(firstFencer, firstFencerPoints);
+                        Fight.setPoints(secondFencer, secondFencerPoints);
+                        Fight.setTime(round, lane);
+                        Fight.setFinished(fightIsFinished);
+                    }
+                    catch (ObjectDeprecatedException ex)
+                    {
+                        LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             catch (NumberFormatException ex)
             {
 
             }
-            catch (SQLException | ObjectDeprecatedException ex)
+            catch (SQLException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

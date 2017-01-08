@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="MainDialogPane" prefHeight="314.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.EditQualificationFightDialogController">
+<AnchorPane id="AnchorPane" fx:id="MainDialogPane" prefHeight="314.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.EditFightDialogController">
    <children>
       <Button fx:id="FinishedButton" layoutX="14.0" layoutY="361.0" mnemonicParsing="false" onAction="#handleFinishedButtonAction" text="Fertig" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
       <Button fx:id="CanceledButton" layoutX="534.0" layoutY="361.0" mnemonicParsing="false" onAction="#handleCanceledButtonAction" text="Abbrechen" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />

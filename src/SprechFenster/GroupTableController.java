@@ -14,11 +14,10 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import sprechfenster.Presenters.FencerPresenter;
 
 /**
@@ -37,7 +36,7 @@ public class GroupTableController implements Initializable
     
     private TournamentPhase Phase = TournamentPhase.QualificationPhase;
     @FXML
-    private AnchorPane MainAnchorPane;
+    private TitledPane MainPane;
     @FXML
     private TableView<FencerPresenter> GroupTableView;
     @FXML
@@ -48,8 +47,6 @@ public class GroupTableController implements Initializable
     private TableColumn<FencerPresenter, String> WinsTableColumn;
     @FXML
     private TableColumn<FencerPresenter, String> FencingSchoolTableColumn;
-    @FXML
-    private Label GroupNameLabel;
     @FXML
     private iTournament Tournament;
 
@@ -65,13 +62,11 @@ public class GroupTableController implements Initializable
         FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
         GroupTableView.setFixedCellSize(25);
         GroupTableView.prefHeightProperty().bind(GroupTableView.fixedCellSizeProperty().multiply(Bindings.size(GroupTableView.getItems()).add(1.01)));
-        MainAnchorPane.minHeightProperty().bind(GroupTableView.prefHeightProperty().add(50));
-        MainAnchorPane.maxHeightProperty().bind(GroupTableView.prefHeightProperty().add(50));
     }   
     
     public void SetGroupName(String groupName)
     {
-        GroupNameLabel.setText(groupName);
+        MainPane.setText(groupName);
     }
     
     public void SetTournament(iTournament tournament)

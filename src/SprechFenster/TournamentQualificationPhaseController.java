@@ -7,7 +7,7 @@ package sprechfenster;
 
 import Model.ObjectDeprecatedException;
 import Model.Sync;
-import Model.iPreliminary;
+import Model.Rounds.iPreliminary;
 import Model.iSync;
 import Model.iTournament;
 import java.io.IOException;
@@ -19,14 +19,17 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.VBox;
 
 /**
  * FXML Controller class
@@ -37,9 +40,9 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
 {
 
     @FXML
-    FlowPane GroupsPane;
+    VBox GroupsBox;
     @FXML
-    FlowPane FightsPane;
+    VBox FightsBox;
     
     @FXML
     Button CreateQualificationRoundsButton;
@@ -89,8 +92,8 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                 CreateQualificationRoundsButton.setDisable(Tournament.preliminaryWithoutTiming() == 0 || Tournament.isPreliminaryFinished());
                 GroupControllers.clear();
                 FightControllers.clear();
-                FightsPane.getChildren().clear();
-                GroupsPane.getChildren().clear();
+                FightsBox.getChildren().clear();
+                GroupsBox.getChildren().clear();
                 if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount())
                 {
                     List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
@@ -108,7 +111,8 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                 groupController.SetTournament(Tournament);
                                 groupController.SetPhase(GroupTableController.TournamentPhase.QualificationPhase);
                                 GroupControllers.add(groupController);
-                                GroupsPane.getChildren().add(groupTable);
+                                GroupsBox.getChildren().add(groupTable);
+                                
                                 
                                 loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationFightTable.fxml"));
                                 Node fightTable = loader.load();
@@ -116,9 +120,8 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                                 fightController.SetGroupNumber(groupNumber);
                                 fightController.SetTournament(Tournament);
                                 FightControllers.add(fightController);
-                                FightsPane.getChildren().add(fightTable);
+                                FightsBox.getChildren().add(fightTable);
                             }
-
                         }
                         catch (IOException ex)
                         {

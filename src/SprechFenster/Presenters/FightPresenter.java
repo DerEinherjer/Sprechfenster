@@ -1,21 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sprechfenster.Presenters;
 
 import Model.ObjectDeprecatedException;
 import Model.Sync;
 import Model.iFencer;
-import Model.iFinalround;
+import Model.Rounds.iRound;
 import Model.iSync;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -28,12 +22,13 @@ import sprechfenster.LoggingUtilities;
  *
  * @author Stefan
  */
-public final class FinalRoundFightPresenter implements Observer
+public final class FightPresenter implements Observer
 {
 
-    iFinalround Fight;
+    iRound Fight;
     private IntegerProperty Round = new SimpleIntegerProperty();
     private ChangeListener<Number> RoundListener = this::setRound;
+    private IntegerProperty Group = new SimpleIntegerProperty();
     private IntegerProperty Lane = new SimpleIntegerProperty();
     private ChangeListener<Number> LaneListener = this::setLane;
     private IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
@@ -42,9 +37,10 @@ public final class FinalRoundFightPresenter implements Observer
     private ChangeListener<Number> SecondFencerPointsListener = this::setSecondFencerPoints;
     private BooleanProperty Finished = new SimpleBooleanProperty();
     private ChangeListener<Boolean> FinishedListener = this::setFinished;
-
-    public FinalRoundFightPresenter(iFinalround fightToPresent)
+    
+    public FightPresenter(iRound fightToPresent)
     {
+
         if (fightToPresent == null)
         {
             throw new IllegalArgumentException("fightToPresent must not be null");
@@ -73,13 +69,21 @@ public final class FinalRoundFightPresenter implements Observer
 
     private void UpdateData()
     {
-        RemoveListeners();
-        Round.setValue(Fight.getRound());
-        Lane.setValue(Fight.getLane());
-        FirstFencerPoints.setValue(getFirstFencerPoints());
-        SecondFencerPoints.setValue(getSecondFencerPoints());
-        Finished.setValue(Fight.isFinished());
-        AddListeners();
+        try
+        {
+            RemoveListeners();
+            Round.setValue(Fight.getRound());
+            Group.setValue(Fight.getGroup());
+            Lane.setValue(Fight.getLane());
+            FirstFencerPoints.setValue(getFirstFencerPoints());
+            SecondFencerPoints.setValue(getSecondFencerPoints());
+            Finished.setValue(Fight.isFinished());
+            AddListeners();
+        }
+        catch (ObjectDeprecatedException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -88,9 +92,9 @@ public final class FinalRoundFightPresenter implements Observer
         if (o1 instanceof Sync.change)
         {
             Sync.change changeType = (Sync.change) o1;
-            if (changeType == Sync.change.changedFinalround
-                    || changeType == Sync.change.finishedFinalround
-                    || changeType == Sync.change.unfinishedFinalround)
+            if (changeType == Sync.change.changedPreliminary
+                    || changeType == Sync.change.finishedPreliminary
+                    || changeType == Sync.change.unfinishedPreliminary)
             {
                 UpdateData();
             }
@@ -101,7 +105,7 @@ public final class FinalRoundFightPresenter implements Observer
         }
     }
 
-    public iFinalround getFight()
+    public iRound getFight()
     {
         return Fight;
     }
@@ -117,10 +121,15 @@ public final class FinalRoundFightPresenter implements Observer
         {
             Fight.setTime(newValue.intValue(), Fight.getLane());
         }
-        catch (SQLException ex)
+        catch (SQLException | ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
+    }
+
+    public IntegerProperty GroupProperty()
+    {
+        return Group;
     }
 
     public IntegerProperty LaneProperty()
@@ -134,7 +143,7 @@ public final class FinalRoundFightPresenter implements Observer
         {
             Fight.setTime(Fight.getRound(), newValue.intValue());
         }
-        catch (SQLException ex)
+        catch (SQLException | ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
@@ -151,7 +160,7 @@ public final class FinalRoundFightPresenter implements Observer
         {
             Fight.setPoints(getFencer(0), newValue.intValue());
         }
-        catch (SQLException ex)
+        catch (SQLException | ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
@@ -168,7 +177,24 @@ public final class FinalRoundFightPresenter implements Observer
         {
             Fight.setPoints(getFencer(1), newValue.intValue());
         }
-        catch (SQLException ex)
+        catch (SQLException | ObjectDeprecatedException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public BooleanProperty FinishedProperty()
+    {
+        return Finished;
+    }
+
+    private void setFinished(ObservableValue ov, Boolean oldValue, Boolean newValue)
+    {
+        try
+        {
+            Fight.setFinished(newValue);
+        }
+        catch (SQLException | ObjectDeprecatedException ex)
         {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         }
@@ -196,6 +222,38 @@ public final class FinalRoundFightPresenter implements Observer
         return getFencerPoints(getFencer(1));
     }
 
+    public Boolean getFinished()
+    {
+        try
+        {
+            if (Fight.isFinished())
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (ObjectDeprecatedException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    public void setFinished(Boolean isFightFinished)
+    {
+        try
+        {
+            Fight.setFinished(isFightFinished);
+        }
+        catch (SQLException | ObjectDeprecatedException ex)
+        {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
     private String getFencerName(iFencer fencer)
     {
         if (fencer != null)
@@ -212,50 +270,38 @@ public final class FinalRoundFightPresenter implements Observer
     {
         if (fencer != null)
         {
-
             try
             {
                 return Fight.getPoints(fencer);
             }
-            catch (SQLException ex)
+            catch (ObjectDeprecatedException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
-
         }
         return 0;
-    }
-    
-    public BooleanProperty FinishedProperty()
-    {
-        return Finished;
-    }
-
-    private void setFinished(ObservableValue ov, Boolean oldValue, Boolean newValue)
-    {
-        try
-        {
-            Fight.setFinished(newValue);
-        }
-        catch (SQLException | ObjectDeprecatedException ex)
-        {
-            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-        }
     }
 
     private iFencer getFencer(int index)
     {
-
-        List<iFencer> fencers = Fight.getFencer();
-        if (fencers != null && fencers.size() > index)
+        try
         {
-            iFencer fencer = fencers.get(index);
-            return fencer;
+            List<iFencer> fencers = Fight.getFencer();
+            if (fencers != null && fencers.size() > index)
+            {
+                iFencer fencer = fencers.get(index);
+                return fencer;
+            }
+            else
+            {
+                return null;
+            }
         }
-        else
+        catch (ObjectDeprecatedException ex)
         {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             return null;
         }
-
     }
 }
+

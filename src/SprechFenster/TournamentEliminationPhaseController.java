@@ -5,8 +5,9 @@
  */
 package sprechfenster;
 
+import Model.ObjectDeprecatedException;
 import Model.Sync;
-import Model.iFinalround;
+import Model.Rounds.iFinalround;
 import Model.iSync;
 import Model.iTournament;
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +29,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,8 +39,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import sprechfenster.Presenters.FinalRoundFightPresenter;
-import sprechfenster.Presenters.QualificationFightPresenter;
+import sprechfenster.Presenters.FightPresenter;
 
 /**
  * FXML Controller class
@@ -56,23 +54,23 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     @FXML
     FlowPane FencersPane;
     @FXML
-    TableView<FinalRoundFightPresenter> FightsTableView;
+    TableView<FightPresenter> FightsTableView;
     @FXML
-    TableColumn<FinalRoundFightPresenter, Integer> RoundTableColumn;
+    TableColumn<FightPresenter, Integer> RoundTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, Integer> LaneTableColumn;
+    TableColumn<FightPresenter, Integer> LaneTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, String> FirstFencerTableColumn;
+    TableColumn<FightPresenter, String> FirstFencerTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, Integer> FirstFencerPointsTableColumn;
+    TableColumn<FightPresenter, Integer> FirstFencerPointsTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, Integer> SecondFencerPointsTableColumn;
+    TableColumn<FightPresenter, Integer> SecondFencerPointsTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, String> SecondFencerTableColumn;
+    TableColumn<FightPresenter, String> SecondFencerTableColumn;
     @FXML
     TableColumn EditTableColumn;
     @FXML
-    TableColumn<FinalRoundFightPresenter, Boolean> FinishedTableColumn;
+    TableColumn<FightPresenter, Boolean> FinishedTableColumn;
 
     private iTournament Tournament;
     private final ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
@@ -102,12 +100,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FinishedTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        Callback<TableColumn<FinalRoundFightPresenter, String>, TableCell<FinalRoundFightPresenter, String>> editCellFactory
+        Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
                 = //
-                (final TableColumn<FinalRoundFightPresenter, String> param)
+                (final TableColumn<FightPresenter, String> param)
                 -> 
                 {
-                    final TableCell<FinalRoundFightPresenter, String> cell = new TableCell<FinalRoundFightPresenter, String>()
+                    final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
                     {
                         final Button EditButton = new Button("Ändern");
 
@@ -127,12 +125,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                                         {
                                             try
                                             {
-                                                FinalRoundFightPresenter fight = getTableView().getItems().get(getIndex());
+                                                FightPresenter fight = getTableView().getItems().get(getIndex());
                                                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                                                        "sprechfenster/resources/fxml/EditFinalRoundFightDialog.fxml"
+                                                        "sprechfenster/resources/fxml/EditFightDialog.fxml"
                                                 ));
                                                 Parent dialog = loader.<Parent>load();
-                                                EditFinalRoundFightDialogController controller = loader.getController();
+                                                EditFightDialogController controller = loader.getController();
                                                 controller.SetData(fight.getFight(), Tournament);
                                                 Stage stage = new Stage();
                                                 stage.setTitle("Gefecht bearbeiten");
@@ -212,12 +210,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                     maxRound = Math.max(maxRound, finalRound.getRound());
                     if(finalRound.getFencer().size() == 2)
                     {
-                        FightsTableView.getItems().add(new FinalRoundFightPresenter(finalRound));
+                        FightsTableView.getItems().add(new FightPresenter(finalRound));
                     }
                 }
                 StringToRoundNumber.setMinAndMaxValues(maxRound, 1);
             }
-            catch (IOException | SQLException ex)
+            catch (IOException | SQLException | ObjectDeprecatedException ex)
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

@@ -236,7 +236,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             try
             {
                 ContentAnchorPane.getChildren().clear();
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentQualificationPhase.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationPhase.fxml"));
                 Node tournamentQualificationPhaseView = loader.load();
                 ContentAnchorPane.getChildren().add(tournamentQualificationPhaseView);
                 TournamentQualificationPhaseController controller = loader.<TournamentQualificationPhaseController>getController();
@@ -257,7 +257,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             try
             {
                 ContentAnchorPane.getChildren().clear();
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentEliminiationPhase.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/EliminiationPhase.fxml"));
                 Node tournamentFinalEliminationPhaseView = loader.load();
                 ContentAnchorPane.getChildren().add(tournamentFinalEliminationPhaseView);
                 TournamentEliminationPhaseController controller = loader.<TournamentEliminationPhaseController>getController();

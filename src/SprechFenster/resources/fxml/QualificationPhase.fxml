@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane fx:id="MainSplitPane" dividerPositions="0.34959349593495936" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
+   <items>
+      <AnchorPane>
+         <children>
+            <ScrollPane fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="31.0">
+               <content>
+                  <VBox fx:id="GroupsBox" spacing="25.0" />
+               </content>
+            </ScrollPane>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="RightAnchorPane">
+         <children>
+            <ScrollPane fitToWidth="true" layoutY="31.0" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="31.0">
+               <content>
+                  <VBox fx:id="FightsBox" spacing="25.0" />
+               </content>
+            </ScrollPane>
+            <Button fx:id="CreateQualificationRoundsButton" layoutX="14.0" layoutY="8.0" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="2.0" />
+         </children>
+      </AnchorPane>
+   </items>
+</SplitPane>

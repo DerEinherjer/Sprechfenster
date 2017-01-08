@@ -6,7 +6,7 @@
 package sprechfenster;
 
 import Model.ObjectDeprecatedException;
-import Model.iPreliminary;
+import Model.Rounds.iPreliminary;
 import Model.iTournament;
 import java.io.IOException;
 import java.net.URL;
@@ -22,18 +22,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import sprechfenster.Presenters.QualificationFightPresenter;
+import sprechfenster.Presenters.FightPresenter;
 
 /**
  * FXML Controller class
@@ -44,29 +44,28 @@ public class QualificationFightTableController implements Initializable
 {
 
     @FXML
-    AnchorPane MainAnchorPane;
+    TitledPane MainPane;
+   
     @FXML
-    Label GroupNameLabel;
+    TableView<FightPresenter> FightsTableView;
     @FXML
-    TableView<QualificationFightPresenter> FightsTableView;
+    TableColumn<FightPresenter, Integer> RoundTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, Integer> RoundTableColumn;
+    TableColumn<FightPresenter, Integer> LaneTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, Integer> LaneTableColumn;
+    TableColumn<FightPresenter, String> FirstFencerTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, String> FirstFencerTableColumn;
+    TableColumn<FightPresenter, Integer> FirstFencerPointsTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, Integer> FirstFencerPointsTableColumn;
+    TableColumn<FightPresenter, Integer> SecondFencerPointsTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, Integer> SecondFencerPointsTableColumn;
+    TableColumn<FightPresenter, String> SecondFencerTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, String> SecondFencerTableColumn;
-    @FXML
-    TableColumn<QualificationFightPresenter, Integer> GroupTableColumn;
+    TableColumn<FightPresenter, Integer> GroupTableColumn;
     @FXML
     TableColumn EditTableColumn;
     @FXML
-    TableColumn<QualificationFightPresenter, Boolean> FinishedTableColumn;
+    TableColumn<FightPresenter, Boolean> FinishedTableColumn;
 
     private iTournament Tournament;
     private int GroupNumber;
@@ -82,8 +81,6 @@ public class QualificationFightTableController implements Initializable
     {
         FightsTableView.setFixedCellSize(30);
         FightsTableView.prefHeightProperty().bind(FightsTableView.fixedCellSizeProperty().multiply(Bindings.size(FightsTableView.getItems()).add(1.01)));
-        MainAnchorPane.minHeightProperty().bind(FightsTableView.prefHeightProperty().add(50));
-        MainAnchorPane.maxHeightProperty().bind(FightsTableView.prefHeightProperty().add(50));
         
         RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
         RoundTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToRoundNumber));
@@ -100,12 +97,12 @@ public class QualificationFightTableController implements Initializable
         FinishedTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
         EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
 
-        Callback<TableColumn<QualificationFightPresenter, String>, TableCell<QualificationFightPresenter, String>> editCellFactory
+        Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
                 = //
-                (final TableColumn<QualificationFightPresenter, String> param)
+                (final TableColumn<FightPresenter, String> param)
                 -> 
                 {
-                    final TableCell<QualificationFightPresenter, String> cell = new TableCell<QualificationFightPresenter, String>()
+                    final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
                     {
                         final Button EditButton = new Button("Ändern");
 
@@ -125,12 +122,12 @@ public class QualificationFightTableController implements Initializable
                                         {
                                             try
                                             {
-                                                QualificationFightPresenter fight = getTableView().getItems().get(getIndex());
+                                                FightPresenter fight = getTableView().getItems().get(getIndex());
                                                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                                                        "sprechfenster/resources/fxml/EditQualificationFightDialog.fxml"
+                                                        "sprechfenster/resources/fxml/EditFightDialog.fxml"
                                                 ));
                                                 Parent dialog = loader.<Parent>load();
-                                                sprechfenster.EditQualificationFightDialogController controller = loader.getController();
+                                                sprechfenster.EditFightDialogController controller = loader.getController();
                                                 controller.SetData(fight.getFight(), Tournament);
                                                 Stage stage = new Stage();
                                                 stage.setTitle("Gefecht bearbeiten");
@@ -164,32 +161,36 @@ public class QualificationFightTableController implements Initializable
     public void SetGroupNumber(int groupNumber)
     {
         GroupNumber = groupNumber;
-        GroupNameLabel.setText("Gruppe "+Integer.toString(groupNumber));
+        MainPane.setText("Gruppe "+Integer.toString(groupNumber));
     }
 
     public void SetFights(List<iPreliminary> qualificationFights)
     {
-        try
+        FightsTableView.getItems().clear();
+        if (qualificationFights != null)
         {
-            FightsTableView.getItems().clear();
-            if (qualificationFights != null)
+            int MaxRound = 0;
+            for (iPreliminary qualificationFight : qualificationFights)
             {
-                int MaxRound = 0;
-                for (iPreliminary qualificationFight : qualificationFights)
+                try
                 {
                     if (qualificationFight.getGroup() == GroupNumber)
                     {
                         MaxRound = Math.max(MaxRound, qualificationFight.getRound());
-                        FightsTableView.getItems().add(new QualificationFightPresenter(qualificationFight));
+                        FightsTableView.getItems().add(new FightPresenter(qualificationFight));
                     }
                 }
-                StringToRoundNumber.setMinAndMaxValues(MaxRound, 1);
-                StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
+                catch (ObjectDeprecatedException ex)
+                {
+                    Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            StringToRoundNumber.setMinAndMaxValues(MaxRound, 1);
+            StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
         }
-        catch (ObjectDeprecatedException ex)
-        {
-            Logger.getLogger(sprechfenster.TournamentQualificationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    }
+    
+    private void OnFirstFencerPointsEditCancel(CellEditEvent<FightPresenter, Integer> editEvent)
+    {
     }
 }
