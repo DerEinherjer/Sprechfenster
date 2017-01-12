@@ -60,14 +60,12 @@ public class Tournament implements iTournament
 				   + "InFinalrunden BOOLEAN DEFAULT FALSE);";
 	}
 	
-	public Tournament(Map<String, Object> set) throws ObjectExistExeption, SQLException
+	public Tournament(Map<String, Object> set) throws ObjectExistException, SQLException
 	{
-		if(set == null)
-			System.out.println("Nullpointer");
 		this.ID = (Integer) set.get("ID");
 		
 		if(tournaments.containsKey(this.ID))
-			throw new ObjectExistExeption(tournaments.get(this.ID));
+			throw new ObjectExistException(tournaments.get(this.ID));
 		tournaments.put(this.ID, this);
 		
 		this.name = (String) set.get("Name".toUpperCase());
@@ -491,10 +489,14 @@ public class Tournament implements iTournament
 		sync.addPreliminary(this);
 	}
 	
-	void setFinishedPreliminary() throws SQLException
+	private void setFinishedPreliminary() throws SQLException
 	{
+            if(allPreliminaryFinished())
+            {
 		sync.setFinishedPreliminary(this);
 		finishedPreliminary = true;
+            }
+                
 	}
 	
 	public boolean isPreliminaryFinished()
@@ -552,7 +554,7 @@ public class Tournament implements iTournament
                         //Take the best remaining fencer
                         round.addParticipant(finalists.get(c).getFencer());
                         //Take the worst remaining fencer
-                        round.addParticipant(finalists.get(finalists.size()-c).getFencer());
+                        round.addParticipant(finalists.get(finalists.size()-c-1).getFencer());
                     } 
                     catch (ObjectDeprecatedException ex) 
                     {

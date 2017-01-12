@@ -76,7 +76,7 @@ class DBConnector
 			con.prepareStatement(Round.getSQLString()).executeUpdate();
 			
 		}
-		catch (SQLException e) {System.out.println(e.getMessage());e.printStackTrace();}
+		catch (SQLException e) {e.printStackTrace();}
 		
 		try
 		{
@@ -135,7 +135,7 @@ class DBConnector
 		{
 			ret = new Fencer(rowToHash(rs), this);
 		} 
-		catch (ObjectExistExeption e) 
+		catch (ObjectExistException e) 
 		{
 			ret = (Fencer) e.getObject();
 		}
@@ -271,7 +271,7 @@ class DBConnector
 		{
 			ret = new Tournament(rowToHash(rs));
 		} 
-		catch (ObjectExistExeption e) 
+		catch (ObjectExistException e) 
 		{
 			ret = (Tournament) e.getObject();
 		}
@@ -557,7 +557,7 @@ class DBConnector
 		{
 			new Preliminary(rowToHash(rs));
 		} 
-		catch (ObjectExistExeption e) {}
+		catch (ObjectExistException e) {}
 		rs.close();
 	}
 	
@@ -769,10 +769,7 @@ class DBConnector
             {
                 new Finalround(set);
             } 
-            catch (ObjectExistExeption ex) 
-            {
-                Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            catch (ObjectExistException ex){}//Can be ignored safely because it does not change the state of the programm after this line
         }
 	
 	private PreparedStatement rpfpStmt = null;
@@ -1132,19 +1129,31 @@ class DBConnector
         createFinalRounds(t.getID(), -1, -1, t.getFinalRounds());
     }
     
-    private void createFinalRounds(int tournamentid, int winnerround, int loserround, int deepth) throws SQLException
+    void createFinalRounds(int tournamentid, int winnerround, int loserround, int deepth) throws SQLException
     {
         if(deepth<=0)
+        {
+            try
+            {
+                loadFinalround(winnerround);
+            }
+            catch(SQLException e){} //Can be ignored safely
+            try
+            {
+                loadFinalround(loserround);
+            }
+            catch(SQLException e){} //Can be ignored safely
             return;
+        }
         
         int newwinnerround = createFinalRound(tournamentid , winnerround, loserround);
         int newloserround = -1;
         
         if(winnerround == -1)
-            loserround = createFinalRound(tournamentid , -1, -1);
+            newloserround = createFinalRound(tournamentid , -1, -1);
         
-        createFinalRounds(tournamentid, winnerround, loserround, deepth-1);
-        
+        createFinalRounds(tournamentid, newwinnerround, newloserround, deepth-1);
+        createFinalRounds(tournamentid, newwinnerround, newloserround, deepth-1);
     }
     
     private PreparedStatement cfrStmt1 = null;

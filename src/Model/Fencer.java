@@ -54,12 +54,12 @@ public class Fencer implements iFencer
 				   + "Nationalitaet varchar(255) DEFAULT 'Nicht Angegeben');";
 	}
 	
-	Fencer(Map<String, Object> set, DBConnector con) throws ObjectExistExeption
+	Fencer(Map<String, Object> set, DBConnector con) throws ObjectExistException
 	{
 		this.ID = (Integer)set.get("ID");
 		
 		if(fencers.containsKey(this.ID))
-			throw new ObjectExistExeption(fencers.get(this.ID));	
+			throw new ObjectExistException(fencers.get(this.ID));	
 		fencers.put(this.ID, this);
 		
 		this.name = (String) set.get("Vorname".toUpperCase());

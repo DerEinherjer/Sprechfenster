@@ -2,7 +2,7 @@ package Model.Rounds;
 
 import Model.Fencer;
 import Model.ObjectDeprecatedException;
-import Model.ObjectExistExeption;
+import Model.ObjectExistException;
 import Model.Rounds.iFinalround;
 import Model.Tournament;
 import java.sql.SQLException;
@@ -77,29 +77,23 @@ public class Finalround extends Round implements iFinalround
     private Finalround preround1 = null;
     private Finalround preround2 = null;
     
-    public Finalround(Map<String, Object> set) throws  ObjectExistExeption, SQLException
+    public Finalround(Map<String, Object> set) throws  ObjectExistException, SQLException
     {
         super(set);
 		
+        if(finalrounds.containsKey(this.ID))
+            throw new ObjectExistException(finalrounds.get(this.ID));
+        finalrounds.put(this.ID, this);
+        
         try 
         {
-            if(finalrounds.containsKey(this.getID()))
-                throw new ObjectExistExeption(finalrounds.get(this.getID()));
-            finalrounds.put(this.getID(), this);
-        } 
-        catch (ObjectDeprecatedException ex) 
-        {
-            Logger.getLogger(Finalround.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try 
-        {
-            this.winnersround = Finalround.getFinalround((Integer) set.get("Gewinner".toUpperCase()));
+            this.winnersround = Finalround.getFinalround((Integer) set.get("GewinnerRunde".toUpperCase()));
         } 
         catch (Exception e) {}//Catches null-pointer for the finalround
         
         try 
         {
-            this.losersround = Finalround.getFinalround((Integer) set.get("Verlierer".toUpperCase()));
+            this.losersround = Finalround.getFinalround((Integer) set.get("VerliererRunde".toUpperCase()));
         } 
         catch (Exception e) {}//Catches nullpointer for all except the halffinal
         

@@ -2,7 +2,7 @@ package Model.Rounds;
 
 import Model.Fencer;
 import Model.ObjectDeprecatedException;
-import Model.ObjectExistExeption;
+import Model.ObjectExistException;
 import Model.Rounds.iPreliminary;
 import Model.Sync;
 import Model.Tournament;
@@ -59,13 +59,13 @@ public class Preliminary extends Round implements iPreliminary
 	}
 	// -----
         
-	public Preliminary(Map<String, Object> set) throws ObjectExistExeption, SQLException
+	public Preliminary(Map<String, Object> set) throws ObjectExistException, SQLException
 	{
             super(set);
                
             //Checks if there is allready an Object for this ID
             if(preliminarys.containsKey(this.ID))
-                throw new ObjectExistExeption(preliminarys.get(this.ID));
+                throw new ObjectExistException(preliminarys.get(this.ID));
             preliminarys.put(this.ID, this);
 		
             //Propagates the score to the Turnament if the fight is finished

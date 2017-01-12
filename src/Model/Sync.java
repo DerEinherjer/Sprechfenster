@@ -230,9 +230,9 @@ public class Sync extends iSync
 	
 	void createFinalRounds(Tournament t) throws SQLException
 	{
-		con.createFinalRounds(t);
-		setChanged();
-		notifyObservers(change.changedTournamentValue);
+            con.createFinalRounds(t);
+            setChanged();
+            notifyObservers(change.changedTournamentValue);
 	}
 	
 	int finalroundsCount(Tournament t) throws SQLException

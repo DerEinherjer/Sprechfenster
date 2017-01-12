@@ -27,6 +27,9 @@ public class Test
             for(char i = 'A'; i<='Z'; i++)
             {
                 fencers[i-'A'] = sync.createFencer(i+"", i+"");
+                fencers[i-'A'].setBirthday("Geburtstag");
+                if(!fencers[i-'A'].getBirthday().equals("Geburtstag"))
+                    System.out.println("Geburtstag wird nicht richtig behandelt");
                 t.addParticipant(fencers[i-'A']);
             }
             
@@ -60,14 +63,20 @@ public class Test
                 }
             }
             
+            for(iScore s : t.getScoresPrelim())
+                System.out.println(s.toString());
+            
+            System.out.println("Vorrunde wird beendet");
             if(!t.finishPreliminary())
             {
                 System.out.println("Konnte Prelim nicht abschließen.");
                 System.exit(-1);
             }
+            System.out.println("Vorrunde wurde beendet");
         
-            for(iScore s : t.getScoresPrelim())
-                System.out.println(s.toString());
+            
+            
+            System.out.println("Anzahl Finalrunden: "+ t.getAllFinalrounds().size());
             
             boolean fertig = false;
             while(!fertig)

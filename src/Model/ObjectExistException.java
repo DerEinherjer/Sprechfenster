@@ -5,11 +5,11 @@ package Model;
  * out creating an object.
  * @author deus
  */
-public class ObjectExistExeption extends Exception 
+public class ObjectExistException extends Exception 
 {
 	private Object object;
 	
-	public ObjectExistExeption(Object object) 
+	public ObjectExistException(Object object) 
 	{
 		super("There is allready an object for this set of data.");
 		this.object = object;

@@ -2,7 +2,7 @@ package Model.Rounds;
 
 import Model.Fencer;
 import Model.ObjectDeprecatedException;
-import Model.ObjectExistExeption;
+import Model.ObjectExistException;
 import static Model.Rounds.Preliminary.sync;
 import Model.Sync;
 import Model.Tournament;
@@ -66,7 +66,7 @@ public abstract class Round
     Integer redFor2 = null;
     Integer blackFor2 = null;
     
-    Round(Map<String, Object> set) throws  ObjectExistExeption, SQLException
+    Round(Map<String, Object> set) throws  ObjectExistException, SQLException
     {
 	this.ID = (Integer) set.get("ID");
         
