@@ -7,10 +7,13 @@ package sprechfenster;
 
 import Model.ObjectDeprecatedException;
 import Model.Rounds.iPreliminary;
+import Model.Sync;
 import Model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +43,7 @@ import sprechfenster.Presenters.FightPresenter;
  *
  * @author Stefan
  */
-public class QualificationFightTableController implements Initializable
+public class QualificationFightTableController implements Initializable, Observer
 {
 
     @FXML
@@ -151,6 +154,7 @@ public class QualificationFightTableController implements Initializable
         };
 
         EditTableColumn.setCellFactory(editCellFactory);
+        Sync.getInstance().addObserver(this);
     }
 
     public void SetTournament(iTournament tournament)
@@ -188,9 +192,27 @@ public class QualificationFightTableController implements Initializable
             StringToRoundNumber.setMinAndMaxValues(MaxRound, 1);
             StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
         }
+        UpdateStatus();
     }
     
-    private void OnFirstFencerPointsEditCancel(CellEditEvent<FightPresenter, Integer> editEvent)
+    private void UpdateStatus()
     {
+        if(Tournament != null)
+        {
+            FightsTableView.setEditable(!Tournament.isPreliminaryFinished());
+        }
+    }
+
+    @Override
+    public void update(Observable o, Object o1)
+    {
+        if (o1 instanceof Sync.change)
+        {
+            Sync.change changeType = (Sync.change) o1;
+            if(changeType == Sync.change.beganFinalPhase)
+            {
+                UpdateStatus();
+            }
+        }
     }
 }
