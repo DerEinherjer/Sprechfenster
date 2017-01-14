@@ -139,18 +139,12 @@ public abstract class Round
     {
         if(!isValid) throw new ObjectDeprecatedException();
         if(finished || t.isPreliminaryFinished()) return;
-	if(fencer1.equals(f))
-        {
-            pointsFor1 = points;
-        }
-	if(fencer2.equals(f))
-        {
-            pointsFor2 = points;
-        }	
-        //set points in sync AFTER setting points in this object, since 
-        //the sync also triggers the update notification for the observers!
+		
 	sync.setPoints(ID, ((Fencer)f).getID(), points);
-	
+	if(fencer1.equals(f))
+            pointsFor1 = points;
+	if(fencer2.equals(f))
+            pointsFor2 = points;
     }
 	
     public int getPoints(iFencer f) throws ObjectDeprecatedException

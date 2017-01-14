@@ -25,18 +25,18 @@ import sprechfenster.LoggingUtilities;
 public final class FightPresenter implements Observer
 {
 
-    private iRound Fight;
-    private final IntegerProperty Round = new SimpleIntegerProperty();
-    private final ChangeListener<Number> RoundListener = this::setRound;
-    private final IntegerProperty Group = new SimpleIntegerProperty();
-    private final IntegerProperty Lane = new SimpleIntegerProperty();
-    private final ChangeListener<Number> LaneListener = this::setLane;
-    private final IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
-    private final ChangeListener<Number> FirstFencerPointsListener = this::setFirstFencerPoints;
-    private final IntegerProperty SecondFencerPoints = new SimpleIntegerProperty();
-    private final ChangeListener<Number> SecondFencerPointsListener = this::setSecondFencerPoints;
-    private final BooleanProperty Finished = new SimpleBooleanProperty();
-    private final ChangeListener<Boolean> FinishedListener = this::setFinished;
+    iRound Fight;
+    private IntegerProperty Round = new SimpleIntegerProperty();
+    private ChangeListener<Number> RoundListener = this::setRound;
+    private IntegerProperty Group = new SimpleIntegerProperty();
+    private IntegerProperty Lane = new SimpleIntegerProperty();
+    private ChangeListener<Number> LaneListener = this::setLane;
+    private IntegerProperty FirstFencerPoints = new SimpleIntegerProperty();
+    private ChangeListener<Number> FirstFencerPointsListener = this::setFirstFencerPoints;
+    private IntegerProperty SecondFencerPoints = new SimpleIntegerProperty();
+    private ChangeListener<Number> SecondFencerPointsListener = this::setSecondFencerPoints;
+    private BooleanProperty Finished = new SimpleBooleanProperty();
+    private ChangeListener<Boolean> FinishedListener = this::setFinished;
     
     public FightPresenter(iRound fightToPresent)
     {
@@ -94,12 +94,14 @@ public final class FightPresenter implements Observer
             Sync.change changeType = (Sync.change) o1;
             if (changeType == Sync.change.changedPreliminary
                     || changeType == Sync.change.finishedPreliminary
-                    || changeType == Sync.change.unfinishedPreliminary
-                    || changeType == Sync.change.changedFencerValue
-                    || changeType == Sync.change.changedCards)
+                    || changeType == Sync.change.unfinishedPreliminary)
             {
                 UpdateData();
             }
+        }
+        else
+        {
+            UpdateData();
         }
     }
 
@@ -204,7 +206,7 @@ public final class FightPresenter implements Observer
         return getFencerName(fencer);
     }
 
-    private int getFirstFencerPoints()
+    public int getFirstFencerPoints()
     {
         return getFencerPoints(getFencer(0));
     }
@@ -215,12 +217,12 @@ public final class FightPresenter implements Observer
         return getFencerName(fencer);
     }
 
-    private int getSecondFencerPoints()
+    public int getSecondFencerPoints()
     {
         return getFencerPoints(getFencer(1));
     }
 
-    private Boolean getFinished()
+    public Boolean getFinished()
     {
         try
         {
@@ -240,7 +242,7 @@ public final class FightPresenter implements Observer
         }
     }
 
-    private void setFinished(Boolean isFightFinished)
+    public void setFinished(Boolean isFightFinished)
     {
         try
         {
