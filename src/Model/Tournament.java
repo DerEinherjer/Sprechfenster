@@ -5,7 +5,6 @@ import Model.Rounds.Finalround;
 import Model.Rounds.iFinalround;
 import Model.Rounds.iPreliminary;
 import java.sql.SQLException;
-import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,13 +19,18 @@ public class Tournament implements iTournament
 	private static Map<Integer, Tournament> tournaments = new HashMap<>();
 	static Sync sync;
 	
+        public static void ClearDatabaseCache()
+        {
+            tournaments.clear();
+        }
+        
 	public static Tournament getTournament(int id) throws SQLException
 	{
 		if(!tournaments.containsKey(id))
 			sync.loadTournament(id);
 		return tournaments.get(id);
 	}
-	
+        
 	static List<Tournament> getAllTournaments()
 	{
 		List<Tournament> ret = new ArrayList<>();

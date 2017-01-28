@@ -3,11 +3,7 @@ package Model.Rounds;
 import Model.Fencer;
 import Model.ObjectDeprecatedException;
 import Model.ObjectExistException;
-import Model.Rounds.iPreliminary;
-import Model.Sync;
 import Model.Tournament;
-import Model.iFencer;
-import Model.iTournament;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +15,11 @@ public class Preliminary extends Round implements iPreliminary
 	// -----
 	private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
 	
-	
+        public static void ClearDatabaseCache()
+        {
+            preliminarys.clear();
+        }
+        
 	public static Preliminary getPreliminary(int id) throws SQLException
 	{
 		if(!preliminarys.containsKey(id))

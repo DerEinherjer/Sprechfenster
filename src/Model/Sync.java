@@ -33,6 +33,17 @@ public class Sync extends iSync
 		unfinishedFinalround,
                 beganFinalPhase,
 	}
+        
+                
+        public void setDatabaseSavePoint() throws SQLException
+        {
+            con.SetDatabaseSavepoint();
+        }
+        
+        public void restoreDatabaseSavePoint() throws SQLException
+        {
+            con.RestoreDatabase();
+        }
 	
 	Sync() throws SQLException
 	{

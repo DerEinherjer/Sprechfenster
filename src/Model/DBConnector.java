@@ -30,6 +30,16 @@ class DBConnector
 	
 	private Connection con;
 	
+        public void SetDatabaseSavepoint() throws SQLException
+        {
+            con.setSavepoint();
+        }
+        
+        public void RestoreDatabase() throws SQLException
+        {
+            con.rollback();
+        }
+        
 	private DBConnector()
 	{
 		try 
@@ -133,7 +143,7 @@ class DBConnector
 		Fencer ret;
 		try 
 		{
-			ret = new Fencer(rowToHash(rs), this);
+			ret = new Fencer(rowToHash(rs));
 		} 
 		catch (ObjectExistException e) 
 		{
