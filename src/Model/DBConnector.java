@@ -25,11 +25,21 @@ import java.util.logging.Logger;
 
 class DBConnector 
 {
-	private static String url = "jdbc:h2:~/SprechfensterData";
+	private static String databaseURL = "jdbc:h2:~/SprechfensterData";
 	private static DBConnector dbConnector;
 	
 	private Connection con;
 	
+        public String GetDatabaseURL()
+        {
+            return databaseURL;
+        }
+        
+        public void SetDatabaseURL(String url)
+        {
+           databaseURL = url;
+        }
+
         public void SetDatabaseSavepoint() throws SQLException
         {
             con.setSavepoint();
@@ -46,7 +56,7 @@ class DBConnector
 		{
 			Class.forName("org.h2.Driver");
 			
-			con = DriverManager.getConnection(url, "", "");
+			con = DriverManager.getConnection(databaseURL, "", "");
 		} 
 		catch (ClassNotFoundException e) 
 		{

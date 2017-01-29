@@ -18,28 +18,21 @@ import static org.junit.Assert.fail;
  */
 public class TestUtilities
 {
-
-    private static int ID = 0;
-    private static int Groups = 4;
-    private static int FinalRounds = 2;
-    private static int Lanes = 1;
-    private static boolean InFinals = false;
-    private static String Name = "TournamentName";
-    private static String Date = "2017-05-25";
-
-    public static Tournament CreateTournament(int id)
+    public static Tournament CreateTournament()
+    {
+        return CreateTournament("TournamentName");
+    }
+    
+    public static Tournament CreateTournament(String name)
     {
         try
         {
-            Map<String, Object> set = new HashMap<String, Object>();
-            set.put("ID", id);
-            set.put("NAME", Name);
-            set.put("DATUM", Date);
-            set.put("GRUPPEN", Groups);
-            set.put("FINALRUNDEN", FinalRounds);
-            set.put("BAHNEN", Lanes);
-            set.put("INFINALRUNDEN", InFinals);
-            return new Tournament(set);
+            iTournament tournament = Sync.getInstance().createTournament(name);
+            tournament.setDate("2017-05-25");
+            tournament.setGroups(4);
+            tournament.setFinalRounds(2);
+            tournament.setLanes(1);
+            return (Tournament)tournament;
         }
         catch (Exception ex)
         {
@@ -48,19 +41,16 @@ public class TestUtilities
             return null;
         }
     }
-
-    public static Fencer CreateFencer(int id)
+    
+    public static Fencer CreateFencer(String forename, String surname)
     {
         try
         {
-            Map<String, Object> set = new HashMap<String, Object>();
-            set.put("ID", id);
-            set.put("VORNAME", "FechterVorname");
-            set.put("NACHNAME", "FechterNachname");
-            set.put("GEBURTSTAG", "1986-03-14");
-            set.put("FECHTSCHULE", "Fechtschule");
-            set.put("NATIONALITÄT", "Deutsch");
-            return new Fencer(set);
+            iFencer fencer = Sync.getInstance().createFencer(forename, surname);
+            fencer.setBirthday("1986-03-14");
+            fencer.setFencingSchool("Sieben Schwerter");
+            fencer.setNationality("Deutschland");
+            return (Fencer)fencer;
         }
         catch (Exception ex)
         {
@@ -68,5 +58,10 @@ public class TestUtilities
             fail("failed to create Fencer");
             return null;
         }
+    }
+
+    public static Fencer CreateFencer()
+    {
+        return CreateFencer("Vorname", "Nachname");
     }
 }

@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
  */
 public class TournamentTest
 {
+    private static String oldDatabaseURL;
 
     public TournamentTest()
     {
@@ -35,17 +36,23 @@ public class TournamentTest
     @BeforeClass
     public static void setUpClass()
     {
+        //Sync object must be created already and we need to setup database restore point
+        Sync sync = (Sync) Sync.getInstance();
+        oldDatabaseURL = sync.getDatabaseURL();
+        sync.setDatabaseURL("jdbc:h2:~/SprechFensterTestDatabase");
     }
 
     @AfterClass
     public static void tearDownClass()
     {
+        Sync sync = (Sync) Sync.getInstance();
+        sync.setDatabaseURL(oldDatabaseURL);
     }
 
     @Before
     public void setUp()
     {
-        //Sync object must be created already and we need to setup database restore point
+        //Setup database restore point
         Sync sync = (Sync) Sync.getInstance();
         try
         {
@@ -88,8 +95,8 @@ public class TournamentTest
     public void testGetTournament() throws Exception
     {
         System.out.println("getTournament");
-        Tournament expectedResult = TestUtilities.CreateTournament(0);
-        Tournament result = Tournament.getTournament(0);
+        Tournament expectedResult = TestUtilities.CreateTournament();
+        Tournament result = Tournament.getTournament(expectedResult.getID());
         assertEquals(expectedResult, result);
     }
 
@@ -101,9 +108,9 @@ public class TournamentTest
     {
         System.out.println("getAllTournaments");
         ArrayList<Tournament> allTournaments = new ArrayList<>();
-        allTournaments.add(TestUtilities.CreateTournament(0));
-        allTournaments.add(TestUtilities.CreateTournament(1));
-        allTournaments.add(TestUtilities.CreateTournament(2));
+        allTournaments.add(TestUtilities.CreateTournament());
+        allTournaments.add(TestUtilities.CreateTournament());
+        allTournaments.add(TestUtilities.CreateTournament());
         List<Tournament> result = Tournament.getAllTournaments();
 
         assertEquals(allTournaments.size(), result.size());
@@ -128,37 +135,16 @@ public class TournamentTest
     }
 
     /**
-     * Test of getID method, of class Tournament.
-     */
-    @Test
-    public void testGetID()
-    {
-        System.out.println("getID");
-        testID(0);
-        testID(Integer.MAX_VALUE);
-        testID(Integer.MIN_VALUE);
-    }
-
-    private void testID(int id)
-    {
-        Tournament instance = TestUtilities.CreateTournament(id);
-        int result = instance.getID();
-        assertEquals(id, result);
-    }
-
-    /**
      * Test of getName method, of class Tournament.
      */
     @Test
     public void testGetName()
     {
         System.out.println("getName");
-        Tournament instance = null;
-        String expResult = "";
+        String expResult = "asdf";
+        Tournament instance = TestUtilities.CreateTournament(expResult);
         String result = instance.getName();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -343,10 +329,34 @@ public class TournamentTest
     public void testGetAllPreliminary() throws Exception
     {
         System.out.println("getAllPreliminary");
-        Tournament instance = null;
-        List<iPreliminary> expResult = null;
+        int groups = 2;
+        int lanes = 2;
+        int numberOfFencers = 10;
+        double fencersPerGroup = ((double)numberOfFencers)/((double) groups);
+        ArrayList<iFencer> fencers = new ArrayList<>();
+        
+        for(int i = 0; i < numberOfFencers; i++)
+        {
+            fencers.add(TestUtilities.CreateFencer("Fencer_"+i, "Surename"));
+        }
+        
+        Tournament instance = TestUtilities.CreateTournament("TestTournament");
+        instance.setLanes(lanes);
+        instance.setGroups(groups);
+
+        instance.createPreliminaryTiming();
         List<iPreliminary> result = instance.getAllPreliminary();
-        assertEquals(expResult, result);
+        for(int i = 0; i < groups; i++)
+        {
+            assertEquals((double)instance.getParticipantsOfGroup(i).size(), fencersPerGroup, 1.0);
+        }
+        
+        long fightsPerGroup = Math.round(fencersPerGroup*(fencersPerGroup-1.0)/2.0);
+        assertEquals(result.size(), fightsPerGroup*groups);
+        
+        //TODO: test that every fencer in every group fights against all other fencers in his group, exactly once
+        //TODO: test that every fencer is put into exactly one group
+        
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

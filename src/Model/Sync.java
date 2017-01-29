@@ -44,6 +44,16 @@ public class Sync extends iSync
         {
             con.RestoreDatabase();
         }
+        
+        public void setDatabaseURL(String url)
+        {
+            con.SetDatabaseURL(url);
+        }
+        
+        public String getDatabaseURL()
+        {
+            return con.GetDatabaseURL();
+        }
 	
 	Sync() throws SQLException
 	{
