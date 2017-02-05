@@ -210,15 +210,17 @@ public class TournamentTest
     
     private void testGetAllPreliminaryWithParameters(int groups, int lanes, int numberOfFencers) throws Exception
     {
+        Tournament instance = TestUtilities.CreateTournament("TestTournament");
+        
         double numberOfFencersPerGroup = ((double)numberOfFencers)/((double) groups);
         ArrayList<iFencer> fencers = new ArrayList<>();
         
         for(int i = 0; i < numberOfFencers; i++)
         {
-            fencers.add(TestUtilities.CreateFencer("Fencer_"+i, "Surename"));
+            iFencer fencer = TestUtilities.CreateFencer("Fencer_"+i, "Surename");
+            instance.addParticipant(fencer);
         }
         
-        Tournament instance = TestUtilities.CreateTournament("TestTournament");
         instance.setLanes(lanes);
         instance.setGroups(groups);
 
