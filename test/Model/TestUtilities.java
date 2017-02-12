@@ -64,4 +64,18 @@ public class TestUtilities
     {
         return CreateFencer("Vorname", "Nachname");
     }
+    
+    public static void SetupTournamentQualificationRounds(Tournament instance, int groups, int lanes, int numberOfFencers) throws Exception
+    {
+        for(int i = 0; i < numberOfFencers; i++)
+        {
+            iFencer fencer = TestUtilities.CreateFencer("Fencer_"+i, "Surename");
+            instance.addParticipant(fencer);
+        }
+        
+        instance.setLanes(lanes);
+        instance.setGroups(groups);
+
+        instance.createPreliminaryTiming();
+    }
 }
