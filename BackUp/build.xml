@@ -51,7 +51,7 @@
 
     -->
     <target name="-post-compile">
-        <copy file="src/SprechFenster/resources/SprechFensterLogging.config" todir="${dist.dir}"/>        
+        <copy file="src/sprechfenster/resources/SprechFensterLogging.config" todir="${dist.dir}"/>        
     </target>
     
 <target name="-unjar-and-copy-lib-jars">

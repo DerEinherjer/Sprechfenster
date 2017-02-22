@@ -45,7 +45,7 @@ public interface iTournament
 	public List<iScore> getScoresFinal() throws SQLException;
 	public List<iScore>[] getScoresInGroups() throws SQLException;
 	
-	public boolean finishPreliminary() throws SQLException;
+	public boolean finishPreliminary() throws SQLException, ObjectDeprecatedException;
         public boolean isPreliminaryFinished();
 	
 	public List<iFinalround> getAllFinalrounds();

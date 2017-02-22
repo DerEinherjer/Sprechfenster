@@ -5,11 +5,13 @@
  */
 package Model;
 
-import Model.Rounds.Preliminary;
+import Model.Tournament;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.junit.Assert.fail;
 import static org.junit.Assert.fail;
 
 /**

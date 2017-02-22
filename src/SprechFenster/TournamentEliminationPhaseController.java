@@ -182,6 +182,10 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
             {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
+            catch (ObjectDeprecatedException ex) //finishPreliminary wirf neue Exception hab das hier mal abgefangen
+            {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
         }
     }
 

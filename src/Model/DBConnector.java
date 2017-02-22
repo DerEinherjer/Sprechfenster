@@ -1166,11 +1166,11 @@ class DBConnector
             return;
         }
         
-        int newwinnerround = createFinalRound(tournamentid , winnerround, loserround);
+        int newwinnerround = createFinalRound(tournamentid , winnerround, loserround, deepth);
         int newloserround = -1;
         
         if(winnerround == -1)
-            newloserround = createFinalRound(tournamentid , -1, -1);
+            newloserround = createFinalRound(tournamentid , -1, -1, -1);
         
         createFinalRounds(tournamentid, newwinnerround, newloserround, deepth-1);
         createFinalRounds(tournamentid, newwinnerround, newloserround, deepth-1);
@@ -1178,12 +1178,12 @@ class DBConnector
     
     private PreparedStatement cfrStmt1 = null;
     private PreparedStatement cfrStmt2 = null;
-    private int createFinalRound(int tournamentid, int winnerround, int loserround) throws SQLException
+    private int createFinalRound(int tournamentid, int winnerround, int loserround, int round) throws SQLException
     {
         if(cfrStmt1 == null)
         {
-            String sql = "INSERT INTO Finalrunden (GewinnerRunde, VerliererRunde) "+
-                         "VALUES (? ,?);";
+            String sql = "INSERT INTO Finalrunden (GewinnerRunde, VerliererRunde, FinalRunde) "+
+                         "VALUES (? ,? ,?);";
             cfrStmt1 = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
             sql = "INSERT INTO Vorrunden (TurnierID, FinalStrucktur) VALUES (? ,?);";
@@ -1193,6 +1193,7 @@ class DBConnector
         
         cfrStmt1.setInt(1, winnerround);
         cfrStmt1.setInt(2, loserround);
+        cfrStmt1.setInt(3, round);
         cfrStmt1.executeUpdate();
         
         ResultSet rs = cfrStmt1.getGeneratedKeys();

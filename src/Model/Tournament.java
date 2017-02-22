@@ -456,9 +456,9 @@ public class Tournament implements iTournament
 		return ret;
 	}
 	
-	private void createFinalrounds() throws SQLException
+	private void createFinalrounds() throws SQLException, ObjectDeprecatedException
 	{
-		sync.createFinalRounds(this);//TODO
+		sync.createFinalRounds(this);
 		setTimingForFinals();
 	}
 	
@@ -508,7 +508,7 @@ public class Tournament implements iTournament
 		return finishedPreliminary;
 	}
         
-        public boolean finishPreliminary() throws SQLException
+        public boolean finishPreliminary() throws SQLException, ObjectDeprecatedException
         {
             if(allPreliminaryFinished())
             {
@@ -752,72 +752,46 @@ public class Tournament implements iTournament
 		}
 	}
 	
-	private void setTimingForFinals() throws SQLException
+	private void setTimingForFinals() throws SQLException, ObjectDeprecatedException
 	{
-		List<Finalround> f = new ArrayList<>();
-		for(Finalround tmp : Finalround.getFinalrounds(this))
+		int round = 1;
+                for(int i=0;;i++)
                 {
-                    try
+                    List<iFinalround> matchOfRound = new ArrayList<>();
+                    //get all matches for this round of the final
+                    for(iFinalround match : getAllFinalrounds())
+                        if(match.getFinalRound()==i)
+                            matchOfRound.add(match);
+                    
+                    if(matchOfRound.size()==1)
                     {
-                        if(tmp.getPrerounds().isEmpty())//Alt: tmp.getPre1()==null&&tmp.getPre2()==null
-                            f.add(tmp);
-                    } 
-                    catch (ObjectDeprecatedException ex) 
-                    {
-                        //Can be ignored safly because deleted finals don't need a timing // trust me they realy do not
-                    }
-                }
-			
-		
-		while(true)
-		{
-			int round = 1;
-			int lane = 1;
-			List<Finalround> next = new ArrayList<>();
-			Finalround losersround = null;
-			
-			for(Finalround tmp : f)
-			{
-                            try
+                        for(iFinalround match : getAllFinalrounds())
+                            if(match.getFinalRound()==-1)
                             {
-				tmp.setTime(round, lane);
-				lane++;
-				if(lane>this.lanes)
-				{
-					lane=1;
-					round++;
-				}
-				if(tmp.getLoserRound()!=null)
-					losersround = tmp.getLoserRound();
-				if(tmp.getWinnerRound()!=null&&!next.contains(tmp.getWinnerRound()))
-					next.add(tmp.getWinnerRound());
-                            } 
-                            catch (ObjectDeprecatedException ex) 
-                            {
-                                //Can be ignored safely because we sorted them out last loop so if we have
-                                //one now some 	idiot tinkers with threads 
+                                match.setTime(round, 1);
+                                break;
                             }
-                            
-			}
-			lane = 1;
-			round++;
-			if(losersround!=null)
-                            try
-                            {
-				losersround.setTime(round++, lane);
-                            } 
-                            catch (ObjectDeprecatedException ex) 
-                            {
-                                //like I sad ignor it //that Exeption in annoying
-                            }
+                        round++;
+                        matchOfRound.get(0).setTime(round, 1);
                         
-			
-			if(next.isEmpty())
-				break;
-			else
-				f = next;
-		}
-			
+                        return;
+                    }
+                    
+                    int lane = 1;
+                    for(iFinalround match : matchOfRound)
+                    {
+                        match.setTime(round, lane);
+                        lane++;
+                        if(lane>getLanes())
+                        {
+                            lane = 1;
+                            round++;
+                        }
+                        
+                    }
+                    round++;
+                    lane = 1;
+                }
  	}
 	
 	public int getYellowFor(iFencer f) throws ObjectDeprecatedException

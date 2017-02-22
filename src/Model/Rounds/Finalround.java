@@ -73,7 +73,8 @@ public class Finalround extends Round implements iFinalround
     {
         return "CREATE TABLE IF NOT EXISTS Finalrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
                 + "GewinnerRunde int DEFAULT -1,"
-                + "VerliererRunde int DEFAULT -1);";
+                + "VerliererRunde int DEFAULT -1,"
+                + "FinalRunde int DEFAULT -1);";
     }
 
     // --------------------------------------------------------
@@ -81,6 +82,7 @@ public class Finalround extends Round implements iFinalround
     private Finalround losersround = null;
     private Finalround preround1 = null;
     private Finalround preround2 = null;
+    private Integer finalrunde = null;
 
     public Finalround(Map<String, Object> set) throws ObjectExistException, SQLException
     {
@@ -92,6 +94,8 @@ public class Finalround extends Round implements iFinalround
         }
         finalrounds.put(this.ID, this);
 
+        this.finalrunde = (Integer) set.get("FinalRunde".toUpperCase());
+        
         try
         {
             this.winnersround = Finalround.getFinalround((Integer) set.get("GewinnerRunde".toUpperCase()));
@@ -230,6 +234,11 @@ public class Finalround extends Round implements iFinalround
         sync.removeFinalround(this.ID);
         finalrounds.remove(this.ID);
         this.ID = -1;
+    }
+    
+    public int getFinalRound()
+    {
+        return finalrunde;
     }
 
     public boolean hasPrerounds()
