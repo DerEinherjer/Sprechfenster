@@ -377,17 +377,37 @@ public class TournamentTest
             assertEquals((int)Math.pow(2, numberOfFinalRounds-i), matchesOfRound.size());
             for(iFinalround match : matchesOfRound)
             {
-                assertEquals(2, match.getFencer().size());
-                assertTrue(match.getFencer().get(0) != match.getFencer().get(1)); 
-                assertTrue(match.getLane() > 0 && match.getLane() <= lanes); 
-                match.setPoints(match.getFencer().get(0), 7);
-                match.setPoints(match.getFencer().get(1), 3);
-                match.setFinished(true);
+                CheckAndFinishFinalround(match, lanes);
+            }
+            if(i == numberOfFinalRounds-1)
+            {
+                //we are in the semi-finals. The match for third place should have fencers now!
+                iFinalround thirdPlaceMatch = null;
+                for(iFinalround match : finalMatches)
+                {
+                    if(match.getRound() == -1)
+                    {
+                        thirdPlaceMatch = match;
+                        break;
+                    }
+                }
+                assertTrue(thirdPlaceMatch != null);
+                CheckAndFinishFinalround(thirdPlaceMatch, lanes);
             }
             //TODO: test that the pairings for the first round are correct
             //TODO: test that the pairings for the n+1-th round are correct once the n-th round is finished
             //TODO: test that the match for the third place has the correct pairing
         }
+    }
+     
+    private void CheckAndFinishFinalround(iFinalround match, int lanes) throws Exception
+    {
+        assertEquals(2, match.getFencer().size());
+        assertTrue(match.getFencer().get(0) != match.getFencer().get(1)); 
+        assertTrue(match.getLane() > 0 && match.getLane() <= lanes); 
+        match.setPoints(match.getFencer().get(0), 7);
+        match.setPoints(match.getFencer().get(1), 3);
+        match.setFinished(true);
     }
 
 }
