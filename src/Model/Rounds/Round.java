@@ -138,7 +138,7 @@ public abstract class Round
     public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedException
     {
         if(!isValid) throw new ObjectDeprecatedException();
-        if(finished || t.isPreliminaryFinished()) return;
+        if(finished) return;
 	if(fencer1.equals(f))
         {
             pointsFor1 = points;
@@ -221,7 +221,7 @@ public abstract class Round
     public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
     {
         if(!isValid) throw new ObjectDeprecatedException();
-        if(finished || t.isPreliminaryFinished()) return false;
+        if(finished) return false;
 		
         if(fencer1 == null)
         {

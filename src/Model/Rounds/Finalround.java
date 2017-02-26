@@ -146,6 +146,14 @@ public class Finalround extends Round implements iFinalround
             {
                 if (winnersround != null)
                 {
+                    if(getWinner()==null)
+                    {
+                        System.out.println("KEIN GEWINNER");
+                        System.out.println(pointsFor1);
+                        System.out.println(pointsFor2);
+                        System.out.println(fencer1);
+                        System.out.println(fencer2);
+                    }
                     winnersround.addParticipant(getWinner());
                 }
                 if (losersround != null)

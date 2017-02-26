@@ -370,7 +370,6 @@ public class TournamentTest
                     matchesOfRound.add(match);
                 }
             }
-            System.out.println("Runde "+i+": "+matchesOfRound.size()+"("+(int)Math.pow(2, numberOfFinalRounds-i)+")");
             //With the number of final rounds set to n,
             //the first round must have 2^(n-1) matches, second round 2^(n-2), ...
             //TODO: what about the match for third place? Which round number does it receive?
@@ -379,13 +378,13 @@ public class TournamentTest
             {
                 CheckAndFinishFinalround(match, lanes);
             }
-            if(i == numberOfFinalRounds-1)
+            if(i == numberOfFinalRounds)
             {
-                //we are in the semi-finals. The match for third place should have fencers now!
+                //we are in the finals. The match for third place should have fencers now!
                 iFinalround thirdPlaceMatch = null;
                 for(iFinalround match : finalMatches)
                 {
-                    if(match.getRound() == -1)
+                    if(match.getFinalRound() == -1)
                     {
                         thirdPlaceMatch = match;
                         break;
@@ -403,7 +402,7 @@ public class TournamentTest
     private void CheckAndFinishFinalround(iFinalround match, int lanes) throws Exception
     {
         assertEquals(2, match.getFencer().size());
-        assertTrue(match.getFencer().get(0) != match.getFencer().get(1)); 
+        assertTrue(match.getFencer().get(0) != match.getFencer().get(1)); //---------------------------------------------------------------------------------
         assertTrue(match.getLane() > 0 && match.getLane() <= lanes); 
         match.setPoints(match.getFencer().get(0), 7);
         match.setPoints(match.getFencer().get(1), 3);

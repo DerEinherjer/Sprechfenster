@@ -4,6 +4,7 @@ import Model.Fencer;
 import Model.ObjectDeprecatedException;
 import Model.ObjectExistException;
 import Model.Tournament;
+import Model.iFencer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,4 +148,16 @@ public class Preliminary extends Round implements iPreliminary
 		preliminarys.remove(this.ID);
 		this.ID = -1;
 	}
-}
+        
+        public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
+        {
+            if(t.isPreliminaryFinished()) return false;
+            else return super.addParticipant(f);
+        }
+        
+        public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedException
+        {
+            if(t.isPreliminaryFinished()) return;
+            else super.setPoints(f, points);
+        }
+}//
