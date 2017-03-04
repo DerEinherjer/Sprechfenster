@@ -3,7 +3,7 @@ package sprechfenster.presenter;
 import model.ObjectDeprecatedException;
 import model.Sync;
 import model.iFencer;
-import model.Rounds.iRound;
+import model.rounds.iRound;
 import model.iSync;
 import java.sql.SQLException;
 import java.util.List;
