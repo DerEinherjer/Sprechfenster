@@ -11,6 +11,7 @@ import Model.Rounds.iFinalround;
 import Model.Rounds.iPreliminary;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -370,9 +371,35 @@ public class TournamentTest
                     matchesOfRound.add(match);
                 }
             }
+            
+            List<Score> scores = new ArrayList<>();
+            if(i == 0)
+            {
+                for(iFinalround match : matchesOfRound)
+                {
+                    scores.add(instance.getScoreFromPrelim(match.getFencer().get(0)));
+                    scores.add(instance.getScoreFromPrelim(match.getFencer().get(1)));
+                }
+                Collections.sort(scores);
+                System.out.println("#################################");
+                for(Score score : scores)
+                {
+                    System.out.println(score.getFencer());
+                }
+                System.out.println("#################################");
+                for(iFinalround match : matchesOfRound)
+                {
+                    int indexF0 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)));
+                    int indexF1 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1)));
+                    System.out.println(scores.size());
+                    System.out.println(indexF0+"\t"+match.getFencer().get(0));
+                    System.out.println(indexF1+"\t"+match.getFencer().get(1));
+                    System.out.println("-----------------------------------");
+                    assertTrue(scores.size()-scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)))==scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1))));
+                }
+            }
             //With the number of final rounds set to n,
             //the first round must have 2^(n-1) matches, second round 2^(n-2), ...
-            //TODO: what about the match for third place? Which round number does it receive?
             assertEquals((int)Math.pow(2, numberOfFinalRounds-i), matchesOfRound.size());
             for(iFinalround match : matchesOfRound)
             {
@@ -394,8 +421,6 @@ public class TournamentTest
                 CheckAndFinishThirdPlace(thirdPlaceMatch, lanes);
             }
             //TODO: test that the pairings for the first round are correct
-            //TODO: test that the pairings for the n+1-th round are correct once the n-th round is finished
-            //TODO: test that the match for the third place has the correct pairing
         }
     }
     private void CheckAndFinishThirdPlace(iFinalround match, int lanes) throws Exception
@@ -410,11 +435,7 @@ public class TournamentTest
             iFencer fencer1 = null;
             iFencer fencer2 = null;
             iFinalround preround1 = match.getPrerounds().get(0);
-            iFinalround preround2 = match.getPrerounds().get(0);
-            System.out.println(preround1.isFencer(fencer1));
-            System.out.println(preround1.isFencer(fencer2));
-            System.out.println(preround2.isFencer(fencer1));
-            System.out.println(preround2.isFencer(fencer2));
+            iFinalround preround2 = match.getPrerounds().get(1);
             if(preround1.isFencer(fencers.get(0))&&preround2.isFencer(fencers.get(1)))
             {
                 fencer1 = fencers.get(0);
@@ -444,7 +465,8 @@ public class TournamentTest
     private void CheckAndFinishFinalround(iFinalround match, int lanes) throws Exception
     {
         assertEquals(2, match.getFencer().size());
-        assertTrue(match.getFencer().get(0) != match.getFencer().get(1)); 
+        assertTrue(match.getFencer().get(0) != match.getFencer().get(1));
+        System.out.println(match.getLane()+"\t"+lanes);
         assertTrue(match.getLane() > 0 && match.getLane() <= lanes); 
         
         if(match.getPrerounds().size()==2)
