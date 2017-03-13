@@ -373,7 +373,7 @@ public class TournamentTest
             }
             
             List<Score> scores = new ArrayList<>();
-            if(i == 0)
+            if(i == 1)
             {
                 for(iFinalround match : matchesOfRound)
                 {
@@ -391,10 +391,6 @@ public class TournamentTest
                 {
                     int indexF0 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)));
                     int indexF1 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1)));
-                    System.out.println(scores.size());
-                    System.out.println(indexF0+"\t"+match.getFencer().get(0));
-                    System.out.println(indexF1+"\t"+match.getFencer().get(1));
-                    System.out.println("-----------------------------------");
                     assertTrue(scores.size()-scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)))==scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1))));
                 }
             }

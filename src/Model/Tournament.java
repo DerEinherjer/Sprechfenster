@@ -559,6 +559,7 @@ public class Tournament implements iTournament
                         round.addParticipant(finalists.get(c).getFencer());
                         //Take the worst remaining fencer
                         round.addParticipant(finalists.get(finalists.size()-c-1).getFencer());
+                        System.out.println("Pairing: "+finalists.get(c)+"\t"+finalists.get(finalists.size()-c-1));
                         c++;
                     } 
                     catch (ObjectDeprecatedException ex) 
