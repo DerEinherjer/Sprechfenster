@@ -372,26 +372,56 @@ public class TournamentTest
                 }
             }
             
-            List<Score> scores = new ArrayList<>();
             if(i == 1)
             {
+                List<Score> scores = new ArrayList<>();
                 for(iFinalround match : matchesOfRound)
                 {
                     scores.add(instance.getScoreFromPrelim(match.getFencer().get(0)));
                     scores.add(instance.getScoreFromPrelim(match.getFencer().get(1)));
                 }
-                Collections.sort(scores);
-                System.out.println("#################################");
+                List<List<Score>> categories = new ArrayList<>();
                 for(Score score : scores)
                 {
-                    System.out.println(score.getFencer());
+                    if(categories.size()>0&&categories.get(categories.size()-1).get(0).equals(score))
+                    {
+                            categories.get(categories.size()-1).add(score);
+                    }
+                    else
+                    {
+                        categories.add(new ArrayList<>());
+                        categories.get(categories.size()-1).add(score);
+                    }
                 }
-                System.out.println("#################################");
                 for(iFinalround match : matchesOfRound)
                 {
                     int indexF0 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)));
                     int indexF1 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1)));
-                    assertTrue(scores.size()-scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)))==scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1))));
+                    int startF0 = 0;
+                    int endF0 = 0;
+                    int startF1 = 0;
+                    int endF1 = 0;
+                    for(int c = 0; c<categories.size();c++)
+                    {
+                        if(startF0+categories.get(c).size()>=indexF0)
+                        {
+                            endF0 = startF0+categories.get(c).size();
+                            break;
+                        }
+                        else
+                            startF0 += categories.get(c).size(); 
+                    }
+                    for(int c = 0; c<categories.size();c++)
+                    {
+                        if(startF1+categories.get(c).size()>=indexF1)
+                        {
+                            endF1 = startF0+categories.get(c).size();
+                            break;
+                        }
+                        else
+                            startF1 += categories.get(c).size(); 
+                    }
+                    assertTrue((!(endF0<startF1))&&(!(startF0>endF1)));
                 }
             }
             //With the number of final rounds set to n,
