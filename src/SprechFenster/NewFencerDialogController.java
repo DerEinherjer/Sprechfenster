@@ -5,8 +5,8 @@
  */
 package sprechfenster;
 
-import Model.iFencer;
-import Model.iSync;
+import model.iFencer;
+import model.iSync;
 import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
@@ -97,10 +97,12 @@ public class NewFencerDialogController implements Initializable {
         {
             iSync dataModel = iSync.getInstance();
             try { 
-                iFencer newFencer = dataModel.createFencer(FirstNameTextField.getText(), LastNameTextField.getText());
-                newFencer.setBirthday(BirthdayDatePicker.getValue().format(DateTimeFormatter.ISO_DATE));
-                newFencer.setNationality(NationalityComboBox.getValue().toString());
-                newFencer.setFencingSchool(FencingSchoolComboBox.getValue().toString());
+                String firstName = FirstNameTextField.getText();
+                String familyName = LastNameTextField.getText();
+                String birthDay = BirthdayDatePicker.getValue().format(DateTimeFormatter.ISO_DATE);
+                String nationality = NationalityComboBox.getValue().toString();
+                String fencingSchool = FencingSchoolComboBox.getValue().toString();
+                iFencer newFencer = dataModel.createFencer(firstName, familyName, birthDay, nationality, fencingSchool);
             } catch (Exception ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }

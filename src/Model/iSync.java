@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -23,10 +23,11 @@ public abstract class iSync extends Observable
         return sync;
     }
 	
-	public iFencer createFencer(String name, String familyName) throws SQLException{return null;}
+	public iFencer createFencer(String name, String familyName, String birthDay, String nationality, String fencingSchool) throws SQLException{return null;}
 	public List<iFencer> getAllFencer() throws SQLException{return null;}
         public iFencer getFencerByID(int fencerID) throws SQLException {return null;}
-	
+	public boolean deleteFencer(int fencerID) throws SQLException {return false;}
+        public boolean deleteTournament(int tournamentID) throws SQLException {return false;}
 	public iTournament createTournament(String name) throws SQLException{return null;}
 	public List<iTournament> getAllTournaments() throws SQLException{return null;}
 	

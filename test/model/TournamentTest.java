@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package model;
 
-import Model.Rounds.Finalround;
-import Model.Rounds.Preliminary;
-import Model.Rounds.iFinalround;
-import Model.Rounds.iPreliminary;
+import model.rounds.Finalround;
+import model.rounds.Preliminary;
+import model.rounds.iFinalround;
+import model.rounds.iPreliminary;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,7 +144,7 @@ public class TournamentTest
     public void testAddParticipant_iFencer() throws Exception
     {
         System.out.println("addParticipant");
-        iFencer f = Sync.getInstance().createFencer("Asdf", "Fdsa");
+        iFencer f = Sync.getInstance().createFencer("Asdf", "Fdsa", "1986-03-14", "deutsch", "Sieben Schwerter");
         Tournament instance = (Tournament) Sync.getInstance().createTournament("TestTournament");
         instance.addParticipant(f);
         assertTrue(instance.getAllParticipants().contains(f));
@@ -157,7 +157,7 @@ public class TournamentTest
     public void testAddParticipant_iFencer_int() throws Exception
     {
         System.out.println("addParticipant");
-        iFencer f = Sync.getInstance().createFencer("Asdf", "Fdsa");
+        iFencer f = Sync.getInstance().createFencer("Asdf", "Fdsa", "1986-03-14", "deutsch", "Sieben Schwerter");
         Tournament instance = (Tournament) Sync.getInstance().createTournament("TestTournament");
         int group = 2;
         instance.setGroups(group);

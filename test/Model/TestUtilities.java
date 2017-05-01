@@ -3,15 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package model;
 
-import Model.Tournament;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.junit.Assert.fail;
 import static org.junit.Assert.fail;
 
 /**
@@ -48,7 +44,7 @@ public class TestUtilities
     {
         try
         {
-            iFencer fencer = Sync.getInstance().createFencer(forename, surname);
+            iFencer fencer = Sync.getInstance().createFencer(forename, surname, "1986-03-14", "deutsch", "Sieben Schwerter");
             fencer.setBirthday("1986-03-14");
             fencer.setFencingSchool("Sieben Schwerter");
             fencer.setNationality("Deutschland");

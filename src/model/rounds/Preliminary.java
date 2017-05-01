@@ -1,10 +1,10 @@
-package Model.Rounds;
+package model.rounds;
 
-import Model.Fencer;
-import Model.ObjectDeprecatedException;
-import Model.ObjectExistException;
-import Model.Tournament;
-import Model.iFencer;
+import model.Fencer;
+import model.ObjectDeprecatedException;
+import model.ObjectExistException;
+import model.Tournament;
+import model.iFencer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;

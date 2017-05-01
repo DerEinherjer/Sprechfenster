@@ -5,11 +5,11 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedException;
-import Model.Sync;
-import Model.Rounds.iFinalround;
-import Model.iSync;
-import Model.iTournament;
+import model.ObjectDeprecatedException;
+import model.Sync;
+import model.rounds.iFinalround;
+import model.iSync;
+import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -39,7 +39,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import sprechfenster.Presenters.FightPresenter;
+import sprechfenster.presenter.FightPresenter;
 
 /**
  * FXML Controller class

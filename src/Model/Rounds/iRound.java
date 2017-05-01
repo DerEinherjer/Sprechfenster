@@ -1,8 +1,8 @@
-package Model.Rounds;
+package model.rounds;
 
-import Model.ObjectDeprecatedException;
-import Model.iFencer;
-import Model.iTournament;
+import model.ObjectDeprecatedException;
+import model.iFencer;
+import model.iTournament;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -97,6 +97,13 @@ public interface iRound
          */
 	public iFencer getWinner() throws ObjectDeprecatedException;
 	
+         /**
+         * This funktion returns the loser of the fight. if the fight is not finished it will return null;
+         * @return  Loser of the fight.
+         * @throws ObjectDeprecatedException The preliminare got deleted.
+         */
+        public iFencer getLoser() throws ObjectDeprecatedException;
+        
         /**
          * This function returns the turnament wich the fight belongs to.
          * @return  The tournament.

@@ -1,9 +1,9 @@
-package Model;
+package model;
 
-import Model.Rounds.Preliminary;
-import Model.Rounds.Finalround;
-import Model.Rounds.iFinalround;
-import Model.Rounds.iPreliminary;
+import model.rounds.Preliminary;
+import model.rounds.Finalround;
+import model.rounds.iFinalround;
+import model.rounds.iPreliminary;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,7 @@ public class Tournament implements iTournament
 		return ret;
 	}
 	// -----
-	private int ID;
+	private final int ID;
 	
 	private String name = null;
 	private String date = null;
@@ -90,7 +90,7 @@ public class Tournament implements iTournament
 		
 	}
 	
-	int getID(){return ID;}
+	public int getID(){return ID;}
 	public String getName(){return name;}
 	public String getDate(){return date;}
 	public int getGroups(){return groups;}

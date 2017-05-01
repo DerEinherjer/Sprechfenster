@@ -9,7 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
-import sprechfenster.Presenters.FightPresenter;
+import sprechfenster.presenter.FightPresenter;
 
 /**
  *

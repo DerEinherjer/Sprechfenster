@@ -26,8 +26,8 @@
                   <Button fx:id="ShowParticipantsButton" mnemonicParsing="false" onAction="#handleShowParticipantsButtonAction" text="Teilnehmer" />
                   <Button fx:id="ShowGroupsButton" mnemonicParsing="false" onAction="#handleShowGroupsButtonAction" text="Vorgruppen" />
                   <Button fx:id="ShowFinalRoundsButton" mnemonicParsing="false" onAction="#handleShowFinalRoundsButtonAction" text="Finalrunden" />
-                  <Button fx:id="DeleteFencerButton" mnemonicParsing="false" onAction="#handleDeleteFencerButtonAction" text="Fechter löschen" visible="false" />
-                  <Button fx:id="DeleteTournamentButton" mnemonicParsing="false" onAction="#handleDeleteTournamentButtonAction" text="Turnier löschen" visible="false" />
+                  <Button fx:id="DeleteFencerButton" mnemonicParsing="false" onAction="#handleDeleteFencerButtonAction" text="Fechter löschen" />
+                  <Button fx:id="DeleteTournamentButton" mnemonicParsing="false" onAction="#handleDeleteTournamentButtonAction" text="Turnier löschen" />
                </items>
             </ToolBar>
          </children>

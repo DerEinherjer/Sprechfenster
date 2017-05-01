@@ -5,10 +5,10 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedException;
-import Model.iFencer;
-import Model.Rounds.iRound;
-import Model.iTournament;
+import model.ObjectDeprecatedException;
+import model.iFencer;
+import model.rounds.iRound;
+import model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
