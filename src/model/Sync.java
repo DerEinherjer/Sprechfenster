@@ -1,8 +1,8 @@
-package Model;
+package model;
 
-import Model.Rounds.Preliminary;
-import Model.Rounds.Finalround;
-import Model.Rounds.Round;
+import model.rounds.Preliminary;
+import model.rounds.Finalround;
+import model.rounds.Round;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;

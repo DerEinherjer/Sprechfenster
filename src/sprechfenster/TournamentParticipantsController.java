@@ -5,9 +5,9 @@
  */
 package sprechfenster;
 
-import Model.iFencer;
-import Model.iSync;
-import Model.iTournament;
+import model.iFencer;
+import model.iSync;
+import model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import sprechfenster.Presenters.FencerPresenter;
+import sprechfenster.presenter.FencerPresenter;
 
 /**
  * FXML Controller class

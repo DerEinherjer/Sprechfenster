@@ -1,13 +1,13 @@
-package Model.Rounds;
+package model.rounds;
 
-import Model.Fencer;
-import Model.ObjectDeprecatedException;
-import Model.ObjectExistException;
-import static Model.Rounds.Preliminary.sync;
-import Model.Sync;
-import Model.Tournament;
-import Model.iFencer;
-import Model.iTournament;
+import model.Fencer;
+import model.ObjectDeprecatedException;
+import model.ObjectExistException;
+import static model.rounds.Preliminary.sync;
+import model.Sync;
+import model.Tournament;
+import model.iFencer;
+import model.iTournament;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -370,7 +370,7 @@ public abstract class Round
         return false;
     }
     
-    Fencer getLoser()
+    public iFencer getLoser()
     {
 	if(finished)
 	{

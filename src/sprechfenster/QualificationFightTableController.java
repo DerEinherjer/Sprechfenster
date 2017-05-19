@@ -5,10 +5,10 @@
  */
 package sprechfenster;
 
-import Model.ObjectDeprecatedException;
-import Model.Rounds.iPreliminary;
-import Model.Sync;
-import Model.iTournament;
+import model.ObjectDeprecatedException;
+import model.rounds.iPreliminary;
+import model.Sync;
+import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -36,7 +36,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import sprechfenster.Presenters.FightPresenter;
+import sprechfenster.presenter.FightPresenter;
 
 /**
  * FXML Controller class

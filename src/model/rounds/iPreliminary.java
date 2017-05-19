@@ -1,10 +1,4 @@
-package Model.Rounds;
-
-import Model.ObjectDeprecatedException;
-import Model.iFencer;
-import Model.iTournament;
-import java.sql.SQLException;
-import java.util.List;
+package model.rounds;
 
 public interface iPreliminary extends iRound
 {		
