@@ -39,7 +39,9 @@ public class Tournament implements iTournament
 		return ret;
 	}
 	// -----
-	private final int ID;
+	private int ID;
+       
+        private boolean isValid = true;
 	
 	private String name = null;
 	private String date = null;
@@ -871,4 +873,17 @@ public class Tournament implements iTournament
 	    	return true;
 	    return false;
 	}
+        
+    public void delete() throws SQLException
+    {
+        if(!isValid) return;
+        
+        Preliminary.deleteTournament(this);
+        Finalround.deleteTournament(this);
+        
+        tournaments.remove(ID);
+        sync.removeTournament(ID);
+        ID = -1;
+        isValid = false;
+    }
 }

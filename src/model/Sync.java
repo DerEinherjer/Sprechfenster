@@ -399,8 +399,18 @@ public class Sync extends iSync
        con.removePreliminary(id);
     }
     
-    public void removeFinalround(int id)
+    public void removeFinalrounds(int id) throws SQLException
     {
-        throw new UnsupportedOperationException();
+        con.removeFinalrounds(id);
+    }
+    
+    public void removeFencer(int id) throws SQLException
+    {
+        con.removeFencer(id);
+    }
+    
+    public void removeTournament(int id) throws SQLException
+    {
+        con.removeTournament(id);
     }
 }

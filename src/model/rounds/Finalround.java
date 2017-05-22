@@ -49,7 +49,7 @@ public class Finalround extends Round implements iFinalround
         return ret;
     }
 
-    static void deleteFinalrounds(Tournament tournamentToDelete)
+    public static void deleteTournament(Tournament tournamentToDelete)
     {
         List<Finalround> roundsToDelete = new ArrayList<>();
         roundsToDelete.addAll(finalrounds.values());
@@ -226,17 +226,14 @@ public class Finalround extends Round implements iFinalround
         {
             throw new ObjectDeprecatedException();
         }
-        if (finished || t.isPreliminaryFinished())
-        {
-            return; //TODO Finished trotzdem löschen??
-        }
         if (finished)            //This is needet in case finished rounds will be deletable
         {
             setFinished(false); //It will keep the score of the tournament correct.
         }
-        sync.removeFinalround(this.ID);
+        sync.removeFinalrounds(this.ID);
         finalrounds.remove(this.ID);
         this.ID = -1;
+        isValid = false;
     }
     
     public int getFinalRound()

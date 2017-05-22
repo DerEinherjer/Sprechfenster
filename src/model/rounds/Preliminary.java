@@ -41,22 +41,54 @@ public class Preliminary extends Round implements iPreliminary
 	
 	public static void deletePreliminarys(Fencer f) throws SQLException
 	{
-		try
-		{
-			List<Preliminary> remove = new ArrayList<>();
-			for(Preliminary p : preliminarys.values())
-			{
-				if(p.isFencer(f))
-				{
-					remove.add(p);//DO NOT DELET HERE
-                                                      //IT FUCKS UP THE ITERATOR
-				}
-			}
+            List<Preliminary> remove = new ArrayList<>();
+            for(Preliminary p : preliminarys.values())
+            {
+                try
+                {
+                    if(p.isFencer(f))
+                    {
+                            remove.add(p);//DO NOT DELET HERE
+                                          //IT FUCKS UP THE ITERATOR
+                    }
+                }
+                catch(ObjectDeprecatedException e){}
+            }
 			
-			for(Preliminary p : remove)
-				p.delete();
-		}
-		catch(ObjectDeprecatedException e){}
+            for(Preliminary p : remove)
+            {
+                try
+                {
+                    p.delete();
+                }
+                catch(ObjectDeprecatedException e){}
+            }
+	}
+        
+        public static void deleteTournament(Tournament t) throws SQLException
+	{
+            List<Preliminary> remove = new ArrayList<>();
+            for(Preliminary p : preliminarys.values())
+            {
+                try
+                {
+                    if(p.getTournament().equals(t))
+                    {
+                            remove.add(p);//DO NOT DELET HERE
+                                          //IT FUCKS UP THE ITERATOR
+                    }
+                }
+                catch(ObjectDeprecatedException e){}
+            }
+			
+            for(Preliminary p : remove)
+            {
+                try
+                {
+                    p.deleteTournamnet();
+                }
+                catch(ObjectDeprecatedException e){}
+            }
 	}
 	// -----
         
@@ -147,6 +179,19 @@ public class Preliminary extends Round implements iPreliminary
                 sync.removePreliminary(this.ID);
 		preliminarys.remove(this.ID);
 		this.ID = -1;
+                isValid = false;
+	}
+        
+        public void deleteTournamnet() throws SQLException, ObjectDeprecatedException
+	{
+		if(!isValid) throw new ObjectDeprecatedException();
+		
+                if(finished)            //This is needet in case finished rounds will be deletable
+                    setFinished(false); //It will keep the score of the tournament correct.
+                sync.removePreliminary(this.ID);
+		preliminarys.remove(this.ID);
+		this.ID = -1;
+                isValid = false;
 	}
         
         public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
