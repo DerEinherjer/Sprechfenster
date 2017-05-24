@@ -870,11 +870,45 @@ class DBConnector
 		
 		return rs.getInt("Count");
 	}
+        
+        private PreparedStatement rtStmt1 = null;
+        private PreparedStatement rtStmt2 = null;
+        void removeTournament(int id) throws SQLException
+        {
+            if(rtStmt1 == null)
+            {
+                String sql = "DELETE FROM Teilnahme WHERE TurnierID = ?;";
+                rtStmt1 = con.prepareStatement(sql);
+                
+                sql = "DELETE FROM Turniere WHERE ID = ?;";
+                rtStmt2 = con.prepareStatement(sql);
+            }
+            
+            rtStmt1.setInt(1, id);
+            rtStmt1.executeUpdate();
+            
+            rtStmt2.setInt(1, id);
+            rtStmt2.executeUpdate();
+        }
+        
+        
+        private PreparedStatement rfStmt = null;
+        void removeFencer(int id) throws SQLException
+        {
+            if(rfStmt == null)
+            {
+                String sql = "DELETE FROM Fechter WHERE ID = ?;";
+                rfStmt = con.prepareStatement(sql);
+            }
+            
+            rfStmt.setInt(1, id);
+            rfStmt.executeUpdate();
+        }
 	
 	private PreparedStatement rfrStmt1 = null;
 	private PreparedStatement rfrStmt2 = null;
 	private PreparedStatement rfrStmt3 = null;
-	private void removeFinalrounds(int tournamentID) throws SQLException
+	void removeFinalrounds(int tournamentID) throws SQLException
 	{
             if(rfrStmt1 == null)
             {

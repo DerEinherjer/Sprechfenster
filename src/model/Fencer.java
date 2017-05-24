@@ -49,8 +49,11 @@ public class Fencer implements iFencer
         }
         return ret;
     }
+
     // -----
     private int ID;
+    
+    private boolean isValid = true;
 
     private String name = null;
     private String familyName = null;
@@ -175,5 +178,21 @@ public class Fencer implements iFencer
             return true;
         }
         return false;
+    }
+    
+    public void delete() throws SQLException
+    {
+        if(!isValid) return;
+        
+        for(Tournament t :Tournament.getAllTournaments())
+        {
+            if(t.isParticipant(this))
+                t.removeParticipant(this);
+        }
+        
+        fencers.remove(ID);
+        sync.removeFencer(ID);
+        ID = -1;
+        isValid = false;
     }
 }
