@@ -8,19 +8,19 @@
 <?import javafx.scene.layout.*?>
 
 <TitledPane fx:id="MainPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.QualificationFightTableController">
-   <content>
-      <TableView fx:id="FightsTableView" editable="true">
-         <columns>
-            <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
-            <TableColumn fx:id="FinishedTableColumn" prefWidth="75.0" text="Beendet" />
-            <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
-            <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
-            <TableColumn fx:id="GroupTableColumn" editable="false" prefWidth="73.0" text="Gruppe" />
-            <TableColumn fx:id="FirstFencerTableColumn" prefWidth="150.0" text="Fechter A" />
-            <TableColumn fx:id="FirstFencerPointsTableColumn" prefWidth="60.0" text="Punkte A" />
-            <TableColumn fx:id="SecondFencerTableColumn" prefWidth="150.0" text="Fechter B" />
-            <TableColumn fx:id="SecondFencerPointsTableColumn" prefWidth="55.0" text="Punkte B" />
-         </columns>
-      </TableView>
-   </content>
+  <content>
+    <TableView fx:id="FightsTableView" editable="true">
+      <columns>
+        <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
+        <TableColumn fx:id="FinishedTableColumn" prefWidth="75.0" text="Beendet" />
+        <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
+        <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
+        <TableColumn fx:id="GroupTableColumn" editable="false" prefWidth="73.0" text="Gruppe" />
+        <TableColumn fx:id="FirstFencerTableColumn" prefWidth="150.0" text="Fechter A" />
+        <TableColumn fx:id="FirstFencerPointsTableColumn" prefWidth="60.0" text="Punkte A" />
+        <TableColumn fx:id="SecondFencerTableColumn" prefWidth="150.0" text="Fechter B" />
+        <TableColumn fx:id="SecondFencerPointsTableColumn" prefWidth="55.0" text="Punkte B" />
+      </columns>
+    </TableView>
+  </content>
 </TitledPane>

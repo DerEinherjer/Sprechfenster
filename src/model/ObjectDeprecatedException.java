@@ -1,6 +1,5 @@
 package model;
 
-public class ObjectDeprecatedException extends Exception 
-{
-	
+public class ObjectDeprecatedException extends Exception {
+
 }

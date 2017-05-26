@@ -9,43 +9,43 @@
 <?import javafx.scene.layout.*?>
 
 <AnchorPane fx:id="MainDialogPane" prefHeight="600.0" prefWidth="510.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentParticipantsController">
-   <children>
-      <ComboBox fx:id="FinalRoundsComboBox" layoutX="14.0" layoutY="316.0" onAction="#handleFinalRoundsChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
-      <Label layoutX="14.0" layoutY="289.0" text="Finalrunden" AnchorPane.leftAnchor="14.0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <TextField fx:id="NameTextField" layoutX="13.0" layoutY="41.0" onAction="#handleNameChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="41.0" />
-      <DatePicker fx:id="StartDatePicker" layoutX="13.0" layoutY="104.0" onAction="#handleStartDateChange" prefHeight="25.0" prefWidth="174.0" promptText="TT.MM.JJJJ" AnchorPane.leftAnchor="14.0" />
-      <ComboBox fx:id="QualificationGroupsComboBox" layoutX="14.0" layoutY="248.0" onAction="#handleQualificationsGroupsChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
-      <Label layoutX="10.0" layoutY="14.0" text="Turniername" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="14.0" layoutY="77.0" text="Startdatum" AnchorPane.leftAnchor="14.0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <Label layoutX="13.0" layoutY="217.0" text="Vorgruppen" AnchorPane.leftAnchor="14.0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <ComboBox fx:id="FencingLanesComboBox" layoutX="14.0" layoutY="174.0" onAction="#handleFencingLanesChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
-      <Label layoutX="14.0" layoutY="147.0" text="Fechtplätze" AnchorPane.leftAnchor="14.0">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-      <TableView fx:id="ParticipantsTableView" layoutX="236.0" layoutY="41.0" onDragDropped="#ParticipantsTableViewDragDropped" onDragOver="#ParticipantsTableViewDragOver" prefHeight="672.0" prefWidth="255.0" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="19.0" AnchorPane.topAnchor="41.0">
-        <columns>
-          <TableColumn fx:id="ParticipantColumn" maxWidth="1.7976931348623157E308" prefWidth="250.0" text="Teilnehmer" />
-        </columns>
-      </TableView>
-      <Button fx:id="AddParticipantButton" layoutX="236.0" layoutY="726.0" mnemonicParsing="false" onAction="#handleAddParticipantButton" prefHeight="25.0" prefWidth="89.0" text="Hinzufügen" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="185.0" />
-      <Button fx:id="RemoveParticipantButton" layoutX="424.0" layoutY="726.0" mnemonicParsing="false" onAction="#handleRemoveParticipantButton" text="Entfernen" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="19.0" />
-   </children>
+  <children>
+    <ComboBox fx:id="FinalRoundsComboBox" layoutX="14.0" layoutY="316.0" onAction="#handleFinalRoundsChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
+    <Label layoutX="14.0" layoutY="289.0" text="Finalrunden" AnchorPane.leftAnchor="14.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <TextField fx:id="NameTextField" layoutX="13.0" layoutY="41.0" onAction="#handleNameChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="41.0" />
+    <DatePicker fx:id="StartDatePicker" layoutX="13.0" layoutY="104.0" onAction="#handleStartDateChange" prefHeight="25.0" prefWidth="174.0" promptText="TT.MM.JJJJ" AnchorPane.leftAnchor="14.0" />
+    <ComboBox fx:id="QualificationGroupsComboBox" layoutX="14.0" layoutY="248.0" onAction="#handleQualificationsGroupsChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
+    <Label layoutX="10.0" layoutY="14.0" text="Turniername" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <Label layoutX="14.0" layoutY="77.0" text="Startdatum" AnchorPane.leftAnchor="14.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <Label layoutX="13.0" layoutY="217.0" text="Vorgruppen" AnchorPane.leftAnchor="14.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <ComboBox fx:id="FencingLanesComboBox" layoutX="14.0" layoutY="174.0" onAction="#handleFencingLanesChange" prefHeight="25.0" prefWidth="174.0" AnchorPane.leftAnchor="14.0" />
+    <Label layoutX="14.0" layoutY="147.0" text="Fechtplätze" AnchorPane.leftAnchor="14.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <TableView fx:id="ParticipantsTableView" layoutX="236.0" layoutY="41.0" onDragDropped="#ParticipantsTableViewDragDropped" onDragOver="#ParticipantsTableViewDragOver" prefHeight="672.0" prefWidth="255.0" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="19.0" AnchorPane.topAnchor="41.0">
+      <columns>
+        <TableColumn fx:id="ParticipantColumn" maxWidth="1.7976931348623157E308" prefWidth="250.0" text="Teilnehmer" />
+      </columns>
+    </TableView>
+    <Button fx:id="AddParticipantButton" layoutX="236.0" layoutY="726.0" mnemonicParsing="false" onAction="#handleAddParticipantButton" prefHeight="25.0" prefWidth="89.0" text="Hinzufügen" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="185.0" />
+    <Button fx:id="RemoveParticipantButton" layoutX="424.0" layoutY="726.0" mnemonicParsing="false" onAction="#handleRemoveParticipantButton" text="Entfernen" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="19.0" />
+  </children>
 </AnchorPane>

@@ -8,14 +8,14 @@
 <?import javafx.scene.layout.*?>
 
 <TitledPane fx:id="MainPane" animated="false" text="untitled" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.GroupTableController">
-   <content>
-      <TableView fx:id="GroupTableView">
-         <columns>
-            <TableColumn fx:id="FencerNameTableColumn" prefWidth="150.0" text="Fechter" />
-            <TableColumn fx:id="WinsTableColumn" prefWidth="47.0" text="Siege" />
-            <TableColumn fx:id="PointsTableColumn" prefWidth="48.0" text="Punkte" />
-            <TableColumn fx:id="FencingSchoolTableColumn" prefWidth="150.0" text="Fechtschule" />
-         </columns>
-      </TableView>
-   </content>
+  <content>
+    <TableView fx:id="GroupTableView">
+      <columns>
+        <TableColumn fx:id="FencerNameTableColumn" prefWidth="150.0" text="Fechter" />
+        <TableColumn fx:id="WinsTableColumn" prefWidth="47.0" text="Siege" />
+        <TableColumn fx:id="PointsTableColumn" prefWidth="48.0" text="Punkte" />
+        <TableColumn fx:id="FencingSchoolTableColumn" prefWidth="150.0" text="Fechtschule" />
+      </columns>
+    </TableView>
+  </content>
 </TitledPane>

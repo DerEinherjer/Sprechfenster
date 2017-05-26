@@ -13,5 +13,6 @@ import sprechfenster.presenter.FencerPresenter;
  * @author Stefan
  */
 public interface iFencerSelection {
-    public ObservableList<FencerPresenter> GetSelectedFencers();
+
+  public ObservableList<FencerPresenter> GetSelectedFencers ();
 }
