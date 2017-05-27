@@ -72,11 +72,9 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   TableColumn<FightPresenter, Boolean> FinishedTableColumn;
 
   private iTournament Tournament;
-  private final ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
   private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToPointsConverter = new LimitedIntegerStringConverter(Integer.MAX_VALUE, 0);
-  private GroupTableController FencerListController;
 
   /**
    * Initializes the controller class.
@@ -179,15 +177,23 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FightsTableView.getItems().clear();
         FencersPane.getChildren().clear();
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-        Node groupTable = loader.load();
-        GroupTableController controller = loader.getController();
-        controller.SetGroupName("Fechter");
-        controller.SetTournament(Tournament);
-        controller.SetPhase(GroupTableController.TournamentPhase.FinalPhase);
+        Node finalRoundScoreGroupTable = loader.load();
+        GroupTableController finalRoundsScoreController = loader.getController();
+        finalRoundsScoreController.SetGroupName("Finalrundenergebnisse");
+        finalRoundsScoreController.SetTournament(Tournament);
+        finalRoundsScoreController.SetPhase(GroupTableController.TournamentPhase.FinalPhase);
+        FencersPane.getChildren().add(finalRoundScoreGroupTable);
+        finalRoundsScoreController.AddFencers(Tournament.getAllParticipants());
+        loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
+        Node preliminaryRoundScoreGroupTable = loader.load();
+        GroupTableController preliminaryRoundsScoreController = loader.getController();
+        preliminaryRoundsScoreController.SetGroupName("Vorrundenergebnisse");
+        preliminaryRoundsScoreController.SetTournament(Tournament);
+        preliminaryRoundsScoreController.SetPhase(GroupTableController.TournamentPhase.QualificationPhase);
+        preliminaryRoundsScoreController.AddFencers(Tournament.getAllParticipants());
+        FencersPane.getChildren().add(preliminaryRoundScoreGroupTable);
+
         StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
-        FencerListController = controller;
-        FencersPane.getChildren().add(groupTable);
-        controller.AddFencers(Tournament.getAllParticipants());
         CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
         int maxRound = 0;
         for (iFinalround finalRound : Tournament.getAllFinalrounds()) {
@@ -207,13 +213,10 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   @Override
   public void update (Observable o, Object o1) {
     if (o1 instanceof Sync.change) {
-      Sync.change changeType = (Sync.change) o1;
-      if (changeType == Sync.change.beganFinalPhase) {
+      if(((Sync.change)o1) == Sync.change.beganFinalPhase)
+      {
         UpdateData();
       }
-    }
-    else {
-      UpdateData();
     }
   }
 
