@@ -73,13 +73,14 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   }
 
   private void UpdateData () {
+    GroupControllers.clear();
+    FightControllers.clear();
+    FightsBox.getChildren().clear();
+    GroupsBox.getChildren().clear();
     if (Tournament != null) {
       try {
         CreateQualificationRoundsButton.setDisable(Tournament.preliminaryWithoutTiming() == 0 || Tournament.isPreliminaryFinished());
-        GroupControllers.clear();
-        FightControllers.clear();
-        FightsBox.getChildren().clear();
-        GroupsBox.getChildren().clear();
+        
         if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
           List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
           if (qualificationFights != null) {

@@ -11,6 +11,8 @@ import model.Sync;
 import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -35,6 +37,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.iFencer;
 import sprechfenster.presenter.FightPresenter;
 
 /**
@@ -69,6 +72,7 @@ public class QualificationFightTableController implements Initializable, Observe
   TableColumn<FightPresenter, Boolean> FinishedTableColumn;
 
   private iTournament Tournament;
+  private ArrayList<String> FencerNames;
   private int GroupNumber;
   private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1, 1);
@@ -121,7 +125,7 @@ public class QualificationFightTableController implements Initializable, Observe
                 ));
                 Parent dialog = loader.<Parent>load();
                 sprechfenster.EditFightDialogController controller = loader.getController();
-                controller.SetData(fight.getFight(), Tournament);
+                controller.SetData(fight.getFight(), Tournament, FencerNames);
                 Stage stage = new Stage();
                 stage.setTitle("Gefecht bearbeiten");
                 stage.setScene(new Scene(dialog));
@@ -148,6 +152,17 @@ public class QualificationFightTableController implements Initializable, Observe
 
   public void SetTournament (iTournament tournament) {
     Tournament = tournament;
+    FencerNames = new ArrayList<String>();
+    if(Tournament != null)
+    {
+      try {
+          for (iFencer fencer : Tournament.getAllParticipants()) {
+              FencerNames.add(fencer.getFullName());
+          }
+      } catch (SQLException ex) {
+          Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
+      }
+    }
   }
 
   public void SetGroupNumber (int groupNumber) {

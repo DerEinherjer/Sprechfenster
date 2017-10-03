@@ -1,4 +1,4 @@
-package SprechFenster;
+package sprechfenster;
 
 import javafx.event.Event;
 import javafx.scene.control.ContentDisplay;
