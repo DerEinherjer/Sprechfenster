@@ -53,6 +53,7 @@ public class EditFightDialogController implements Initializable {
 
   private iRound Fight;
   private iTournament Tournament;
+  private ArrayList<String> FencerNames;
 
   /**
    * Initializes the controller class.
@@ -64,9 +65,10 @@ public class EditFightDialogController implements Initializable {
     GUIUtilities.FillNumberComboBox(SecondFencerPointsComboBox, 0, 30);
   }
 
-  public void SetData (iRound fight, iTournament tournament) {
+  public void SetData (iRound fight, iTournament tournament, ArrayList<String> fencerNames) {
     Fight = fight;
     Tournament = tournament;
+    FencerNames = fencerNames;
     updateData();
   }
 
@@ -75,13 +77,9 @@ public class EditFightDialogController implements Initializable {
       try {
         iFencer firstFencer = Fight.getFencer().get(0);
         iFencer secondFencer = Fight.getFencer().get(1);
-        ArrayList<String> fencerNames = new ArrayList<>();
-        for (iFencer fencer : Tournament.getAllParticipants()) {
-          fencerNames.add(fencer.getFullName());
-        }
-        FirstFencerComboBox.getItems().setAll(fencerNames);
-        SecondFencerComboBox.getItems().setAll(fencerNames);
-        for (String name : fencerNames) {
+        FirstFencerComboBox.getItems().setAll(FencerNames);
+        SecondFencerComboBox.getItems().setAll(FencerNames);
+        for (String name : FencerNames) {
           if (name.equals(firstFencer.getFullName())) {
             FirstFencerComboBox.getSelectionModel().select(name);
           }
@@ -96,9 +94,6 @@ public class EditFightDialogController implements Initializable {
         FirstFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(0)));
         SecondFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(1)));
         FightFinishedCheckBox.setSelected(Fight.isFinished());
-      }
-      catch (SQLException ex) {
-        LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
       catch (ObjectDeprecatedException ex) {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
@@ -134,6 +129,14 @@ public class EditFightDialogController implements Initializable {
 
         if (allValuesOk) {
           try {
+            if(!Fight.getFencer().contains(firstFencer)
+                || !Fight.getFencer().contains(secondFencer))
+            {
+                Fight.removeParticipant(Fight.getFencer().get(0));
+                Fight.removeParticipant(Fight.getFencer().get(0));
+                Fight.addParticipant(firstFencer);
+                Fight.addParticipant(secondFencer);
+            }
             Fight.setPoints(firstFencer, firstFencerPoints);
             Fight.setPoints(secondFencer, secondFencerPoints);
             Fight.setTime(round, lane);
@@ -144,10 +147,7 @@ public class EditFightDialogController implements Initializable {
           }
         }
       }
-      catch (NumberFormatException ex) {
-
-      }
-      catch (SQLException ex) {
+      catch (NumberFormatException| SQLException ex) {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
       finally {

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
@@ -60,6 +61,8 @@ public class GroupTableController implements Initializable {
     FencingSchoolTableColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
     GroupTableView.setFixedCellSize(25);
     GroupTableView.prefHeightProperty().bind(GroupTableView.fixedCellSizeProperty().multiply(Bindings.size(GroupTableView.getItems()).add(1.01)));
+    WinsTableColumn.setComparator(GUIUtilities::CompareWinsStrings);
+    PointsTableColumn.setComparator(GUIUtilities::ComparePointsStrings);
   }
 
   public void SetGroupName (String groupName) {
@@ -82,7 +85,7 @@ public class GroupTableController implements Initializable {
     }
   }
 
-  public void AddFencers (List<iFencer> fencers) {
+  public void AddFencers (List<iFencer> fencers) { 
     ObservableList items = GroupTableView.getItems();
     for (iFencer fencer : fencers) {
       FencerPresenter fencerPresenter = new FencerPresenter(fencer, Tournament);
@@ -90,5 +93,10 @@ public class GroupTableController implements Initializable {
         items.add(fencerPresenter);
       }
     }
+    GroupTableView.getSortOrder().clear();
+    WinsTableColumn.setSortType(TableColumn.SortType.DESCENDING);
+    PointsTableColumn.setSortType(TableColumn.SortType.DESCENDING);
+    GroupTableView.getSortOrder().add(WinsTableColumn);
+    GroupTableView.getSortOrder().add(PointsTableColumn);
   }
 }

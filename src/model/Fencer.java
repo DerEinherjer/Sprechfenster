@@ -113,32 +113,32 @@ public class Fencer implements iFencer {
 
   @Override
   public void setName (String name) throws SQLException {
-    sync.fencerSetName(name, ID);
-    this.name = name;
+      this.name = name;
+      sync.fencerSetName(name, ID);
   }
 
   @Override
   public void setFamilyName (String name) throws SQLException {
-    sync.fencerSetFamilyName(name, ID);
     this.familyName = name;
+    sync.fencerSetFamilyName(name, ID);
   }
 
   @Override
   public void setBirthday (String date) throws SQLException {
-    sync.fencerSetBirthday(date, ID);
     this.birthday = date;
+    sync.fencerSetBirthday(date, ID);
   }
 
   @Override
   public void setFencingSchool (String school) throws SQLException {
-    sync.fencerSetFencingSchool(school, ID);
     this.fencingSchool = school;
+    sync.fencerSetFencingSchool(school, ID);
   }
 
   @Override
   public void setNationality (String nation) throws SQLException {
-    sync.fencerSetNationality(nation, ID);
     this.nationality = nation;
+    sync.fencerSetNationality(nation, ID);   
   }
 
   @Override

@@ -89,6 +89,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     private iTournament Tournament;
     private ArrayList<ArrayList<iFinalround>> RoundToFights;
     private ArrayList<String> FencerNames;
+    
+    private final ArrayList<TournamentBracketController> BracketControllers = new ArrayList<TournamentBracketController>();;
 
     private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
     private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1, 1);
@@ -175,9 +177,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 Logger.getLogger(TournamentEliminationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        updateRounds();
-        updateTableTabData();
-        updateBracketTabData();
+        updateAll();
 
     }
 
@@ -201,7 +201,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
 
     @FXML
     private void handleCreateEliminiationRoundsButtonAction(ActionEvent event) {
-        if (Tournament != null) {
+        if (Tournament != null) { 
             try {
                 Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
                         "Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?",
@@ -209,6 +209,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 Optional<ButtonType> result = confirmationDialog.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.YES) {
                     Tournament.finishPreliminary();
+                    updateAll();
                 }
             } catch (SQLException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
@@ -217,6 +218,13 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    private void updateAll()
+    {
+        updateRounds();
+        updateTableTabData();
+        createBracketTabData();
     }
 
     private void updateTableTabData() {
@@ -257,12 +265,18 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         }
     }
 
-    private void updateBracketTabData() {
+    private void createBracketTabData() {
+        for(TournamentBracketController controller : BracketControllers)
+        {
+            controller.deleteObserver(this);
+        }
+        BracketControllers.clear();
         BracketViewHBox.getChildren().clear();
         if (Tournament != null) {
             final int finalRounds = Tournament.getFinalRounds();
             int round = 0;
-            boolean isLastRound = false;
+            boolean isLastRound;
+            boolean firstPlaceMatch = false;
             int spacingBetweenBrackets = 1;
             int spacingForFirstBracket = 0;
             for (int i = finalRounds - 1; i >= 0; i--) {
@@ -273,6 +287,11 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 Label roundTitle = new Label("Runde " + round);
                 roundMatchesBox.getChildren().add(roundTitle);
                 int numberOfMatchesInRound = (int) Math.pow(2, i);
+                if(isLastRound)
+                {
+                    //add one match for the third place
+                    numberOfMatchesInRound++;
+                }
                 for (int j = 0; j < numberOfMatchesInRound; j++) {
                     try {
                         if (j == 0) {
@@ -284,23 +303,53 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                             if (isLastRound) {
                                 Label matchTitle = new Label("Finale");
                                 roundMatchesBox.getChildren().add(matchTitle);
+                                firstPlaceMatch = true;
                             }
                         } else {
-                            //apply spacing between two matches
-                            for (int x = 0; x < spacingBetweenBrackets; x++) {
-                                addVerticalSpacer(roundMatchesBox);
-                            }
                             if (isLastRound) {
+                                //Small fixed spacing between final match and match for third place
+                                addVerticalSpacer(roundMatchesBox);
                                 Label matchTitle = new Label("3. Platz");
                                 roundMatchesBox.getChildren().add(matchTitle);
+                                firstPlaceMatch = false;
+                            }
+                            else
+                            {
+                                //apply spacing between two matches
+                                for (int x = 0; x < spacingBetweenBrackets; x++) {
+                                    addVerticalSpacer(roundMatchesBox);
+                                }  
                             }
                         }
                         iFinalround fight = null;
                         int roundIndex = round - 1;
-                        if (RoundToFights.size() < roundIndex && RoundToFights.get(roundIndex).size() < j) {
-                            RoundToFights.get(roundIndex).get(j);
+                        if (roundIndex < RoundToFights.size() && j < RoundToFights.get(roundIndex).size()) {
+                            if(isLastRound)
+                            {
+                                //special handling for last round: make sure the final match appears under the correct label,
+                                //and the third place match appears below it (also under its own label)
+                                for(iFinalround match : RoundToFights.get(roundIndex))
+                                {
+                                    if(firstPlaceMatch && match.getFinalRound() != -1)
+                                    {
+                                        //first place match has a final round != -1
+                                        fight = match;
+                                    }
+                                    else if(!firstPlaceMatch && match.getFinalRound() == -1)
+                                    {
+                                        //third place match has final round == -1
+                                        fight = match;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                fight = RoundToFights.get(roundIndex).get(j);
+                            }
                         }
                         TournamentBracketController bracketController = addBracketForFight(fight, roundMatchesBox);
+                        BracketControllers.add(bracketController);
+                        bracketController.addObserver(this);
                     } catch (IOException e) {
                         LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
                     }
@@ -338,10 +387,16 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     public void update(Observable o, Object o1) {
         if (o1 instanceof Sync.change) {
             if (((Sync.change) o1) == Sync.change.beganFinalPhase) {
+               /* currently does not work as intended since notification is triggered before all data for the final phase is available
                 updateRounds();
                 updateTableTabData();
-                updateBracketTabData();
+                createBracketTabData();*/
             }
+        }
+        if(o instanceof TournamentBracketController)
+        {
+            updateTableTabData();
+            createBracketTabData();
         }
     }
 

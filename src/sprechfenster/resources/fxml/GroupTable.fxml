@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
 
-<TitledPane fx:id="MainPane" animated="false" text="untitled" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.GroupTableController">
+<TitledPane fx:id="MainPane" animated="false" text="untitled" xmlns="http://javafx.com/javafx/8.0.101" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.GroupTableController">
   <content>
     <TableView fx:id="GroupTableView">
       <columns>
         <TableColumn fx:id="FencerNameTableColumn" prefWidth="150.0" text="Fechter" />
-        <TableColumn fx:id="WinsTableColumn" prefWidth="47.0" text="Siege" />
-        <TableColumn fx:id="PointsTableColumn" prefWidth="48.0" text="Punkte" />
+        <TableColumn fx:id="WinsTableColumn" prefWidth="60.0" text="Siege" />
+        <TableColumn fx:id="PointsTableColumn" prefWidth="65.0" text="Punkte" />
         <TableColumn fx:id="FencingSchoolTableColumn" prefWidth="150.0" text="Fechtschule" />
       </columns>
     </TableView>

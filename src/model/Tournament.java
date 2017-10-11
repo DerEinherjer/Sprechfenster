@@ -769,41 +769,39 @@ public class Tournament implements iTournament {
   }
 
   private void setTimingForFinals () throws SQLException, ObjectDeprecatedException {
-    int round = 1;
-    for (int i = 0;; i++) {
-      List<iFinalround> matchOfRound = new ArrayList<>();
-      //get all matches for this round of the final
-      for (iFinalround match : getAllFinalrounds()) {
-        if (match.getFinalRound() == i) {
-          matchOfRound.add(match);
+    int matchRound = 1;
+    int lane = 1;
+    List<iFinalround> allMatches = getAllFinalrounds();
+    List<iFinalround> matchesOfRound = new ArrayList<iFinalround>();
+    for(int finalRound = 1; finalRound <= allMatches.size(); finalRound++)
+    {
+        for(iFinalround match : allMatches)
+        {
+            matchesOfRound.clear();
+            if(match.getFinalRound() == finalRound)
+            {
+                matchesOfRound.add(match);
+                match.setTime(matchRound, lane);
+                lane++;
+                if(lane > getLanes())
+                {
+                    lane = 1;
+                    matchRound++;
+                }
+            }
         }
-      }
-
-      if (matchOfRound.size() == 1) {
-        for (iFinalround match : getAllFinalrounds()) {
-          if (match.getFinalRound() == -1) {
-            match.setTime(round, 1);
-            break;
-          }
+        if(matchesOfRound.size() == 1)
+        {
+            //the last final round has only one match (the final match).
+            //Additionally there is the match for third place, find it and 
+            //schedule it for the round after the final match
+            for (iFinalround match : allMatches) {
+                if (match.getFinalRound() == -1) {
+                    match.setTime(matchRound, 1);
+                    break;
+                }
+            }
         }
-        round++;
-        matchOfRound.get(0).setTime(round, 1);
-
-        return;
-      }
-
-      int lane = 1;
-      for (iFinalround match : matchOfRound) {
-        match.setTime(round, lane);
-        lane++;
-        if (lane > getLanes()) {
-          lane = 1;
-          round++;
-        }
-
-      }
-      round++;
-      lane = 1;
     }
   }
 

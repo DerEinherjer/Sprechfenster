@@ -231,8 +231,11 @@ public class TournamentParticipantsController implements Initializable {
           List<FencerPresenter> selectedFencers = new ArrayList<FencerPresenter>();
           selectedFencers.addAll(FencerSelection.GetSelectedFencers());
           for (FencerPresenter fencerPresenter : selectedFencers) {
-            if (!participants.contains(fencerPresenter.getFencer())) {
-              Tournament.addParticipant(fencerPresenter.getFencer());
+            if(fencerPresenter != null)
+            {
+                if (!participants.contains(fencerPresenter.getFencer())) {
+                  Tournament.addParticipant(fencerPresenter.getFencer());
+                }
             }
           }
           UpdateParticipantsList();
