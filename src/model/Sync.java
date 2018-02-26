@@ -306,8 +306,8 @@ public class Sync extends iSync {
     notifyObservers(change.createdPreliminary);
   }
 
-  public void setFinishedPreliminary (Tournament t) throws SQLException {
-    con.setFinishedPreliminary(t);
+  public void setFinishedPreliminary (Tournament t, boolean finished) throws SQLException {
+    con.setFinishedPreliminary(t, finished);
     setChanged();
     notifyObservers(change.beganFinalPhase);
   }
