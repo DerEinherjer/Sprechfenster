@@ -347,6 +347,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
 
         FencerTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        DeleteTournamentButton.setVisible(false);
+        
         SetupOverview();
         UpdateOverview();
 

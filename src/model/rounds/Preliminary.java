@@ -171,10 +171,7 @@ public class Preliminary extends Round implements iPreliminary {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
-      return;
-    } //TODO Finished trotzdem löschen??
-
+    
     if (finished) //This is needet in case finished rounds will be deletable
     {
       setFinished(false);
