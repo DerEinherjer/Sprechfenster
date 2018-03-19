@@ -524,7 +524,7 @@ public class Tournament implements iTournament {
 
   private void setFinishedPreliminary () throws SQLException {
     if (allPreliminaryFinished()) {
-      sync.setFinishedPreliminary(this);
+      sync.setFinishedPreliminary(this, true);
       finishedPreliminary = true;
     }
 
@@ -889,6 +889,23 @@ public class Tournament implements iTournament {
     return false;
   }
 
+  @Override
+  public boolean reversToPreliminary() throws SQLException
+  {
+      if(finishedPreliminary)
+      {
+          sync.setFinishedPreliminary(this, false);
+          finishedPreliminary = false;
+          
+          Finalround.deleteAllFinalRoundsOfTournament(this);
+          return true;
+      }
+      else
+      {
+          return false;
+      }
+  }
+  
   @Override
   public void delete () throws SQLException {
     if (!isValid) {

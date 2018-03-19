@@ -74,6 +74,8 @@ public interface iTournament {
   public List<iScore>[] getScoresInGroups () throws SQLException;
 
   public boolean finishPreliminary () throws SQLException, ObjectDeprecatedException;
+  
+  public boolean reversToPreliminary() throws SQLException;
 
   public boolean isPreliminaryFinished ();
 

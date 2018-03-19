@@ -11,6 +11,7 @@ import model.rounds.iFinalround;
 import model.rounds.iPreliminary;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -339,6 +340,12 @@ public class TournamentTest {
           scores.add(instance.getScoreFromPrelim(match.getFencer().get(0)));
           scores.add(instance.getScoreFromPrelim(match.getFencer().get(1)));
         }
+        
+        Collections.sort(scores);//Sort the list so that equal scores always behind each other
+                                 //so that they will end up in that same category
+        
+        
+        //This will put als same scores in one category
         List<List<Score>> categories = new ArrayList<>();
         for (Score score : scores) {
           if (categories.size() > 0 && categories.get(categories.size() - 1).get(0).equals(score)) {
@@ -349,34 +356,66 @@ public class TournamentTest {
             categories.get(categories.size() - 1).add(score);
           }
         }
+        
         for (iFinalround match : matchesOfRound) {
-          int indexF0 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(0)));
-          int indexF1 = scores.indexOf(instance.getScoreFromPrelim(match.getFencer().get(1)));
-          int startF0 = 0;
-          int endF0 = 0;
-          int startF1 = 0;
-          int endF1 = 0;
-          for (int c = 0; c < categories.size(); c++) {
-            if (startF0 + categories.get(c).size() >= indexF0) {
-              endF0 = startF0 + categories.get(c).size();
-              break;
-            }
-            else {
-              startF0 += categories.get(c).size();
-            }
+          Score scoreF0 = instance.getScoreFromPrelim(match.getFencer().get(0));
+          Score scoreF1 = instance.getScoreFromPrelim(match.getFencer().get(1));
+          int indexF0 = scores.indexOf(scoreF0);
+          int indexF1 = scores.indexOf(scoreF1);
+          int startF0 = -1;
+          int endF0 = -1;
+          int startF1 = -1;
+          int endF1 = -1;
+          
+          //The following part calculates witch possition the fencer could have (1 for unic scores more if more tahn 1 fencer has the same score)
+          //startFX is the first possible index -1
+          //endFX is the last possible index
+          for (int c = 0; c < categories.size(); c++)
+          {
+              if(endF0 == -1)
+              {
+                  if(categories.get(c).get(0).equals(scoreF0))
+                  {
+                      endF0 = startF0 + categories.get(c).size();
+                  }
+                  else
+                  {
+                      startF0 += categories.get(c).size();
+                  }
+              }
+              
+              if(endF1 == -1)
+              {
+                  if(categories.get(c).get(0).equals(scoreF1))
+                  {
+                      endF1 = startF1 + categories.get(c).size();
+                  }
+                  else
+                  {
+                      startF1 += categories.get(c).size();
+                  }
+              }
           }
-          for (int c = 0; c < categories.size(); c++) {
-            if (startF1 + categories.get(c).size() >= indexF1) {
-              endF1 = startF0 + categories.get(c).size();
-              break;
-            }
-            else {
-              startF1 += categories.get(c).size();
-            }
+          
+          //The following loop checks if ther is a possible mutation of the score list in witch the the two fencer are paired
+          //The rule for pairing is: first vs last; second vs prelast; ...
+          boolean found=false;
+          for(int index = 0; index < scores.size(); index++)
+          {
+              if(index>startF0&&index<=endF0)
+              {
+                  if(scores.size()-index>startF1&&scores.size()-index<=endF1)
+                  {
+                      found =true;
+                      break;
+                  }
+              }
           }
-          assertTrue((!(endF0 < startF1)) && (!(startF0 > endF1)));
+          assert(found);
+     
         }
       }
+      
       //With the number of final rounds set to n,
       //the first round must have 2^(n-1) matches, second round 2^(n-2), ...
       assertEquals((int) Math.pow(2, numberOfFinalRounds - i), matchesOfRound.size());
@@ -439,7 +478,6 @@ public class TournamentTest {
   private void CheckAndFinishFinalround (iFinalround match, int lanes) throws Exception {
     assertEquals(2, match.getFencer().size());
     assertTrue(match.getFencer().get(0) != match.getFencer().get(1));
-    System.out.println(match.getLane() + "\t" + lanes);
     assertTrue(match.getLane() > 0 && match.getLane() <= lanes);
 
     if (match.getPrerounds().size() == 2) {
