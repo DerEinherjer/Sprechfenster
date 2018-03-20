@@ -5,17 +5,34 @@
  */
 package sprechfenster;
 
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Level;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import model.iTournament;
 
 /**
  *
  * @author Stefan
  */
 public class GUIUtilities {
+    public static boolean IsTournamentStarted(iTournament tournament) throws SQLException
+    {
+        return (tournament.isPreliminaryFinished() || tournament.getPreliminaryCount() > 0 && tournament.preliminaryWithoutTiming() == 0);
+    }
+    
+    public static boolean ShowConfirmationDialog(String message) {
+        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
+                message,
+                ButtonType.YES, ButtonType.NO);
+        Optional<ButtonType> result = confirmationDialog.showAndWait();
+        return(result.isPresent() && result.get() == ButtonType.YES);
+    }
 
     public static void FillNumberComboBox(ComboBox box, int startNumber, int maxNumber) {
         ArrayList<String> numbers = new ArrayList<>(maxNumber);
@@ -57,9 +74,9 @@ public class GUIUtilities {
             int scoredHits2 = Integer.parseInt(scoredHitsString2);
             int result = Integer.compare(scoredHits1, scoredHits2);
             if (result == 0) {
-                String receivedHitsString1 = pointsString1.substring(pointsString1.indexOf("/")+1);
+                String receivedHitsString1 = pointsString1.substring(pointsString1.indexOf("/") + 1);
                 int receivedHits1 = Integer.parseInt(receivedHitsString1);
-                String receivedHitsString2 = pointsString2.substring(pointsString2.indexOf("/")+1);
+                String receivedHitsString2 = pointsString2.substring(pointsString2.indexOf("/") + 1);
                 int receivedHits2 = Integer.parseInt(receivedHitsString2);
                 result = Integer.compare(receivedHits2, receivedHits1);//inverse order since less received hits is better
             }

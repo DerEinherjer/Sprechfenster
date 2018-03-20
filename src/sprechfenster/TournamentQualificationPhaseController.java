@@ -79,7 +79,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     GroupsBox.getChildren().clear();
     if (Tournament != null) {
       try {
-        CreateQualificationRoundsButton.setDisable(Tournament.preliminaryWithoutTiming() == 0 || Tournament.isPreliminaryFinished());
+        CreateQualificationRoundsButton.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
         
         if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
           List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();

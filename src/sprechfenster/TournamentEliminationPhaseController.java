@@ -203,18 +203,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     private void handleCreateEliminiationRoundsButtonAction(ActionEvent event) {
         if (Tournament != null) { 
             try {
-                Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
-                        "Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?",
-                        ButtonType.YES, ButtonType.NO);
-                Optional<ButtonType> result = confirmationDialog.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.YES) {
+                boolean confirmed = GUIUtilities.ShowConfirmationDialog("Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?");
+                if (confirmed) {
                     Tournament.finishPreliminary();
                     updateAll();
                 }
-            } catch (SQLException ex) {
-                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-            } catch (ObjectDeprecatedException ex) //finishPreliminary wirf neue Exception hab das hier mal abgefangen
-            {
+            } catch (SQLException|ObjectDeprecatedException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }

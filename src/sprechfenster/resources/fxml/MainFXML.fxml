@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane id="MainAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="778.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.MainFXMLController">
   <children>
@@ -26,6 +29,7 @@
             <Button fx:id="ShowParticipantsButton" mnemonicParsing="false" onAction="#handleShowParticipantsButtonAction" text="Teilnehmer" />
             <Button fx:id="ShowGroupsButton" mnemonicParsing="false" onAction="#handleShowGroupsButtonAction" text="Vorgruppen" />
             <Button fx:id="ShowFinalRoundsButton" mnemonicParsing="false" onAction="#handleShowFinalRoundsButtonAction" text="Finalrunden" />
+            <Button fx:id="DropOutFencerButton" mnemonicParsing="false" onAction="#handleDropOutFencerButtonAction" text="Fechter ausscheiden" />
             <Button fx:id="DeleteFencerButton" mnemonicParsing="false" onAction="#handleDeleteFencerButtonAction" text="Fechter löschen" />
             <Button fx:id="DeleteTournamentButton" mnemonicParsing="false" onAction="#handleDeleteTournamentButtonAction" text="Turnier löschen" />
           </items>

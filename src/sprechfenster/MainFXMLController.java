@@ -19,6 +19,7 @@ import java.util.Observer;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -84,6 +85,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     @FXML
     Button DeleteFencerButton;
     @FXML
+    Button DropOutFencerButton;
+    @FXML
     Button DeleteTournamentButton;
 
     @FXML
@@ -115,7 +118,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     private TournamentQualificationPhaseController QualificationPhaseController;
     private TournamentEliminationPhaseController EliminationPhaseController;
     private iTournament ActiveTournament;
-    
+
     @Override
     public ObservableList<FencerPresenter> GetSelectedFencers() {
         return FencerTableView.getSelectionModel().getSelectedItems();
@@ -191,12 +194,10 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         items.add(DeleteFencerButton);
         items.add(DeleteTournamentButton);
         ActiveTournament = null;
-        if(EliminationPhaseController != null)
-        {
+        if (EliminationPhaseController != null) {
             EliminationPhaseController.SetTournament(null);
         }
-        if(QualificationPhaseController != null)
-        {
+        if (QualificationPhaseController != null) {
             QualificationPhaseController.SetTournament(null);
         }
     }
@@ -214,8 +215,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
                 TournamentParticipantsController.setFencerSelectionInterface(this);
                 TournamentParticipantsController.setTournament(tournament);
                 LeftContentAnchorPane.getChildren().add(tournamentPlanningView);
-                SetupToolbarForActiveTournament();
                 ActiveTournament = tournament;
+                SetupToolbarForActiveTournament();
             } catch (IOException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
@@ -262,7 +263,9 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         items.add(NewFencerButton);
         items.add(ShowParticipantsButton);
         items.add(ShowGroupsButton);
-        items.add(ShowFinalRoundsButton);
+        items.add(ShowFinalRoundsButton); 
+        items.add(DropOutFencerButton);
+        UpdateDropOutButtonState();
     }
 
     @FXML
@@ -278,17 +281,34 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             stage.showAndWait();
             UpdateOverview();
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
+        }
+    }
+
+    @FXML
+    private void handleDropOutFencerButtonAction(ActionEvent event) {
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/DropOutFencerDialog.fxml"));
+            root = loader.load();
+            DropOutFencerDialogController controller = loader.<DropOutFencerDialogController>getController();
+            controller.setTournament(ActiveTournament);
+            Stage stage = new Stage();
+            stage.setTitle("Fechter ausscheiden");
+            stage.setScene(new Scene(root));
+            stage.initOwner(DropOutFencerButton.getScene().getWindow());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            UpdateOverview();
+        } catch (IOException e) {
+            LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
         }
     }
 
     @FXML
     private void handleDeleteTournamentButtonAction(ActionEvent event) {
-        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
-                "Sollen die ausgewählten Turniere wirklich gelöscht werden?",
-                ButtonType.YES, ButtonType.NO);
-        Optional<ButtonType> result = confirmationDialog.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.YES) {
+        boolean confirmed = GUIUtilities.ShowConfirmationDialog("Sollen die ausgewählten Turniere wirklich gelöscht werden?");
+        if (confirmed) {
             for (TournamentPresenter presenter : TournamentTableView.getSelectionModel().getSelectedItems()) {
                 try {
                     presenter.getTournament().delete();
@@ -302,11 +322,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
 
     @FXML
     private void handleDeleteFencerButtonAction(ActionEvent event) {
-        Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
-                "Sollen die ausgewählten Fechter wirklich gelöscht werden?",
-                ButtonType.YES, ButtonType.NO);
-        Optional<ButtonType> result = confirmationDialog.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.YES) {
+        boolean confirmed = GUIUtilities.ShowConfirmationDialog("Sollen die ausgewählten Fechter wirklich gelöscht werden?");
+        if (confirmed) {
             for (FencerPresenter presenter : FencerTableView.getSelectionModel().getSelectedItems()) {
                 try {
                     presenter.getFencer().delete();
@@ -348,7 +365,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         FencerTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         DeleteTournamentButton.setVisible(false);
-        
+
         SetupOverview();
         UpdateOverview();
 
@@ -384,6 +401,16 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
             TournamentTableView.getItems().setAll(tournaments);
         } catch (SQLException ex) {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void UpdateDropOutButtonState() {
+        if (ActiveTournament != null) {
+            try {
+                DropOutFencerButton.setDisable(!GUIUtilities.IsTournamentStarted(ActiveTournament));
+            } catch (SQLException ex) {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
