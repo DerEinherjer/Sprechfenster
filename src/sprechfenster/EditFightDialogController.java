@@ -129,13 +129,12 @@ public class EditFightDialogController implements Initializable {
 
         if (allValuesOk) {
           try {
-            if(!Fight.getFencer().contains(firstFencer)
-                || !Fight.getFencer().contains(secondFencer))
-            {
-                Fight.removeParticipant(Fight.getFencer().get(0));
-                Fight.removeParticipant(Fight.getFencer().get(0));
-                Fight.addParticipant(firstFencer);
-                Fight.addParticipant(secondFencer);
+            if (!Fight.getFencer().contains(firstFencer)
+                    || !Fight.getFencer().contains(secondFencer)) {
+              Fight.removeParticipant(Fight.getFencer().get(0));
+              Fight.removeParticipant(Fight.getFencer().get(0));
+              Fight.addParticipant(firstFencer);
+              Fight.addParticipant(secondFencer);
             }
             Fight.setPoints(firstFencer, firstFencerPoints);
             Fight.setPoints(secondFencer, secondFencerPoints);
@@ -147,7 +146,7 @@ public class EditFightDialogController implements Initializable {
           }
         }
       }
-      catch (NumberFormatException| SQLException ex) {
+      catch (NumberFormatException | SQLException ex) {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
       finally {

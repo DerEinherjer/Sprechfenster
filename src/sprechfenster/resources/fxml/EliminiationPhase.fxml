@@ -21,39 +21,40 @@
         <FlowPane fx:id="FencersPane" prefHeight="398.0" prefWidth="433.0" prefWrapLength="1.0E12" />
       </content>
     </ScrollPane>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab fx:id="TableTab" text="Gefechtstabelle">
-               <content>
-                  <AnchorPane fx:id="FightsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                     <children>
-                        <Button fx:id="CreateEliminationRoundsButton" layoutX="14.0" layoutY="2.0" mnemonicParsing="false" onAction="#handleCreateEliminationRoundsButtonAction" prefHeight="25.0" prefWidth="104.0" text="Finale beginnen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="2.0" />
-                        <Button fx:id="AbortEliminationRoundsButton" layoutX="128.0" layoutY="2.0" mnemonicParsing="false" onAction="#handleAbortEliminationRoundsButtonAction" text="Finale abbrechen" />
-                        <TableView fx:id="FightsTableView" editable="true" prefHeight="398.0" prefWidth="501.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-24.0" AnchorPane.topAnchor="30.0">
-                           <columns>
-                              <TableColumn fx:id="FinishedTableColumn" prefWidth="75.0" text="Beendet" />
-                              <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
-                              <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
-                              <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
-                              <TableColumn fx:id="FirstFencerTableColumn" prefWidth="164.0" text="Fechter A" />
-                              <TableColumn fx:id="FirstFencerPointsTableColumn" prefWidth="60.0" text="Punkte A" />
-                              <TableColumn fx:id="SecondFencerTableColumn" prefWidth="136.0" text="Fechter B" />
-                              <TableColumn fx:id="SecondFencerPointsTableColumn" prefWidth="55.0" text="Punkte B" />
-                           </columns>
-                        </TableView>
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-          <Tab fx:id="BracketTab" text="Baumansicht">
-               <content>
-                  <ScrollPane fx:id="BracketTabScrollPane">
-                     <content>
-                        <HBox fx:id="BracketViewHBox" prefHeight="100.0" prefWidth="200.0" />
-                     </content></ScrollPane>
-               </content>
-            </Tab>
-        </tabs>
-      </TabPane>
+    <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+      <tabs>
+        <Tab fx:id="TableTab" text="Gefechtstabelle">
+          <content>
+            <AnchorPane fx:id="FightsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+              <children>
+                <Button fx:id="CreateEliminationRoundsButton" layoutX="14.0" layoutY="2.0" mnemonicParsing="false" onAction="#handleCreateEliminationRoundsButtonAction" prefHeight="25.0" prefWidth="104.0" text="Finale beginnen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="2.0" />
+                <Button fx:id="AbortEliminationRoundsButton" layoutX="128.0" layoutY="2.0" mnemonicParsing="false" onAction="#handleAbortEliminationRoundsButtonAction" text="Finale abbrechen" />
+                <TableView fx:id="FightsTableView" editable="true" prefHeight="398.0" prefWidth="501.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-24.0" AnchorPane.topAnchor="30.0">
+                  <columns>
+                    <TableColumn fx:id="FinishedTableColumn" prefWidth="75.0" text="Beendet" />
+                    <TableColumn fx:id="EditTableColumn" prefWidth="75.0" text="Ändern" />
+                    <TableColumn fx:id="RoundTableColumn" prefWidth="42.0" text="Runde" />
+                    <TableColumn fx:id="LaneTableColumn" prefWidth="42.0" text="Bahn" />
+                    <TableColumn fx:id="FirstFencerTableColumn" prefWidth="164.0" text="Fechter A" />
+                    <TableColumn fx:id="FirstFencerPointsTableColumn" prefWidth="60.0" text="Punkte A" />
+                    <TableColumn fx:id="SecondFencerTableColumn" prefWidth="136.0" text="Fechter B" />
+                    <TableColumn fx:id="SecondFencerPointsTableColumn" prefWidth="55.0" text="Punkte B" />
+                  </columns>
+                </TableView>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab fx:id="BracketTab" text="Baumansicht">
+          <content>
+            <ScrollPane fx:id="BracketTabScrollPane">
+              <content>
+                <HBox fx:id="BracketViewHBox" prefHeight="100.0" prefWidth="200.0" />
+              </content>
+            </ScrollPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
   </items>
 </SplitPane>

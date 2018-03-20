@@ -153,14 +153,14 @@ public class QualificationFightTableController implements Initializable, Observe
   public void SetTournament (iTournament tournament) {
     Tournament = tournament;
     FencerNames = new ArrayList<String>();
-    if(Tournament != null)
-    {
+    if (Tournament != null) {
       try {
-          for (iFencer fencer : Tournament.getAllParticipants()) {
-              FencerNames.add(fencer.getFullName());
-          }
-      } catch (SQLException ex) {
-          Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
+        for (iFencer fencer : Tournament.getAllParticipants()) {
+          FencerNames.add(fencer.getFullName());
+        }
+      }
+      catch (SQLException ex) {
+        Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
   }

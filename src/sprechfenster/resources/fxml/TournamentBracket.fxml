@@ -6,13 +6,13 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane id="AnchorPane" fx:id="bracketAnchorPane" prefHeight="116.0" prefWidth="275.0" xmlns="http://javafx.com/javafx/8.0.101" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentBracketController">
-   <children>
-      <ComboBox fx:id="FirstFencerComboBox" layoutX="14.0" layoutY="28.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="202.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="15.0" />
-      <ComboBox fx:id="SecondFencerComboBox" layoutX="14.0" layoutY="93.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="202.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="5.0" />
-      <ComboBox fx:id="FirstFencerPointsComboBox" editable="true" layoutX="215.0" layoutY="25.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="40.0" promptText="0" AnchorPane.leftAnchor="215.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="15.0" />
-      <ComboBox fx:id="SecondFencerPointsComboBox" editable="true" layoutX="215.0" layoutY="105.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="40.0" promptText="0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="215.0" AnchorPane.rightAnchor="1.0" />
-      <CheckBox fx:id="FightFinishedCheckBox" layoutX="100.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleAnyAction" text="Gefecht beendet" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="49.0" />
-      <ComboBox fx:id="LaneComboBox" editable="true" layoutX="48.0" layoutY="70.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="50.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="35.0" AnchorPane.topAnchor="45.0" />
-      <Label fx:id="LaneLabel" layoutX="14.0" layoutY="74.0" prefWidth="27.0" text="Bahn" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="49.0" />
-   </children>
+  <children>
+    <ComboBox fx:id="FirstFencerComboBox" layoutX="14.0" layoutY="28.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="202.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="15.0" />
+    <ComboBox fx:id="SecondFencerComboBox" layoutX="14.0" layoutY="93.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="202.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="5.0" />
+    <ComboBox fx:id="FirstFencerPointsComboBox" editable="true" layoutX="215.0" layoutY="25.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="40.0" promptText="0" AnchorPane.leftAnchor="215.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="15.0" />
+    <ComboBox fx:id="SecondFencerPointsComboBox" editable="true" layoutX="215.0" layoutY="105.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="40.0" promptText="0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="215.0" AnchorPane.rightAnchor="1.0" />
+    <CheckBox fx:id="FightFinishedCheckBox" layoutX="100.0" layoutY="65.0" mnemonicParsing="false" onAction="#handleAnyAction" text="Gefecht beendet" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="49.0" />
+    <ComboBox fx:id="LaneComboBox" editable="true" layoutX="48.0" layoutY="70.0" onAction="#handleAnyAction" prefHeight="25.0" prefWidth="50.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="35.0" AnchorPane.topAnchor="45.0" />
+    <Label fx:id="LaneLabel" layoutX="14.0" layoutY="74.0" prefWidth="27.0" text="Bahn" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="49.0" />
+  </children>
 </AnchorPane>

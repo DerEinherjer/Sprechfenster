@@ -85,7 +85,7 @@ public class GroupTableController implements Initializable {
     }
   }
 
-  public void AddFencers (List<iFencer> fencers) { 
+  public void AddFencers (List<iFencer> fencers) {
     ObservableList items = GroupTableView.getItems();
     for (iFencer fencer : fencers) {
       FencerPresenter fencerPresenter = new FencerPresenter(fencer, Tournament);

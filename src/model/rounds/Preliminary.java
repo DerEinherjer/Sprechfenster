@@ -171,7 +171,7 @@ public class Preliminary extends Round implements iPreliminary {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    
+
     if (finished) //This is needet in case finished rounds will be deletable
     {
       setFinished(false);

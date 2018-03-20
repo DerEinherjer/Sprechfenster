@@ -42,7 +42,7 @@ public interface iTournament {
   public int getParticipantGroup (iFencer f) throws SQLException;
 
   public void removeParticipant (iFencer f) throws SQLException;
-  
+
   public void dropOut (iFencer f) throws SQLException;
 
   public void setEntryFee (iFencer f, boolean paid) throws SQLException;
@@ -76,8 +76,8 @@ public interface iTournament {
   public List<iScore>[] getScoresInGroups () throws SQLException;
 
   public boolean finishPreliminary () throws SQLException, ObjectDeprecatedException;
-  
-  public boolean reversToPreliminary() throws SQLException;
+
+  public boolean reversToPreliminary () throws SQLException;
 
   public boolean isPreliminaryFinished ();
 

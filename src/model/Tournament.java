@@ -773,35 +773,30 @@ public class Tournament implements iTournament {
     int lane = 1;
     List<iFinalround> allMatches = getAllFinalrounds();
     List<iFinalround> matchesOfRound = new ArrayList<iFinalround>();
-    for(int finalRound = 1; finalRound <= allMatches.size(); finalRound++)
-    {
-        for(iFinalround match : allMatches)
-        {
-            matchesOfRound.clear();
-            if(match.getFinalRound() == finalRound)
-            {
-                matchesOfRound.add(match);
-                match.setTime(matchRound, lane);
-                lane++;
-                if(lane > getLanes())
-                {
-                    lane = 1;
-                    matchRound++;
-                }
-            }
+    for (int finalRound = 1; finalRound <= allMatches.size(); finalRound++) {
+      for (iFinalround match : allMatches) {
+        matchesOfRound.clear();
+        if (match.getFinalRound() == finalRound) {
+          matchesOfRound.add(match);
+          match.setTime(matchRound, lane);
+          lane++;
+          if (lane > getLanes()) {
+            lane = 1;
+            matchRound++;
+          }
         }
-        if(matchesOfRound.size() == 1)
-        {
-            //the last final round has only one match (the final match).
-            //Additionally there is the match for third place, find it and 
-            //schedule it for the round after the final match
-            for (iFinalround match : allMatches) {
-                if (match.getFinalRound() == -1) {
-                    match.setTime(matchRound, 1);
-                    break;
-                }
-            }
+      }
+      if (matchesOfRound.size() == 1) {
+        //the last final round has only one match (the final match).
+        //Additionally there is the match for third place, find it and 
+        //schedule it for the round after the final match
+        for (iFinalround match : allMatches) {
+          if (match.getFinalRound() == -1) {
+            match.setTime(matchRound, 1);
+            break;
+          }
         }
+      }
     }
   }
 
@@ -890,22 +885,19 @@ public class Tournament implements iTournament {
   }
 
   @Override
-  public boolean reversToPreliminary() throws SQLException
-  {
-      if(finishedPreliminary)
-      {
-          sync.setFinishedPreliminary(this, false);
-          finishedPreliminary = false;
-          
-          Finalround.deleteAllFinalRoundsOfTournament(this);
-          return true;
-      }
-      else
-      {
-          return false;
-      }
+  public boolean reversToPreliminary () throws SQLException {
+    if (finishedPreliminary) {
+      sync.setFinishedPreliminary(this, false);
+      finishedPreliminary = false;
+
+      Finalround.deleteAllFinalRoundsOfTournament(this);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
-  
+
   @Override
   public void delete () throws SQLException {
     if (!isValid) {

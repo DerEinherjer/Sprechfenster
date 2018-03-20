@@ -971,7 +971,7 @@ class DBConnector {
 
   void setFinishedPreliminary (Tournament t, boolean finished) throws SQLException {
     if (sfpStmt == null) {
-      String sql = "UPDATE Turniere SET InFinalrunden = "+finished+" WHERE ID = ?;";
+      String sql = "UPDATE Turniere SET InFinalrunden = " + finished + " WHERE ID = ?;";
       sfpStmt = con.prepareStatement(sql);
     }
 

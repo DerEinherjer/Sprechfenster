@@ -80,7 +80,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     if (Tournament != null) {
       try {
         CreateQualificationRoundsButton.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
-        
+
         if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
           List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
           if (qualificationFights != null) {

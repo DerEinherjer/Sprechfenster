@@ -113,8 +113,8 @@ public class Fencer implements iFencer {
 
   @Override
   public void setName (String name) throws SQLException {
-      this.name = name;
-      sync.fencerSetName(name, ID);
+    this.name = name;
+    sync.fencerSetName(name, ID);
   }
 
   @Override
@@ -138,7 +138,7 @@ public class Fencer implements iFencer {
   @Override
   public void setNationality (String nation) throws SQLException {
     this.nationality = nation;
-    sync.fencerSetNationality(nation, ID);   
+    sync.fencerSetNationality(nation, ID);
   }
 
   @Override

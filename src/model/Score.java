@@ -81,13 +81,16 @@ public class Score implements iScore {
       }
     }
   }
-  
+
   @Override
-  public boolean equals(Object o)
-  {
-      if(!(o instanceof Score)) return false;
-      if(this.compareTo((Score)o)==0) return true;
+  public boolean equals (Object o) {
+    if (!(o instanceof Score)) {
       return false;
+    }
+    if (this.compareTo((Score) o) == 0) {
+      return true;
+    }
+    return false;
   }
 
   public String toString () {
