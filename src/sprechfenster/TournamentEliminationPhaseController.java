@@ -59,6 +59,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     @FXML
     Button CreateEliminationRoundsButton;
     @FXML
+    Button AbortEliminationRoundsButton;
+    @FXML
     FlowPane FencersPane;
     @FXML
     Tab BracketTab;
@@ -198,17 +200,38 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
             }
         }
     }
-
+    
     @FXML
-    private void handleCreateEliminiationRoundsButtonAction(ActionEvent event) {
+    private void handleCreateEliminationRoundsButtonAction(ActionEvent event) {
         if (Tournament != null) { 
             try {
                 boolean confirmed = GUIUtilities.ShowConfirmationDialog("Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?");
                 if (confirmed) {
+                    System.out.println("ok");
                     Tournament.finishPreliminary();
+                System.out.println("finisched");
                     updateAll();
                 }
             } catch (SQLException|ObjectDeprecatedException ex) {
+                LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+                System.out.println("exc2");
+            }
+        }
+    }
+    
+    @FXML
+    private void handleAbortEliminationRoundsButtonAction(ActionEvent event) {
+        if (Tournament != null) { 
+            try {
+                Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
+                        "Alle bisherigen Finalrunden-Ergebnisse werden gelöscht. Fortfahren?",
+                        ButtonType.YES, ButtonType.NO);
+                Optional<ButtonType> result = confirmationDialog.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.YES) {
+                    Tournament.reversToPreliminary();
+                    updateAll();
+                }
+            } catch (SQLException ex) {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
             }
         }
@@ -245,6 +268,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
 
                 StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
                 CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
+                AbortEliminationRoundsButton.setDisable(!Tournament.isPreliminaryFinished());
                 int maxRound = 0;
                 for (iFinalround finalRound : Tournament.getAllFinalrounds()) {
                     maxRound = Math.max(maxRound, finalRound.getRound());
