@@ -88,13 +88,12 @@ public class TournamentBracketController extends Observable implements Initializ
           secondFencer = fencer;
         }
       }
-      if (!Fight.getFencer().contains(firstFencer)
-              || !Fight.getFencer().contains(secondFencer)) {
-        Fight.removeParticipant(Fight.getFencer().get(0));
-        Fight.removeParticipant(Fight.getFencer().get(0));
-        Fight.addParticipant(firstFencer);
-        Fight.addParticipant(secondFencer);
-      }
+      if (!Fight.getFencer().contains(firstFencer)) {
+              Fight.switchParticipantOut(Fight.getFencer().get(0), firstFencer);
+            }
+            if (!Fight.getFencer().contains(secondFencer)) {
+              Fight.switchParticipantOut(Fight.getFencer().get(1), secondFencer);
+            }
       if (Fight.getPoints(firstFencer) != firstFencerPoints) {
         Fight.setPoints(firstFencer, firstFencerPoints);
       }

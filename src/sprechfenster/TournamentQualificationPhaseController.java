@@ -153,7 +153,13 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   public void update (Observable o, Object o1) {
     if (o1 instanceof Sync.change) {
       Sync.change changeType = (Sync.change) o1;
-      if (changeType == Sync.change.createdPreliminary) {
+      if (changeType == Sync.change.createdPreliminary
+              || changeType == Sync.change.changedPreliminary
+              || changeType == Sync.change.finishedPreliminary
+              || changeType == Sync.change.unfinishedFinalround
+              || changeType == Sync.change.unfinishedPreliminary
+              || changeType == Sync.change.changedFencerValue
+              ) {
         UpdateData();
       }
     }
