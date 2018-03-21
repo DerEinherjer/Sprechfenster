@@ -559,6 +559,7 @@ public class Tournament implements iTournament {
         }
       }
 
+      Collections.sort(wildcards);
       //If need%groups != 0: take the best, out of all groups, who are
       //not participating in the finals yet
       for (int i = 0; i < (numberOfFinalists % groups); i++) {
