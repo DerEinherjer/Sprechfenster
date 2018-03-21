@@ -70,7 +70,7 @@ public class NewFencerDialogController implements Initializable {
    */
   @Override
   public void initialize (URL url, ResourceBundle rb) {
-    FencingSchoolComboBox.getItems().addAll("7 Schwerter", "Krîfon", "Asteria", "Schwert und Bogen", "Der Fechtboden", "Institut für Stabfechten");
+    FencingSchoolComboBox.getItems().addAll("7 Schwerter", "Krîfon", "Asteria", "Schwert und Bogen", "Der Fechtboden", "Institut für Stabfechten", "TG Münster");
     FencingSchoolComboBox.getSelectionModel().selectFirst();
     NationalityComboBox.getItems().addAll("Deutschland", "Österreich", "Schweiz");
     NationalityComboBox.getSelectionModel().selectFirst();

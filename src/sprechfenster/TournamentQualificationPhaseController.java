@@ -19,6 +19,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,10 +38,14 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   @FXML
   VBox GroupsBox;
   @FXML
-  VBox FightsBox;
+  VBox FightsPerGroupBox;
+  @FXML
+  VBox FightsPerLaneBox;
 
   @FXML
-  Button CreateQualificationRoundsButton;
+  Button CreateQualificationRoundsButton1;
+  @FXML
+  Button CreateQualificationRoundsButton2;
 
   private iTournament Tournament;
   private final ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
@@ -75,11 +80,13 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   private void UpdateData () {
     GroupControllers.clear();
     FightControllers.clear();
-    FightsBox.getChildren().clear();
+    FightsPerGroupBox.getChildren().clear();
+    FightsPerLaneBox.getChildren().clear();
     GroupsBox.getChildren().clear();
     if (Tournament != null) {
       try {
-        CreateQualificationRoundsButton.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
+        CreateQualificationRoundsButton1.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
+        CreateQualificationRoundsButton2.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
 
         if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
           List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
@@ -96,13 +103,14 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                 GroupControllers.add(groupController);
                 GroupsBox.getChildren().add(groupTable);
 
-                loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationFightTable.fxml"));
-                Node fightTable = loader.load();
-                QualificationFightTableController fightController = loader.getController();
+                QualificationFightTableController fightController = CreateAndInsertFightTable(FightsPerGroupBox);
                 fightController.SetGroupNumber(groupNumber);
                 fightController.SetTournament(Tournament);
-                FightControllers.add(fightController);
-                FightsBox.getChildren().add(fightTable);
+              }
+              for (int laneNumber = 1; laneNumber <= Tournament.getLanes(); laneNumber++) {
+                QualificationFightTableController fightController = CreateAndInsertFightTable(FightsPerLaneBox);
+                fightController.SetLaneNumber(laneNumber);
+                fightController.SetTournament(Tournament);
               }
             }
             catch (IOException ex) {
@@ -149,6 +157,22 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     }
   }
 
+  private QualificationFightTableController CreateAndInsertFightTable (VBox parent) {
+    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationFightTable.fxml"));
+    try {
+      Node fightTable = loader.load();
+      QualificationFightTableController fightController = loader.getController();
+      fightController.SetTournament(Tournament);
+      FightControllers.add(fightController);
+      parent.getChildren().add(fightTable);
+      return fightController;
+    }
+    catch (IOException ex) {
+      LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+    }
+    return null;
+  }
+
   @Override
   public void update (Observable o, Object o1) {
     if (o1 instanceof Sync.change) {
@@ -158,8 +182,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
               || changeType == Sync.change.finishedPreliminary
               || changeType == Sync.change.unfinishedFinalround
               || changeType == Sync.change.unfinishedPreliminary
-              || changeType == Sync.change.changedFencerValue
-              ) {
+              || changeType == Sync.change.changedFencerValue) {
         UpdateData();
       }
     }

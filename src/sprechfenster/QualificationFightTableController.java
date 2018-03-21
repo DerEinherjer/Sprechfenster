@@ -74,6 +74,7 @@ public class QualificationFightTableController implements Initializable, Observe
   private iTournament Tournament;
   private ArrayList<String> FencerNames;
   private int GroupNumber;
+  private int LaneNumber;
   private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToPointsConverter = new LimitedIntegerStringConverter(Integer.MAX_VALUE, 0);
@@ -167,7 +168,15 @@ public class QualificationFightTableController implements Initializable, Observe
 
   public void SetGroupNumber (int groupNumber) {
     GroupNumber = groupNumber;
+    LaneNumber = Integer.MIN_VALUE;
     MainPane.setText("Gruppe " + Integer.toString(groupNumber));
+  }
+  
+  public void SetLaneNumber (int laneNumber)
+  {
+    LaneNumber = laneNumber;
+    GroupNumber = Integer.MIN_VALUE;
+    MainPane.setText("Bahn " + Integer.toString(LaneNumber));
   }
 
   public void SetFights (List<iPreliminary> qualificationFights) {
@@ -176,7 +185,7 @@ public class QualificationFightTableController implements Initializable, Observe
       int MaxRound = 0;
       for (iPreliminary qualificationFight : qualificationFights) {
         try {
-          if (qualificationFight.getGroup() == GroupNumber) {
+          if (qualificationFight.getGroup() == GroupNumber ||qualificationFight.getLane() == LaneNumber) {
             MaxRound = Math.max(MaxRound, qualificationFight.getRound());
             FightsTableView.getItems().add(new FightPresenter(qualificationFight));
           }
