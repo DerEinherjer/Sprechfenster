@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Sync;
 
 public class Preliminary extends Round implements iPreliminary {
   // -----
@@ -128,6 +129,8 @@ public class Preliminary extends Round implements iPreliminary {
         t.addGotHitPrelim(fencer2, pointsFor1);
 
         sync.setPrelimFinished(this, finished);
+        setChanged();
+        notifyObservers(Sync.change.finishedPreliminary);
       }
       else {
         if (pointsFor1 > pointsFor2) {
@@ -145,6 +148,8 @@ public class Preliminary extends Round implements iPreliminary {
         t.addGotHitPrelim(fencer2, -pointsFor1);
 
         sync.setPrelimFinished(this, finished);
+        setChanged();
+        notifyObservers(Sync.change.unfinishedPreliminary);
       }
     }
   }

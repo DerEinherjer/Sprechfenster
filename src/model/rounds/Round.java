@@ -12,12 +12,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
 /**
  *
  * @author deus
  */
-public abstract class Round {
+public abstract class Round extends Observable {
 
   public static String getSQLString () {
     return "CREATE TABLE IF NOT EXISTS Vorrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
@@ -76,6 +77,8 @@ public abstract class Round {
     this.pointsFor1 = (Integer) set.get("PunkteVon1".toUpperCase());
     this.pointsFor2 = (Integer) set.get("PunkteVon2".toUpperCase());
     this.finished = (Boolean) set.get("Beendet".toUpperCase());
+    
+    sync.observeThis(this);
   }
 
   public int getID () throws ObjectDeprecatedException {
@@ -139,6 +142,8 @@ public abstract class Round {
     if (sync.setTime(this, round, lane)) {
       this.round = round;
       this.lane = lane;
+      setChanged();
+      notifyObservers(Sync.change.changedPreliminary);
       return true;
     }
     return false;
@@ -160,7 +165,9 @@ public abstract class Round {
     //set points in sync AFTER setting points in this object, since 
     //the sync also triggers the update notification for the observers!
     sync.setPoints(ID, ((Fencer) f).getID(), points);
-
+    
+    setChanged();
+    notifyObservers(Sync.change.changedPreliminary);
   }
 
   public int getPoints (iFencer f) throws ObjectDeprecatedException {
@@ -227,6 +234,8 @@ public abstract class Round {
       sync.removeParticipantFromPrelim(this, (Fencer) f);
       fencer1 = null;
       pointsFor1 = 0;
+      setChanged();
+      notifyObservers(Sync.change.changedPreliminary);
       return true;
     }
     else {
@@ -234,6 +243,8 @@ public abstract class Round {
         sync.removeParticipantFromPrelim(this, (Fencer) f);
         fencer2 = null;
         pointsFor2 = 0;
+        setChanged();
+        notifyObservers(Sync.change.changedPreliminary);
         return true;
       }
     }
@@ -251,12 +262,16 @@ public abstract class Round {
     if (fencer1 == null) {
       sync.addParticipantToPrelim(this, (Fencer) f);
       fencer1 = (Fencer) f;
+      setChanged();
+      notifyObservers(Sync.change.changedPreliminary);
       return true;
     }
     else {
       if (fencer2 == null) {
         sync.addParticipantToPrelim(this, (Fencer) f);
         fencer2 = (Fencer) f;
+        setChanged();
+        notifyObservers(Sync.change.changedPreliminary);
         return true;
       }
     }
@@ -275,6 +290,8 @@ public abstract class Round {
       sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
       fencer1 = (Fencer) in;
       pointsFor1 = 0;
+      setChanged();
+      notifyObservers(Sync.change.changedPreliminary);
       return true;
     }
     else {
@@ -282,6 +299,8 @@ public abstract class Round {
         sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
         fencer2 = (Fencer) in;
         pointsFor2 = 0;
+        setChanged();
+        notifyObservers(Sync.change.changedPreliminary);
         return true;
       }
     }
@@ -320,6 +339,8 @@ public abstract class Round {
         yellowFor2 = count;
       }
     }
+    setChanged();
+    notifyObservers(Sync.change.changedCards);
   }
 
   public void setRed (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
@@ -340,6 +361,8 @@ public abstract class Round {
         redFor2 = count;
       }
     }
+    setChanged();
+    notifyObservers(Sync.change.changedCards);
   }
 
   public void setBlack (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
@@ -360,6 +383,8 @@ public abstract class Round {
         blackFor2 = count;
       }
     }
+    setChanged();
+    notifyObservers(Sync.change.changedCards);
   }
 
   public int getYellow (iFencer f) throws ObjectDeprecatedException {

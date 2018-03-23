@@ -405,7 +405,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   @Override
   public void update (Observable o, Object o1) {
     if (o1 instanceof Sync.change) {
-      if (((Sync.change) o1) == Sync.change.beganFinalPhase) {
+      if (((Sync.change) o1) == Sync.change.finishedPreliminary||((Sync.change) o1) == Sync.change.finishedFinalround||((Sync.change) o1) == Sync.change.unfinishedPreliminary||((Sync.change) o1) == Sync.change.unfinishedFinalround) {
         /* currently does not work as intended since notification is triggered before all data for the final phase is available
                 updateRounds();
                 updateTableTabData();

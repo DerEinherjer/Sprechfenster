@@ -870,11 +870,11 @@ class DBConnector {
 
   void removeFinalround (int finalRoundID) throws SQLException {
     if (rfrStmt1 == null) {
-      String sql = "SELECT FinalStrucktur FROM Vorrunden WHERE TurnierID = ? AND FinalStrucktur != -1;";
+      String sql = "SELECT FinalStrucktur FROM Vorrunden WHERE ID = ? AND FinalStrucktur != -1;";
       rfrStmt1 = con.prepareStatement(sql);
 
-      sql = "DELETE FROM Vorrunden WHERE TurnierID = ? AND FinalStrucktur != -1;";
-      rfrStmt1 = con.prepareStatement(sql);
+      sql = "DELETE FROM Vorrunden WHERE ID = ? AND FinalStrucktur != -1;";
+      rfrStmt2 = con.prepareStatement(sql);
 
       sql = "DELETE FROM Finalrunden WHERE ID = ?;";
       rfrStmt3 = con.prepareStatement(sql);
@@ -882,19 +882,15 @@ class DBConnector {
 
     rfrStmt1.setInt(1, finalRoundID);
     ResultSet rs = rfrStmt1.executeQuery();
-    List<Integer> ids = new ArrayList<>();
-    while (rs.next()) {
-      ids.add(rs.getInt("FinalStrucktur"));
-    }
+    rs.next();
+    int id = rs.getInt("FinalStrucktur");
     rs.close();
 
     rfrStmt2.setInt(1, finalRoundID);
     rfrStmt2.executeUpdate();
 
-    for (Integer id : ids) {
-      rfrStmt3.setInt(1, id);
-      rfrStmt3.executeUpdate();
-    }
+    rfrStmt3.setInt(1, id);
+    rfrStmt3.executeUpdate();
   }
 
   private PreparedStatement lapStmt = null;//gapStmt allread in use -> LoadAllPreliminary -> lapStmt

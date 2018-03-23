@@ -152,9 +152,7 @@ public class FencerPresenter implements Observer {
       Sync.change changeType = (Sync.change) o1;
       if (changeType == Sync.change.changedFencerValue
               || changeType == Sync.change.finishedPreliminary
-              || changeType == Sync.change.unfinishedPreliminary
-              || changeType == Sync.change.finishedFinalround
-              || changeType == Sync.change.unfinishedFinalround) {
+              || changeType == Sync.change.unfinishedPreliminary) {
         UpdateData();
       }
     }

@@ -210,7 +210,7 @@ public class QualificationFightTableController implements Initializable, Observe
   public void update (Observable o, Object o1) {
     if (o1 instanceof Sync.change) {
       Sync.change changeType = (Sync.change) o1;
-      if (changeType == Sync.change.beganFinalPhase) {
+      if (changeType == Sync.change.finishedPreliminary) {
         UpdateStatus();
       }
     }

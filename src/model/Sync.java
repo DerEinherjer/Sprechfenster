@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Sync extends iSync {
+public class Sync extends iSync implements Observer {
 
   private DBConnector con;
 
@@ -28,7 +30,6 @@ public class Sync extends iSync {
     finishedFinalround,
     unfinishedPreliminary,
     unfinishedFinalround,
-    beganFinalPhase,
   }
 
   public void setDatabaseSavePoint () throws SQLException {
@@ -137,32 +138,22 @@ public class Sync extends iSync {
 
   void tournamentSetName (String name, int id) throws SQLException {
     con.tournamentSetName(name, id);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   void tournamentSetDate (String date, int id) throws SQLException {
     con.tournamentSetDate(date, id);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   void tournamentSetGroups (int groups, int id) throws SQLException {
     con.tournamentSetGroups(groups, id);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   void tournamentSetFinalRounds (int rounds, int id) throws SQLException {
     con.tournamentSetFinalRounds(rounds, id);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   void tournamentSetLanes (int lanes, int id) throws SQLException {
     con.tournamentSetLanes(lanes, id);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   int[] getGroupsMemberCount (Tournament t) throws SQLException {
@@ -175,32 +166,22 @@ public class Sync extends iSync {
 
   void fencerSetName (String name, int id) throws SQLException {
     con.fencerSetName(name, id);
-    setChanged();
-    notifyObservers(change.changedFencerValue);
   }
 
   void fencerSetFamilyName (String name, int id) throws SQLException {
     con.fencerSetFamilyName(name, id);
-    setChanged();
-    notifyObservers(change.changedFencerValue);
   }
 
   void fencerSetBirthday (String date, int id) throws SQLException {
     con.fencerSetBirthday(date, id);
-    setChanged();
-    notifyObservers(change.changedFencerValue);
   }
 
   void fencerSetFencingSchool (String school, int id) throws SQLException {
     con.fencerSetFencingSchool(school, id);
-    setChanged();
-    notifyObservers(change.changedFencerValue);
   }
 
   void fencerSetNationality (String nation, int id) throws SQLException {
     con.fencerSetNationality(nation, id);
-    setChanged();
-    notifyObservers(change.changedFencerValue);
   }
 
   int getParticipantGroup (Tournament t, Fencer f) throws SQLException {
@@ -209,14 +190,10 @@ public class Sync extends iSync {
 
   void setEntryFee (Tournament t, Fencer f, boolean paid) throws SQLException {
     con.setEntryFee(t, f, paid);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   void setEquipmentCheck (Tournament t, Fencer f, boolean checked) throws SQLException {
     con.setEquipmentCheck(t, f, checked);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   boolean getEntryFee (Tournament t, Fencer f) throws SQLException {
@@ -229,8 +206,6 @@ public class Sync extends iSync {
 
   void createFinalRounds (Tournament t) throws SQLException {
     con.createFinalRounds(t);
-    setChanged();
-    notifyObservers(change.changedTournamentValue);
   }
 
   int finalroundsCount (Tournament t) throws SQLException {
@@ -240,48 +215,30 @@ public class Sync extends iSync {
   public void removeParticipant (Fencer f) throws SQLException {
     Preliminary.deletePreliminarys(f);
     con.removeParticipant(f);
-
-    setChanged();
-    notifyObservers(change.removedParticipant);
   }
 
   void addParticipant (Tournament t, Fencer f, int group) throws SQLException {
     con.addParticipant(t, f, group);
-
-    setChanged();
-    notifyObservers(change.addedParticipant);
   }
 
   public boolean setTime (Round p, int round, int lane) throws SQLException {
-    boolean ret = con.setTime(p, round, lane);
-
-    setChanged();
-    notifyObservers(change.changedPreliminary);
-    return ret;
+    return con.setTime(p, round, lane);
   }
 
   public void setPoints (int id, int fencer, int points) throws SQLException {
     con.setPoints(id, fencer, points);
-    setChanged();
-    notifyObservers(change.changedPreliminary);
   }
 
   public void removeParticipantFromPrelim (Round p, Fencer f) throws SQLException {
     con.removeParticipantFromPrelim(p, f);
-    setChanged();
-    notifyObservers(change.changedPreliminary);
   }
 
   public void addParticipantToPrelim (Round p, Fencer f) throws SQLException {
     con.addParticipantToPrelim(p, f);
-    setChanged();
-    notifyObservers(change.changedPreliminary);
   }
 
   public void switchParticipantsInPrelim (Round p, Fencer out, Fencer in) throws SQLException {
     con.switchParticipantsInPrelim(p, out, in);
-    setChanged();
-    notifyObservers(change.changedPreliminary);
   }
 
   public void loadFinalround (int id) throws SQLException {
@@ -302,32 +259,22 @@ public class Sync extends iSync {
 
   void addPreliminary (Tournament t) throws SQLException {
     con.addPreliminary(t);
-    setChanged();
-    notifyObservers(change.createdPreliminary);
   }
 
   public void setFinishedPreliminary (Tournament t, boolean finished) throws SQLException {
     con.setFinishedPreliminary(t, finished);
-    setChanged();
-    notifyObservers(change.beganFinalPhase);
   }
 
   public void setYellowPrelim (Round p, Fencer f, int count) throws SQLException {
     con.setYellowPrelim(p, f, count);
-    setChanged();
-    notifyObservers(change.changedCards);
   }
 
   public void setRedPrelim (Round p, Fencer f, int count) throws SQLException {
     con.setRedPrelim(p, f, count);
-    setChanged();
-    notifyObservers(change.changedCards);
   }
 
   public void setBlackPrelim (Round p, Fencer f, int count) throws SQLException {
     con.setBlackPrelim(p, f, count);
-    setChanged();
-    notifyObservers(change.changedCards);
   }
 
   boolean getDropedOut (Tournament t, Fencer f) throws SQLException {
@@ -344,13 +291,6 @@ public class Sync extends iSync {
 
   public void setPrelimFinished (Round p, Boolean finished) throws SQLException, ObjectDeprecatedException {
     con.setPrelimFinished(p, finished);
-    setChanged();
-    if (finished) {
-      notifyObservers(change.finishedPreliminary);
-    }
-    else {
-      notifyObservers(change.unfinishedPreliminary);
-    }
   }
 
   public void deletePreliminaryFromDatabase (int id) throws SQLException {
@@ -367,5 +307,17 @@ public class Sync extends iSync {
 
   public void deleteTournamentFromDatabase (int tournamentID) throws SQLException {
     con.removeTournament(tournamentID);
+  }
+  
+  public void observeThis(Observable o)
+  {
+      o.addObserver(this);
+  }
+  
+  @Override
+  public void update(Observable o, Object arg) 
+  {
+      setChanged();
+      notifyObservers(arg);
   }
 }

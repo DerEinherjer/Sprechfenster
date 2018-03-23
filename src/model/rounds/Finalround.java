@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Sync;
 
 public class Finalround extends Round implements iFinalround {
 
@@ -41,19 +42,25 @@ public class Finalround extends Round implements iFinalround {
   }
 
   public static void deleteAllFinalRoundsOfTournament (Tournament tournamentToDelete) {
-    List<Finalround> roundsToDelete = new ArrayList<>();
-    roundsToDelete.addAll(finalrounds.values());
-    for (Finalround f : roundsToDelete) {
-      try {
-        if (f.getTournament().equals(tournamentToDelete)) {
-          finalrounds.remove(f.getID());
+    ArrayList<Finalround> toDelet = new ArrayList<>();
+    for (Map.Entry<Integer, Finalround> entry : finalrounds.entrySet()) 
+    {
+        Finalround f = entry.getValue();
+        try{
+            if(f.getTournament().equals(tournamentToDelete))
+            {
+                toDelet.add(f);
+            }
         }
-      }
-      catch (ObjectDeprecatedException ex) {
-        //Depricated Objectes can be ignored safely
-      }
+        catch(Exception e){System.out.println(e.getMessage());}
     }
-  }
+    for(Finalround f : toDelet)
+    {
+        try{
+        f.delete();
+        }catch(Exception e){System.out.println(e.getMessage());}
+    }
+   }
 
   public static String getSQLString () {
     return "CREATE TABLE IF NOT EXISTS Finalrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
@@ -113,8 +120,8 @@ public class Finalround extends Round implements iFinalround {
   @Override
   public void setFinished (boolean finish) throws SQLException, ObjectDeprecatedException {
     if (this.isFinished() != finish) {
-      finished = finish;
-      if (finished) {
+      if (!finished) {
+        finished = finish;
         if (winnersround != null) {
           winnersround.addParticipant(getWinner());
         }
@@ -131,6 +138,8 @@ public class Finalround extends Round implements iFinalround {
         t.addGotHitFinal(fencer2, pointsFor1);
 
         sync.setPrelimFinished(this, finished);
+        setChanged();
+        notifyObservers(Sync.change.finishedFinalround);
       }
       else {
         if (winnersround != null) {
@@ -139,8 +148,10 @@ public class Finalround extends Round implements iFinalround {
         if (losersround != null) {
           losersround.removeParticipant(getLoser());
         }
-
+        
+        System.out.println("ABZIEHEN");
         t.subWinFinal((Fencer) getWinner());
+        finished = finish;
 
         t.addHitsFinal(fencer1, -pointsFor1);
         t.addHitsFinal(fencer2, -pointsFor2);
@@ -149,6 +160,8 @@ public class Finalround extends Round implements iFinalround {
         t.addGotHitFinal(fencer2, -pointsFor1);
 
         sync.setPrelimFinished(this, finished);
+        setChanged();
+        notifyObservers(Sync.change.unfinishedFinalround);
       }
     }
   }

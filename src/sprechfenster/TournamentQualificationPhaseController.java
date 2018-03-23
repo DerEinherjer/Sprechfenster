@@ -180,7 +180,6 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
       if (changeType == Sync.change.createdPreliminary
               || changeType == Sync.change.changedPreliminary
               || changeType == Sync.change.finishedPreliminary
-              || changeType == Sync.change.unfinishedFinalround
               || changeType == Sync.change.unfinishedPreliminary
               || changeType == Sync.change.changedFencerValue) {
         UpdateData();

@@ -10,10 +10,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static model.rounds.Round.sync;
 
-public class Tournament implements iTournament {
+public class Tournament extends Observable implements iTournament {
   // -----
 
   private static Map<Integer, Tournament> tournaments = new HashMap<>();
@@ -86,7 +88,8 @@ public class Tournament implements iTournament {
       dropedOut.put((Fencer) f, sync.getDropedOut(this, (Fencer) f));
       equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
     }
-
+    
+    sync.observeThis(this);
   }
 
   @Override
@@ -123,12 +126,16 @@ public class Tournament implements iTournament {
   public void setName (String name) throws SQLException {
     sync.tournamentSetName(name, ID);
     this.name = name;
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
   public void setDate (String date) throws SQLException {
     sync.tournamentSetDate(date, ID);
     this.date = date;
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
@@ -152,6 +159,8 @@ public class Tournament implements iTournament {
     for (iFencer f : tmp) {
       addParticipant(f);
     }
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
@@ -162,6 +171,8 @@ public class Tournament implements iTournament {
 
     sync.tournamentSetFinalRounds(rounds, ID);
     this.numberFinalrounds = rounds;
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
@@ -177,6 +188,8 @@ public class Tournament implements iTournament {
     }
     sync.tournamentSetLanes(lanes, ID);
     this.lanes = lanes;
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
@@ -210,6 +223,8 @@ public class Tournament implements iTournament {
     scoresFinal.put((Fencer) f, new Score((Fencer) f));
     entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer) f));
     equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
+    setChanged();
+    notifyObservers(Sync.change.addedParticipant);
   }
 
   @Override
@@ -318,6 +333,9 @@ public class Tournament implements iTournament {
 
       scoresPrelim.remove((Fencer) f);
       scoresFinal.remove((Fencer) f);
+      
+      setChanged();
+      notifyObservers(Sync.change.removedParticipant);
     }
   }
 
@@ -325,13 +343,17 @@ public class Tournament implements iTournament {
   public void setEntryFee (iFencer f, boolean paid) throws SQLException {
     sync.setEntryFee(this, (Fencer) f, paid);
     entryFee.put((Fencer) f, paid);
-
+    
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
   public void setEquipmentCheck (iFencer f, boolean checked) throws SQLException {
     sync.setEquipmentCheck(this, (Fencer) f, checked);
     equipmentChecked.put((Fencer) f, checked);
+    setChanged();
+    notifyObservers(Sync.change.changedTournamentValue);
   }
 
   @Override
@@ -370,9 +392,12 @@ public class Tournament implements iTournament {
 
   public void subWinPrelim (Fencer f) throws SQLException {
     if (isParticipant(f)) {
+        
+    System.out.println("isParticipant==true");
       if (!scoresPrelim.containsKey(f)) {
         scoresPrelim.put(f, new Score(f));
       }
+    System.out.println("ok");
       scoresPrelim.get(f).subWin();
     }
   }
@@ -520,6 +545,8 @@ public class Tournament implements iTournament {
   @Override
   public void addPreliminary () throws SQLException {
     sync.addPreliminary(this);
+    setChanged();
+    notifyObservers(Sync.change.createdPreliminary);
   }
 
   private void setFinishedPreliminary () throws SQLException {
@@ -591,6 +618,9 @@ public class Tournament implements iTournament {
           Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
+      
+      setChanged();
+      notifyObservers(Sync.change.finishedPreliminary);
       return true;
     }
     else {
@@ -598,108 +628,6 @@ public class Tournament implements iTournament {
     }
   }
 
-  /*public boolean finishPreliminary() throws SQLException
-	{
-		if(allPreliminaryFinished())
-		{
-			createFinalrounds();
-			setFinishedPreliminary();
-			
-			int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
-			int wildcards = 0;
-			List<Finalround> leafFinalRounds = new ArrayList<>();
-			
-			List<iScore>[] groupScores = getScoresInGroups();
-			
-			//Find the round in the leaves of the tree and collect them in leafFinalRounds
-			for(Finalround finalRound : Finalround.getFinalrounds(this))
-			{
-				if(!finalRound.hasPrerounds())
-					leafFinalRounds.add(finalRound);
-			}
-			
-			int groupIndex;
-                        int roundIndex;
-                        int scoreIndex;
-                        iFinalround leafFinalRound;
-                        iScore fencerScore;
-			for(int i = 0; i< numberOfFinalists; i++)
-			{
-                            //we iterate through groups and scores in the following way:
-                            //take the best fencer score from each group until every group has been visited once.
-                            //The first fencer is added to the first round, the second fencer to the second, and so on.
-                            //then take the second best fencer score from each group until every group has been visited twice.
-                            //And so on until we have enough fencers for the Finalists.
-                            //If we can't get a score from a group because it doesn't have enough, we add a wildcard.
-                            //The wildcard score is taken from a different group later (if posssible). Otherwise, it's a free win wildcard.
-                            
-                            //this index iterates through the groups
-                            groupIndex = i%groups;
-                            //this index is 0 for the first iteration through the groups, 1 for the second, etc.
-                            scoreIndex = i/groups;
-                            //this index iterates through the final rounds. We add 1 to i to mix the different groups.
-                            //Otherwise it could happen that if two fencers from the same group advance into the finals,
-                            //they would have to fight each other in the first round.
-                            roundIndex = (i+1)%leafFinalRounds.size();  
-                            
-                            if(groupScores[groupIndex].size()>scoreIndex)//if group has enough scores
-                                {
-                                    leafFinalRound = leafFinalRounds.get(roundIndex);
-                                    fencerScore = groupScores[groupIndex].get(scoreIndex);
-                                    try 
-                                    {
-                                        leafFinalRound.addParticipant(fencerScore.getFencer());
-                                    } 
-                                    catch (ObjectDeprecatedException ex) 
-                                    {
-                                        //A deleted finalround is still in the finalround hash.
-                                        Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-				else
-                                {
-                                    //else we need to get a fencer from a different group later. Or add a free win if no fencer is available.
-                                    wildcards++;
-                                }
-			}
-			
-			//Sort everyone out who is allready in the finals
-			for(int i = 0; i<numberOfFinalists-wildcards; i++)
-				if(groupScores[i%groups].size()>i/groups)
-					groupScores[i%groups].remove(groupScores[i%groups].get(i/groups));
-			
-			List<iScore> wilds = new ArrayList<>();
-			
-			//Collect everyone who is NOT in the final in wilds
-			for(int i = 0; i< groups; i++)
-				for(int c = 0; c < groupScores[i].size(); c++)
-					wilds.add(groupScores[i].get(c));
-			
-			//Get from all who are not allready in the final those who have the best hit-gotHit
-			for(int i = 0; i < wildcards; i++)
-			{
-				int best = 0;
-				for(int c = 1; c < wilds.size(); c ++)
-					if(wilds.get(best).getHitDifference()<wilds.get(c).getHitDifference())
-						best = c;
-				
-				int c = 0;
-				while(!leafFinalRounds.get(c++).addParticipant(wilds.get(best).getFencer()));
-			}
-			
-			for(Finalround tmp : leafFinalRounds)
-			{
-				if(tmp.getFencer().size()>0)
-					scoresFinal.put((Fencer)tmp.getFencer().get(0), new Score((Fencer)tmp.getFencer().get(0)));
-				if(tmp.getFencer().size()>1)
-					scoresFinal.put((Fencer)tmp.getFencer().get(1), new Score((Fencer)tmp.getFencer().get(1)));
-			}
-			
-					
-                        return true;
-		}
-		return false;
-	}*/
   boolean allPreliminaryFinished () {
     for (Preliminary p : Preliminary.getPreliminarys(this)) {
       try {
@@ -892,6 +820,7 @@ public class Tournament implements iTournament {
       finishedPreliminary = false;
 
       Finalround.deleteAllFinalRoundsOfTournament(this);
+      notifyObservers(Sync.change.unfinishedPreliminary);
       return true;
     }
     else {

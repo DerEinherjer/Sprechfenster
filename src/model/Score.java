@@ -14,10 +14,12 @@ public class Score implements iScore {
 
   void addWin () {
     wins++;
+    System.out.println("Win++");
   }
 
   void subWin () {
     wins--;
+    System.out.println("Win--");
   }
 
   void addHits (int add) {

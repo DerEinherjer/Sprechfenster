@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+import static model.rounds.Round.sync;
 
-public class Fencer implements iFencer {
+public class Fencer extends Observable implements iFencer {
   // -----
 
   static Sync sync;
@@ -74,6 +76,8 @@ public class Fencer implements iFencer {
     this.birthday = (String) set.get("Geburtstag".toUpperCase());
     this.fencingSchool = (String) set.get("Fechtschule".toUpperCase());
     this.nationality = (String) set.get("Nationalitaet".toUpperCase());
+    
+    sync.observeThis(this);
   }
 
   @Override
@@ -115,30 +119,40 @@ public class Fencer implements iFencer {
   public void setName (String name) throws SQLException {
     this.name = name;
     sync.fencerSetName(name, ID);
+    setChanged();
+    notifyObservers(Sync.change.changedFencerValue);
   }
 
   @Override
   public void setFamilyName (String name) throws SQLException {
     this.familyName = name;
     sync.fencerSetFamilyName(name, ID);
+    setChanged();
+    notifyObservers(Sync.change.changedFencerValue);
   }
 
   @Override
   public void setBirthday (String date) throws SQLException {
     this.birthday = date;
     sync.fencerSetBirthday(date, ID);
+    setChanged();
+    notifyObservers(Sync.change.changedFencerValue);
   }
 
   @Override
   public void setFencingSchool (String school) throws SQLException {
     this.fencingSchool = school;
     sync.fencerSetFencingSchool(school, ID);
+    setChanged();
+    notifyObservers(Sync.change.changedFencerValue);
   }
 
   @Override
   public void setNationality (String nation) throws SQLException {
     this.nationality = nation;
     sync.fencerSetNationality(nation, ID);
+    setChanged();
+    notifyObservers(Sync.change.changedFencerValue);
   }
 
   @Override
