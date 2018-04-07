@@ -5,10 +5,11 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane fx:id="MainSplitPane" dividerPositions="0.34959349593495936" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
+<SplitPane fx:id="MainSplitPane" dividerPositions="0.34959349593495936" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="10.0" minWidth="10.0" prefHeight="768.0" prefWidth="1024.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sprechfenster.TournamentQualificationPhaseController">
   <items>
     <AnchorPane>
       <children>
@@ -21,11 +22,16 @@
     </AnchorPane>
       <TabPane>
          <tabs>
-            <Tab fx:id="GroupTab" text="Gruppenansicht">
+            <Tab fx:id="GroupsTab" text="Gruppenansicht">
                <content>
                 <AnchorPane fx:id="RightAnchorPane">
                   <children>
-                    <Button fx:id="CreateQualificationRoundsButton1" layoutX="14.0" layoutY="8.0" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="5.0" />
+                        <ToolBar layoutX="8.0" layoutY="10.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <items>
+                          <Button fx:id="CreateQualificationRoundsButton1" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
+                            <Button fx:id="PrintGroupsViewButton" mnemonicParsing="false" onAction="#HandlePrintGroupsViewButtonAction" text="Drucken" />
+                          </items>
+                        </ToolBar>
                     <ScrollPane fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
                       <content>
                         <VBox fx:id="FightsPerGroupBox" spacing="25.0" />
@@ -39,7 +45,12 @@
               <content>
                 <AnchorPane minHeight="10.0" minWidth="10.0">
                      <children>
-                        <Button fx:id="CreateQualificationRoundsButton2" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="5.0" />
+                        <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <items>
+                              <Button fx:id="CreateQualificationRoundsButton2" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
+                            <Button fx:id="PrintLanesViewButton" mnemonicParsing="false" onAction="#HandlePrintLanesViewButtonAction" text="Drucken" />
+                          </items>
+                        </ToolBar>
                         <ScrollPane fx:id="LanesTab1" fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
                            <content>
                               <VBox fx:id="FightsPerLaneBox" spacing="25.0" />

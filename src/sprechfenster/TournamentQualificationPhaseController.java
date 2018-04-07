@@ -20,13 +20,27 @@ import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.Printer;
+import javafx.print.PrinterJob;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 
 /**
  * FXML Controller class
@@ -46,10 +60,15 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   Button CreateQualificationRoundsButton1;
   @FXML
   Button CreateQualificationRoundsButton2;
+  @FXML
+  Button PrintGroupsViewButton;
+  @FXML
+  Button PrintLanesViewButton;
 
   private iTournament Tournament;
   private final ArrayList<GroupTableController> GroupControllers = new ArrayList<GroupTableController>();
-  private final ArrayList<QualificationFightTableController> FightControllers = new ArrayList<QualificationFightTableController>();
+  private final ArrayList<QualificationFightTableController> FightsPerGroupControllers = new ArrayList<QualificationFightTableController>();
+  private final ArrayList<QualificationFightTableController> FightsPerLaneControllers = new ArrayList<QualificationFightTableController>();
 
   /**
    * Initializes the groupController class.
@@ -77,9 +96,64 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     }
   }
 
+  @FXML
+  private void HandlePrintGroupsViewButtonAction (ActionEvent event) {
+    printTablesForFights(FightsPerGroupControllers);
+  }
+
+  @FXML
+  private void HandlePrintLanesViewButtonAction (ActionEvent event) {
+    printTablesForFights(FightsPerLaneControllers);
+  }
+
+  private void printTablesForFights (final ArrayList<QualificationFightTableController> tableControllers) {
+    Printer printer = Printer.getDefaultPrinter(); //get the default printer
+    PageLayout layout = printer.createPageLayout(Paper.A4, PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+    PrinterJob job = PrinterJob.createPrinterJob();
+    job.getJobSettings().setPageLayout(layout);
+    if (job.showPrintDialog(GroupsBox.getScene().getWindow())) {
+      for (QualificationFightTableController controller : tableControllers) {
+          job.getJobSettings().jobNameProperty().set(controller.GetTableTitle());
+          PrintOneTable(controller.GetTableViewForPrinting(), job);
+          job.endJob();
+          job = PrinterJob.createPrinterJob();
+          job.getJobSettings().setPageLayout(layout);
+      }
+    }
+  }
+
+  private void PrintOneTable (TableView table, PrinterJob job) {
+    PageLayout layout = job.getJobSettings().getPageLayout();
+    double pagePrintableWidth = layout.getPrintableWidth();
+    double pagePrintableHeight = layout.getPrintableHeight();
+
+    table.prefHeightProperty().bind(Bindings.size(table.getItems()).multiply(35));
+    table.minHeightProperty().bind(table.prefHeightProperty());
+    table.maxHeightProperty().bind(table.prefHeightProperty());
+
+    double scaleX = pagePrintableWidth / table.getBoundsInParent().getWidth();
+    double scaleY = scaleX; 
+    double localScale = scaleX; 
+    double numberOfPages = Math.ceil((table.getPrefHeight() * localScale) / pagePrintableHeight);
+
+    ObservableList<Transform> tableTransforms = table.getTransforms();
+    tableTransforms.add(new Scale(scaleX, (scaleY)));
+    tableTransforms.add(new Translate(0, 0));
+    Translate gridTransform = new Translate();
+    table.getTransforms().add(gridTransform);
+
+    for (int i = 0; i < numberOfPages; i++) {
+      gridTransform.setY(-i * (pagePrintableHeight / localScale));
+      job.printPage(layout, table);
+    }
+    //remove the three added transforms
+    tableTransforms.remove(tableTransforms.size()-3, tableTransforms.size());
+  }
+
   private void UpdateData () {
     GroupControllers.clear();
-    FightControllers.clear();
+    FightsPerGroupControllers.clear();
+    FightsPerLaneControllers.clear();
     FightsPerGroupBox.getChildren().clear();
     FightsPerLaneBox.getChildren().clear();
     GroupsBox.getChildren().clear();
@@ -103,14 +177,14 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                 GroupControllers.add(groupController);
                 GroupsBox.getChildren().add(groupTable);
 
-                QualificationFightTableController fightController = CreateAndInsertFightTable(FightsPerGroupBox);
+                QualificationFightTableController fightController = CreateFightTable(FightsPerGroupBox);
                 fightController.SetGroupNumber(groupNumber);
-                fightController.SetTournament(Tournament);
+                FightsPerGroupControllers.add(fightController);
               }
               for (int laneNumber = 1; laneNumber <= Tournament.getLanes(); laneNumber++) {
-                QualificationFightTableController fightController = CreateAndInsertFightTable(FightsPerLaneBox);
+                QualificationFightTableController fightController = CreateFightTable(FightsPerLaneBox);
                 fightController.SetLaneNumber(laneNumber);
-                fightController.SetTournament(Tournament);
+                FightsPerLaneControllers.add(fightController);
               }
             }
             catch (IOException ex) {
@@ -126,7 +200,10 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                 return -1;
               }
             });
-            for (QualificationFightTableController fightController : FightControllers) {
+            for (QualificationFightTableController fightController : FightsPerLaneControllers) {
+              fightController.SetFights(qualificationFights);
+            }
+            for (QualificationFightTableController fightController : FightsPerGroupControllers) {
               fightController.SetFights(qualificationFights);
             }
             for (iPreliminary qualificationFight : qualificationFights) {
@@ -157,13 +234,12 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
     }
   }
 
-  private QualificationFightTableController CreateAndInsertFightTable (VBox parent) {
+  private QualificationFightTableController CreateFightTable (VBox parent) {
     FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationFightTable.fxml"));
     try {
       Node fightTable = loader.load();
       QualificationFightTableController fightController = loader.getController();
       fightController.SetTournament(Tournament);
-      FightControllers.add(fightController);
       parent.getChildren().add(fightTable);
       return fightController;
     }
@@ -180,6 +256,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
       if (changeType == Sync.change.createdPreliminary
               || changeType == Sync.change.changedPreliminary
               || changeType == Sync.change.finishedPreliminary
+              || changeType == Sync.change.unfinishedFinalround
               || changeType == Sync.change.unfinishedPreliminary
               || changeType == Sync.change.changedFencerValue) {
         UpdateData();
