@@ -26,7 +26,7 @@ public class Test {
         t.addParticipant(fencers[i - 'A']);
       }
 
-      t.createPreliminaryTiming();
+      //t.createPreliminaryTiming();
       printSchedule(t.getPreliminarySchedule());
 
       int count = t.getPreliminaryCount();
@@ -60,10 +60,8 @@ public class Test {
       }
 
       System.out.println("Vorrunde wird beendet");
-      if (!t.finishPreliminary()) {
-        System.out.println("Konnte Prelim nicht abschließen.");
-        System.exit(-1);
-      }
+      t.startFinalrounds();
+      
       System.out.println("Vorrunde wurde beendet");
 
       System.out.println("Anzahl Finalrunden: " + t.getAllFinalrounds().size());

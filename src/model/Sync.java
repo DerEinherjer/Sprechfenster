@@ -261,8 +261,8 @@ public class Sync extends iSync implements Observer {
     con.addPreliminary(t);
   }
 
-  public void setFinishedPreliminary (Tournament t, boolean finished) throws SQLException {
-    con.setFinishedPreliminary(t, finished);
+  public void setTournamentStatus (Tournament t, int status) throws SQLException {
+    con.setTournamentStatus(t, status);
   }
 
   public void setYellowPrelim (Round p, Fencer f, int count) throws SQLException {
@@ -307,6 +307,11 @@ public class Sync extends iSync implements Observer {
 
   public void deleteTournamentFromDatabase (int tournamentID) throws SQLException {
     con.removeTournament(tournamentID);
+  }
+  
+  public void createPreliminaryFights(Tournament t) throws SQLException
+  {
+      con.createPreliminaryFights(t);
   }
   
   public void observeThis(Observable o)

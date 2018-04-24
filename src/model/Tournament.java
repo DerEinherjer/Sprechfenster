@@ -49,7 +49,16 @@ public class Tournament extends Observable implements iTournament {
   private Integer groups = null;
   private Integer numberFinalrounds = null;
   private Integer lanes = null;
-  private Boolean finishedPreliminary = null;
+  private Integer status = null;
+  /**
+   * 0  Preparing Phase         (Fencer Registration, ...)
+   * 1  Preliminary
+   * 2  Finalephase
+   * 3  Completed
+   */
+  
+  
+  //private Boolean finishedPreliminary = null;
   private Map<Fencer, Boolean> entryFee = new HashMap<>();
   private Map<Fencer, Boolean> equipmentChecked = new HashMap<>();
   private Map<Fencer, Score> scoresPrelim = new HashMap<>();
@@ -63,7 +72,8 @@ public class Tournament extends Observable implements iTournament {
             + "Gruppen int DEFAULT 2,"
             + "Finalrunden int DEFAULT 2,"
             + "Bahnen int DEFAULT 2,"
-            + "InFinalrunden BOOLEAN DEFAULT FALSE);";
+            + "Status int DEFAULT 0);";
+            //+ "InFinalrunden BOOLEAN DEFAULT FALSE);";
   }
 
   public Tournament (Map<String, Object> set) throws ObjectExistException, SQLException {
@@ -79,7 +89,8 @@ public class Tournament extends Observable implements iTournament {
     this.groups = (Integer) set.get("Gruppen".toUpperCase());
     this.numberFinalrounds = (Integer) set.get("Finalrunden".toUpperCase());
     this.lanes = (Integer) set.get("Bahnen".toUpperCase());
-    this.finishedPreliminary = (Boolean) set.get("InFinalrunden".toUpperCase());
+    this.status = (Integer) set.get("Status".toUpperCase());
+    //this.finishedPreliminary = (Boolean) set.get("InFinalrunden".toUpperCase());
 
     for (iFencer f : getAllParticipants()) {
       scoresPrelim.put((Fencer) f, new Score((Fencer) f));
@@ -90,6 +101,9 @@ public class Tournament extends Observable implements iTournament {
     }
     
     sync.observeThis(this);
+    
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.tournamentCreated));
   }
 
   @Override
@@ -127,7 +141,7 @@ public class Tournament extends Observable implements iTournament {
     sync.tournamentSetName(name, ID);
     this.name = name;
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
@@ -135,18 +149,20 @@ public class Tournament extends Observable implements iTournament {
     sync.tournamentSetDate(date, ID);
     this.date = date;
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
   public void setGroups (int groups) throws SQLException {
+    if(status != 0) return;
+      
     if (this.groups == groups) {
       return;
     }
 
     List<iFencer> tmp = new ArrayList<>();
     for (Fencer f : Fencer.getFencer(this)) {
-      if (getParticipantGroup(f) > groups || true) //TODO Mit Stefan verhalten abstimmen
+      if (getParticipantGroup(f) > groups || true) //TODO: Mit Stefan verhalten abstimmen
       {
         tmp.add(f);
         removeParticipant(f);
@@ -160,23 +176,23 @@ public class Tournament extends Observable implements iTournament {
       addParticipant(f);
     }
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
   public void setFinalRounds (int rounds) throws SQLException {
-    if (finishedPreliminary) {
-      return;
-    }
+    if(status != 0) return;
 
     sync.tournamentSetFinalRounds(rounds, ID);
     this.numberFinalrounds = rounds;
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
-  public void setLanes (int lanes) throws SQLException {
+  public void setLanes (int lanes) throws SQLException {  
+    if(status != 0) return;
+      
     for (Preliminary p : Preliminary.getPreliminarys(this)) {
       try {
         if (p.getLane() > lanes) {
@@ -189,7 +205,7 @@ public class Tournament extends Observable implements iTournament {
     sync.tournamentSetLanes(lanes, ID);
     this.lanes = lanes;
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
@@ -199,6 +215,8 @@ public class Tournament extends Observable implements iTournament {
 
   @Override
   public void addParticipant (iFencer f) throws SQLException {
+    if(status != 0) return;
+      
     if (!(f instanceof Fencer)) {
       return;
     }
@@ -213,7 +231,9 @@ public class Tournament extends Observable implements iTournament {
   }
 
   @Override
-  public void addParticipant (iFencer f, int group) throws SQLException {
+  public void addParticipant (iFencer f, int group) throws SQLException { 
+    if(status != 0) return;
+    
     if (!(f instanceof Fencer)) {
       return;
     }
@@ -224,7 +244,7 @@ public class Tournament extends Observable implements iTournament {
     entryFee.put((Fencer) f, sync.getEntryFee(this, (Fencer) f));
     equipmentChecked.put((Fencer) f, sync.getEquipmentCheck(this, (Fencer) f));
     setChanged();
-    notifyObservers(Sync.change.addedParticipant);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
@@ -244,39 +264,50 @@ public class Tournament extends Observable implements iTournament {
     return sync.isFencerParticipant(this, (Fencer) f);
   }
 
-  @Override
-  public void createPreliminaryTiming () throws SQLException {
+
+  private void createPreliminaryTiming () throws SQLException, ObjectDeprecatedException {
+    if(status != 0) return;
+    
     List<iPreliminary> prelim = getAllPreliminary();
-    Map<iPreliminary, Integer> lastForPrelim = new HashMap<>();
+    Map<iFencer, Integer> lastForPrelim = new HashMap<>();
 
     for (iPreliminary p : prelim) {
-      lastForPrelim.put(p, -1);
+      lastForPrelim.put(p.getFencer().get(0), -1);
+      lastForPrelim.put(p.getFencer().get(1), -1);
     }
 
-    for (int i = 0; !prelim.isEmpty(); i++) {
-      try {
-        iPreliminary next = prelim.get(0);
-        for (iPreliminary p : prelim) {
-          if (lastForPrelim.get(next) > lastForPrelim.get(p)) {
-            next = p;
-          }
+    //Iterate over every lane for every round until every fight has a timeing
+    for (int time = 1; !prelim.isEmpty(); time++) 
+    {
+        for(int lane = 1; lane <= this.lanes; lane++)
+        {
+            iPreliminary next = null;
+            int lastFight = Integer.MAX_VALUE;
+            
+            //Get match witch the fighter who waits the longest
+            for (iPreliminary p : prelim) 
+            {
+                int f1 = lastForPrelim.get(p.getFencer().get(0));
+                int f2 = lastForPrelim.get(p.getFencer().get(1));
+                //If one of the fighter already fight at this moment ignore the match
+                if(f1 != time && f2 != time)
+                {
+                    //Take the match whith the fencer who hasn't fought the longest
+                    if(f1 < lastFight || f2 < lastFight)
+                    {
+                        time = (f1<f2)? f1 : f2;
+                        next = p;
+                    }
+                }
+            }
+            if(next == null) break;//All not already places PrelimFights have a fighter who is already fighting at this point in time
+            
+            //Delete the match from the 
+            prelim.remove(next);
+            next.setTime(time, lane);
+            lastForPrelim.put(next.getFencer().get(0), time);
+            lastForPrelim.put(next.getFencer().get(1), time);
         }
-
-        if (lastForPrelim.get(next) == i / lanes) {
-          continue;
-        }
-
-        next.setTime((i / lanes) + 1, (i % lanes) + 1);
-
-        prelim.remove(next);
-        for (iPreliminary p : prelim) {
-          if (p.getFencer().contains(next.getFencer().get(0)) || p.getFencer().contains(next.getFencer().get(1))) {
-            lastForPrelim.put(p, i / lanes);
-          }
-        }
-      }
-      catch (ObjectDeprecatedException e) {
-      }
     }
   }
 
@@ -328,6 +359,8 @@ public class Tournament extends Observable implements iTournament {
 
   @Override
   public void removeParticipant (iFencer f) throws SQLException {
+    if(status != 0) return;
+    
     if (isParticipant(f)) {
       sync.removeParticipant((Fencer) f);
 
@@ -335,7 +368,7 @@ public class Tournament extends Observable implements iTournament {
       scoresFinal.remove((Fencer) f);
       
       setChanged();
-      notifyObservers(Sync.change.removedParticipant);
+      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
     }
   }
 
@@ -344,8 +377,9 @@ public class Tournament extends Observable implements iTournament {
     sync.setEntryFee(this, (Fencer) f, paid);
     entryFee.put((Fencer) f, paid);
     
+    
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
@@ -353,7 +387,7 @@ public class Tournament extends Observable implements iTournament {
     sync.setEquipmentCheck(this, (Fencer) f, checked);
     equipmentChecked.put((Fencer) f, checked);
     setChanged();
-    notifyObservers(Sync.change.changedTournamentValue);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   @Override
@@ -373,6 +407,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addWinPrelim (Fencer f) throws SQLException {
+    if(status != 1) return;
+    
     if (isParticipant(f)) {
       if (!scoresPrelim.containsKey(f)) {
         scoresPrelim.put(f, new Score(f));
@@ -382,6 +418,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addWinFinal (Fencer f) throws SQLException {
+    if(status != 2) return;
+    
     if (isParticipant(f)) {
       if (!scoresFinal.containsKey(f)) {
         scoresFinal.put(f, new Score(f));
@@ -391,6 +429,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void subWinPrelim (Fencer f) throws SQLException {
+    if(status != 1) return;
+    
     if (isParticipant(f)) {
         
     System.out.println("isParticipant==true");
@@ -403,6 +443,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void subWinFinal (Fencer f) throws SQLException {
+    if(status != 2) return;
+    
     if (isParticipant(f)) {
       if (!scoresFinal.containsKey(f)) {
         scoresFinal.put(f, new Score(f));
@@ -412,6 +454,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addHitsPrelim (Fencer f, int points) throws SQLException {
+    if(status != 1) return;
+    
     if (isParticipant(f)) {
       if (!scoresPrelim.containsKey(f)) {
         scoresPrelim.put(f, new Score(f));
@@ -421,6 +465,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addHitsFinal (Fencer f, int points) throws SQLException {
+    if(status != 2) return;
+    
     if (isParticipant(f)) {
       if (!scoresFinal.containsKey(f)) {
         scoresFinal.put(f, new Score(f));
@@ -430,6 +476,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addGotHitPrelim (Fencer f, int points) throws SQLException {
+    if(status != 1) return;
+    
     if (isParticipant(f)) {
       if (!scoresPrelim.containsKey(f)) {
         scoresPrelim.put(f, new Score(f));
@@ -439,6 +487,8 @@ public class Tournament extends Observable implements iTournament {
   }
 
   public void addGotHitFinal (Fencer f, int points) throws SQLException {
+    if(status != 2) return;
+    
     if (isParticipant(f)) {
       if (!scoresFinal.containsKey(f)) {
         scoresFinal.put(f, new Score(f));
@@ -527,105 +577,63 @@ public class Tournament extends Observable implements iTournament {
 			f = ((Finalround) f).getWinnerRound();
 		f.printTree();
 	}*/
-  @Override
-  public int preliminaryWithoutTiming () throws SQLException {
-    int ret = 0;
-    for (iPreliminary p : getAllPreliminary()) {
+
+  private void createFinalePairing () throws SQLException, ObjectDeprecatedException {
+    createFinalrounds();
+
+    List<iScore>[] groupScores = getScoresInGroups();
+    List<iScore> finalists = new ArrayList<>();
+    List<iScore> wildcards = new ArrayList<>();
+
+    int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
+
+    //Get the first x fencers all groups 
+    for (int i = 0; i < groups; i++) {
+      for (int c = 0; c < groupScores[i].size(); c++) {
+        if (c < (int) (numberOfFinalists / groups)) {
+          finalists.add(groupScores[i].get(c));
+        }
+        else {
+          wildcards.add(groupScores[i].get(c));
+        }
+      }
+    }
+
+    Collections.sort(wildcards);
+    //If need%groups != 0: take the best, out of all groups, who are
+    //not participating in the finals yet
+    for (int i = 0; i < (numberOfFinalists % groups); i++) {
+      finalists.add(wildcards.get(i));
+    }
+    //Sort the list so that best Fencer is first
+    Collections.sort(finalists);
+
+    //Get all Finalrounds wich are part of the first/lowest level
+    List<Finalround> leafFinalRounds = new ArrayList<>();
+    for (Finalround finalRound : Finalround.getFinalrounds(this)) {
+      if (!finalRound.hasPrerounds()) {
+        leafFinalRounds.add(finalRound);
+      }
+    }
+
+    int c = 0;
+    for (Finalround round : leafFinalRounds) {
       try {
-        if (p.getLane() < 1 || p.getRound() < 1) {
-          ret++;
-        }
+        //Take the best remaining fencer
+        round.addParticipant(finalists.get(c).getFencer());
+        //Take the worst remaining fencer
+        round.addParticipant(finalists.get(finalists.size() - c - 1).getFencer());
+        System.out.println("Pairing: " + finalists.get(c) + "\t" + finalists.get(finalists.size() - c - 1));
+        c++;
       }
-      catch (ObjectDeprecatedException e) {
+      catch (ObjectDeprecatedException ex) {
+        //We can ignore that because we created them a few lines above
+        Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
-    return ret;
-  }
-
-  @Override
-  public void addPreliminary () throws SQLException {
-    sync.addPreliminary(this);
-    setChanged();
-    notifyObservers(Sync.change.createdPreliminary);
-  }
-
-  private void setFinishedPreliminary () throws SQLException {
-    if (allPreliminaryFinished()) {
-      sync.setFinishedPreliminary(this, true);
-      finishedPreliminary = true;
-    }
-
-  }
-
-  @Override
-  public boolean isPreliminaryFinished () {
-    return finishedPreliminary;
-  }
-
-  @Override
-  public boolean finishPreliminary () throws SQLException, ObjectDeprecatedException {
-    if (allPreliminaryFinished()) {
-      createFinalrounds();
-      setFinishedPreliminary();
-
-      List<iScore>[] groupScores = getScoresInGroups();
-      List<iScore> finalists = new ArrayList<>();
-      List<iScore> wildcards = new ArrayList<>();
-
-      int numberOfFinalists = (int) Math.pow(2, numberFinalrounds);
-
-      //Get the first x fencers all groups 
-      for (int i = 0; i < groups; i++) {
-        for (int c = 0; c < groupScores[i].size(); c++) {
-          if (c < (int) (numberOfFinalists / groups)) {
-            finalists.add(groupScores[i].get(c));
-          }
-          else {
-            wildcards.add(groupScores[i].get(c));
-          }
-        }
-      }
-
-      Collections.sort(wildcards);
-      //If need%groups != 0: take the best, out of all groups, who are
-      //not participating in the finals yet
-      for (int i = 0; i < (numberOfFinalists % groups); i++) {
-        finalists.add(wildcards.get(i));
-      }
-      //Sort the list so that best Fencer is first
-      Collections.sort(finalists);
-
-      //Get all Finalrounds wich are part of the first/lowest level
-      List<Finalround> leafFinalRounds = new ArrayList<>();
-      for (Finalround finalRound : Finalround.getFinalrounds(this)) {
-        if (!finalRound.hasPrerounds()) {
-          leafFinalRounds.add(finalRound);
-        }
-      }
-
-      int c = 0;
-      for (Finalround round : leafFinalRounds) {
-        try {
-          //Take the best remaining fencer
-          round.addParticipant(finalists.get(c).getFencer());
-          //Take the worst remaining fencer
-          round.addParticipant(finalists.get(finalists.size() - c - 1).getFencer());
-          System.out.println("Pairing: " + finalists.get(c) + "\t" + finalists.get(finalists.size() - c - 1));
-          c++;
-        }
-        catch (ObjectDeprecatedException ex) {
-          //We can ignore that because we created them a few lines above
-          Logger.getLogger(Tournament.class.getName()).log(Level.SEVERE, null, ex);
-        }
-      }
       
-      setChanged();
-      notifyObservers(Sync.change.finishedPreliminary);
-      return true;
-    }
-    else {
-      return false;
-    }
+    setChanged();
+    notifyObservers(Sync.change.finishedPreliminary);
   }
 
   boolean allPreliminaryFinished () {
@@ -635,8 +643,7 @@ public class Tournament extends Observable implements iTournament {
           return false;
         }
       }
-      catch (ObjectDeprecatedException e) {
-      }
+      catch (ObjectDeprecatedException e) {}
     }
     return true;
   }
@@ -652,7 +659,12 @@ public class Tournament extends Observable implements iTournament {
 
   @Override
   public void dropOut (iFencer f) throws SQLException {
-    if (!finishedPreliminary) {
+    if (status == 0)
+    {
+        removeParticipant(f);
+    }
+    else if (status == 1) 
+    {
       for (Preliminary p : Preliminary.getPreliminarys(this)) {
         try {
           if (p.isFencer((Fencer) f) && !p.isFinished()) {
@@ -672,7 +684,8 @@ public class Tournament extends Observable implements iTournament {
         }
       }
     }
-    else {
+    else if (status == 2)
+    {
       for (Finalround fr : Finalround.getFinalrounds(this)) {
         try {
           if (fr.isFencer(f) && !fr.isFinished()) {
@@ -692,7 +705,6 @@ public class Tournament extends Observable implements iTournament {
           //Can be ignored safly because we don't need to 
           //remove a droped out fencer from a depricated fight
         }
-
       }
     }
   }
@@ -814,26 +826,14 @@ public class Tournament extends Observable implements iTournament {
   }
 
   @Override
-  public boolean reversToPreliminary () throws SQLException {
-    if (finishedPreliminary) {
-      sync.setFinishedPreliminary(this, false);
-      finishedPreliminary = false;
-
-      Finalround.deleteAllFinalRoundsOfTournament(this);
-      notifyObservers(Sync.change.unfinishedPreliminary);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-
-  @Override
   public void delete () throws SQLException {
     if (!isValid) {
       return;
     }
 
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.tournamentDeleted));
+    
     Preliminary.deleteAllPreliminaryRoundsForTournament(this);
     Finalround.deleteAllFinalRoundsOfTournament(this);
 
@@ -841,5 +841,168 @@ public class Tournament extends Observable implements iTournament {
     sync.deleteTournamentFromDatabase(ID);
     ID = -1;
     isValid = false;
+  }
+  
+    public void createPreliminaryTiming (boolean separateGroups) throws SQLException, ObjectDeprecatedException
+    {
+        List<List<iPreliminary>> timingGroups = new ArrayList<>();
+        if(separateGroups)
+        {
+            for(int i=0;i<getGroups();i++)
+                timingGroups.add(new ArrayList<iPreliminary>());
+            for(iPreliminary p: getAllPreliminary())
+            {
+                timingGroups.get(p.getGroup()-1).add(p);
+            }
+        }
+        else
+        {
+            timingGroups.add(getAllPreliminary());
+        }
+      
+        int actuellTiming = 1;
+        Map<iFencer, Integer> lastFight = new HashMap<>();
+        for(iFencer f : getAllParticipants())
+        {
+            lastFight.put(f, 0);
+        }
+        for(int i=0;i<timingGroups.size();i++)
+        {
+            while(timingGroups.get(i).size()>0)
+            {
+                for(int l = 1; l<=lanes;l++)
+                {
+                    iPreliminary p = null;
+                    int last = Integer.MAX_VALUE;
+                    for(iPreliminary tmp : timingGroups.get(i))
+                    {
+                        iFencer f1 = tmp.getFencer().get(0);
+                        iFencer f2 = tmp.getFencer().get(1);
+                        if(lastFight.get(f1)<last && lastFight.get(f1)!=actuellTiming)
+                        {
+                            last = lastFight.get(f1);
+                            p = tmp;
+                        }
+                        if(lastFight.get(f1)<last && lastFight.get(f2)!=actuellTiming)
+                        {
+                            last = lastFight.get(f1);
+                            p = tmp;
+                        }
+                    }
+                    if(p==null) break;
+                    p.setTime(actuellTiming, l);
+                    lastFight.put(p.getFencer().get(0), actuellTiming);
+                    lastFight.put(p.getFencer().get(1), actuellTiming);
+                }
+                actuellTiming++;
+            }
+        }
+    }
+  
+  private void createPreliminarySchedule(boolean seperateGroups) throws SQLException, ObjectDeprecatedException
+  {
+      sync.createPreliminaryFights(this);
+      createPreliminaryTiming(seperateGroups);
+  }
+  
+  public void startPreliminary() throws SQLException
+  {
+      if(status == 0)
+      {
+          sync.setTournamentStatus(this, 1);
+          status = 1;
+          
+          sync.addPreliminary(this);
+          
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public void abortPreliminary() throws SQLException
+  {
+      if(status == 1)
+      {
+          sync.setTournamentStatus(this, 0);
+          status = 0;
+          
+          Preliminary.getPreliminarys(this);
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public void startFinalrounds() throws SQLException, ObjectDeprecatedException
+  {
+      if(status == 1)
+      {
+          sync.setTournamentStatus(this, 2);
+          status = 2;
+          
+          createFinalePairing();
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public void abortFinalrounds() throws SQLException
+  {
+      if(status == 2)
+      {
+          sync.setTournamentStatus(this, 1);
+          status = 1;
+          
+          Finalround.deleteAllFinalRoundsOfTournament(this);
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public void finishTournament() throws SQLException
+  {
+      if(status == 2)
+      {
+          sync.setTournamentStatus(this, 3);
+          status = 3;
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public void reopenFinalrounds() throws SQLException
+  {
+      if(status == 3)
+      {
+          sync.setTournamentStatus(this, 2);
+          status = 2;
+          
+          setChanged();
+          notifyObservers(EventPayload.Type.tournamentStateChanged);
+      }
+  }
+  
+  public boolean isPreparingPhase()
+  {
+      return status == 0;
+  }
+  
+  public boolean isPreliminaryPhase()
+  {
+      return status == 1;
+  }
+  
+  public boolean isFinalPhase()
+  {
+      return status == 2;
+  }
+  
+  public boolean isFinished()
+  {
+      return status == 3;
   }
 }

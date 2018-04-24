@@ -239,7 +239,7 @@ class DBConnector {
       return -1;
     }
     if (ctStmt == null) {
-      String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen, InFinalrunden) VALUES (?, '', 2, 2, 2, FALSE);";
+      String sql = "INSERT INTO Turniere (Name, Datum, Gruppen, Finalrunden, Bahnen, Status) VALUES (?, '', 2, 2, 2, 0);";
       ctStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
     }
 
@@ -400,8 +400,6 @@ class DBConnector {
       ap2Stmt.setInt(2, f.getID());
       ap2Stmt.setInt(3, group);
       ap2Stmt.executeUpdate();
-
-      createPreliminary(t, f, group);
     }
   }
 
@@ -426,36 +424,53 @@ class DBConnector {
 
   private PreparedStatement cp1Stmt = null;
   private PreparedStatement cp2Stmt = null;
-
-  private void createPreliminary (Tournament t, Fencer f, int group) throws SQLException {
-    if (cp1Stmt == null) {
-      String sql = "SELECT FechterID FROM Teilnahme WHERE TurnierID = ? AND Gruppe = ? AND FechterID != ?;";
-      cp1Stmt = con.prepareStatement(sql);
-
-      sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
-      cp2Stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-    }
-    cp1Stmt.setInt(1, t.getID());
-    cp1Stmt.setInt(2, group);
-    cp1Stmt.setInt(3, f.getID());
-
-    ResultSet rs = cp1Stmt.executeQuery();
-
-    cp2Stmt.setInt(1, t.getID());
-    cp2Stmt.setInt(2, group);
-    cp2Stmt.setInt(3, f.getID());
-
-    while (rs.next()) {
-      cp2Stmt.setInt(4, rs.getInt("FechterID"));
-      cp2Stmt.executeUpdate();
-      ResultSet rs2 = cp2Stmt.getGeneratedKeys();
-      if (!rs2.next()) {
-        throw new SQLException("Could not generate preliminary");
+  public void createPreliminaryFights(Tournament t) throws SQLException
+  {
+      if(cp1Stmt == null)
+      {
+          String sql = "SELECT FechterID FROM Teilnehmer WHERE TurnierID = ? AND Gruppe = ?;";
+          cp1Stmt = con.prepareStatement(sql);
+          
+          sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
+          cp2Stmt = con.prepareStatement(sql);
       }
-      int id = rs2.getInt(1);
-      rs2.close();
-      loadPreliminary(id);
-    }
+      
+      cp1Stmt.setInt(1, t.getID());
+      
+      cp2Stmt.setInt(1, t.getID());
+      for(int i = 1; i <= t.getGroups(); i++)
+      {
+          ArrayList<Integer> fechterIDs = new ArrayList<>();
+          cp2Stmt.setInt(2, i);
+          
+          cp1Stmt.setInt(2, i);
+          ResultSet rs = cp1Stmt.executeQuery();
+          while (rs.next())//Transfer IDs to ArrayList to make double and partly iterating easier 
+            fechterIDs.add(rs.getInt("FechterID"));
+          
+          //Iterrate IDs with x and y in a way that every combination is meat once (1:2 and 2:1 are the same)
+          for(int x = 0; x < fechterIDs.size()-1; x++)
+          {
+              for(int y = x+1; y < fechterIDs.size(); y++)
+              {
+                  cp2Stmt.setInt(3, fechterIDs.get(x));
+                  cp2Stmt.setInt(4, fechterIDs.get(y));
+                  cp2Stmt.executeUpdate();
+                  
+                  ResultSet roundIDs = cp2Stmt.getGeneratedKeys();
+                  
+                  if (!roundIDs.next()) 
+                  {
+                    throw new SQLException("Could not generate preliminary");
+                  }
+                  do
+                  {
+                      loadPreliminary(roundIDs.getInt(1));
+                  }
+                  while(roundIDs.next());
+              }
+          }
+      }
   }
 
   private PreparedStatement rp1Stmt = null;
@@ -965,13 +980,14 @@ class DBConnector {
 
   private PreparedStatement sfpStmt = null;
 
-  void setFinishedPreliminary (Tournament t, boolean finished) throws SQLException {
+  void setTournamentStatus (Tournament t, int status) throws SQLException {
     if (sfpStmt == null) {
-      String sql = "UPDATE Turniere SET InFinalrunden = " + finished + " WHERE ID = ?;";
+      String sql = "UPDATE Turniere SET Status = ? WHERE ID = ?;";
       sfpStmt = con.prepareStatement(sql);
     }
-
-    sfpStmt.setInt(1, t.getID());
+    
+    sfpStmt.setInt(1, status);
+    sfpStmt.setInt(2, t.getID());
     sfpStmt.executeUpdate();
   }
 

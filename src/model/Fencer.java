@@ -78,6 +78,9 @@ public class Fencer extends Observable implements iFencer {
     this.nationality = (String) set.get("Nationalitaet".toUpperCase());
     
     sync.observeThis(this);
+    
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.fencerCreated));
   }
 
   @Override
@@ -182,6 +185,9 @@ public class Fencer extends Observable implements iFencer {
       return;
     }
 
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.fencerDeleted));
+    
     for (Tournament t : Tournament.getAllTournaments()) {
       if (t.isParticipant(this)) {
         t.removeParticipant(this);

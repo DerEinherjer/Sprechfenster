@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.EventPayload;
 import model.Sync;
 
 public class Finalround extends Round implements iFinalround {
@@ -104,6 +105,9 @@ public class Finalround extends Round implements iFinalround {
     if (losersround != null) {
       losersround.initPrerounds(this);
     }
+    
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.roundFinalCreated));
   }
 
   void initPrerounds (Finalround f) {
@@ -138,8 +142,9 @@ public class Finalround extends Round implements iFinalround {
         t.addGotHitFinal(fencer2, pointsFor1);
 
         sync.setPrelimFinished(this, finished);
-        setChanged();
-        notifyObservers(Sync.change.finishedFinalround);
+        
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       }
       else {
         if (winnersround != null) {
@@ -160,8 +165,8 @@ public class Finalround extends Round implements iFinalround {
         t.addGotHitFinal(fencer2, -pointsFor1);
 
         sync.setPrelimFinished(this, finished);
-        setChanged();
-        notifyObservers(Sync.change.unfinishedFinalround);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       }
     }
   }
@@ -203,6 +208,10 @@ public class Finalround extends Round implements iFinalround {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
+    
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.roundFinalDeleted));
+    
     if (finished) //This is needet in case finished rounds will be deletable
     {
       setFinished(false); //It will keep the score of the tournament correct.

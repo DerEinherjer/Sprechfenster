@@ -210,9 +210,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
       try {
         boolean confirmed = GUIUtilities.ShowConfirmationDialog("Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?");
         if (confirmed) {
-          System.out.println("ok");
-          Tournament.finishPreliminary();
-          System.out.println("finisched");
+          Tournament.startFinalrounds();
           updateAll();
         }
       }
@@ -232,7 +230,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 ButtonType.YES, ButtonType.NO);
         Optional<ButtonType> result = confirmationDialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.YES) {
-          Tournament.reversToPreliminary();
+          Tournament.abortFinalrounds();
           updateAll();
         }
       }
@@ -271,8 +269,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FencersPane.getChildren().add(preliminaryRoundScoreGroupTable);
 
         StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
-        CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryFinished() || Tournament.preliminaryWithoutTiming() > 0);
-        AbortEliminationRoundsButton.setDisable(!Tournament.isPreliminaryFinished());
+        CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryPhase());
+        AbortEliminationRoundsButton.setDisable(Tournament.isFinalPhase());
         int maxRound = 0;
         for (iFinalround finalRound : Tournament.getAllFinalrounds()) {
           maxRound = Math.max(maxRound, finalRound.getRound());

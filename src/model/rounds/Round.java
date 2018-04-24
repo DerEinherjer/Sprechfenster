@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import model.EventPayload;
 
 /**
  *
@@ -66,7 +67,7 @@ public abstract class Round extends Observable {
   Round (Map<String, Object> set) throws ObjectExistException, SQLException {
     this.ID = (Integer) set.get("ID");
 
-    //The DB return all colum names in caps
+    //The DB returns all colum names in caps
     this.t = Tournament.getTournament((Integer) set.get("TurnierID".toUpperCase()));
 
     this.group = (Integer) set.get("Gruppe".toUpperCase());
@@ -135,7 +136,7 @@ public abstract class Round extends Observable {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return false;
     }
 
@@ -143,7 +144,7 @@ public abstract class Round extends Observable {
       this.round = round;
       this.lane = lane;
       setChanged();
-      notifyObservers(Sync.change.changedPreliminary);
+      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
     }
     return false;
@@ -167,7 +168,7 @@ public abstract class Round extends Observable {
     sync.setPoints(ID, ((Fencer) f).getID(), points);
     
     setChanged();
-    notifyObservers(Sync.change.changedPreliminary);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   public int getPoints (iFencer f) throws ObjectDeprecatedException {
@@ -226,7 +227,7 @@ public abstract class Round extends Observable {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return false;
     }
 
@@ -234,8 +235,8 @@ public abstract class Round extends Observable {
       sync.removeParticipantFromPrelim(this, (Fencer) f);
       fencer1 = null;
       pointsFor1 = 0;
-      setChanged();
-      notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
     }
     else {
@@ -243,8 +244,8 @@ public abstract class Round extends Observable {
         sync.removeParticipantFromPrelim(this, (Fencer) f);
         fencer2 = null;
         pointsFor2 = 0;
-        setChanged();
-        notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
         return true;
       }
     }
@@ -262,16 +263,16 @@ public abstract class Round extends Observable {
     if (fencer1 == null) {
       sync.addParticipantToPrelim(this, (Fencer) f);
       fencer1 = (Fencer) f;
-      setChanged();
-      notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
     }
     else {
       if (fencer2 == null) {
         sync.addParticipantToPrelim(this, (Fencer) f);
         fencer2 = (Fencer) f;
-        setChanged();
-        notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
         return true;
       }
     }
@@ -282,7 +283,7 @@ public abstract class Round extends Observable {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return false;
     }
 
@@ -290,8 +291,8 @@ public abstract class Round extends Observable {
       sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
       fencer1 = (Fencer) in;
       pointsFor1 = 0;
-      setChanged();
-      notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
     }
     else {
@@ -299,8 +300,8 @@ public abstract class Round extends Observable {
         sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
         fencer2 = (Fencer) in;
         pointsFor2 = 0;
-        setChanged();
-        notifyObservers(Sync.change.changedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
         return true;
       }
     }
@@ -325,7 +326,7 @@ public abstract class Round extends Observable {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return;
     }
 
@@ -340,14 +341,14 @@ public abstract class Round extends Observable {
       }
     }
     setChanged();
-    notifyObservers(Sync.change.changedCards);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   public void setRed (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return;
     }
 
@@ -362,14 +363,14 @@ public abstract class Round extends Observable {
       }
     }
     setChanged();
-    notifyObservers(Sync.change.changedCards);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   public void setBlack (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
     if (!isValid) {
       throw new ObjectDeprecatedException();
     }
-    if (finished || t.isPreliminaryFinished()) {
+    if (finished || !t.isPreliminaryPhase()) {
       return;
     }
 
@@ -384,7 +385,7 @@ public abstract class Round extends Observable {
       }
     }
     setChanged();
-    notifyObservers(Sync.change.changedCards);
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
   public int getYellow (iFencer f) throws ObjectDeprecatedException {

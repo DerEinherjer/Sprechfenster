@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.EventPayload;
 import model.Sync;
 
 public class Preliminary extends Round implements iPreliminary {
@@ -93,6 +94,9 @@ public class Preliminary extends Round implements iPreliminary {
 
     //Propagates the score to the Turnament if the fight is finished
     propagateScore();
+    
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.roundPreliminaryCreated));
   }
 
   public String toString () {
@@ -107,7 +111,7 @@ public class Preliminary extends Round implements iPreliminary {
       throw new ObjectDeprecatedException();
     }
 
-    if (t.isPreliminaryFinished()) {
+    if (!t.isPreliminaryPhase()) {
       return;
     }
 
@@ -129,8 +133,8 @@ public class Preliminary extends Round implements iPreliminary {
         t.addGotHitPrelim(fencer2, pointsFor1);
 
         sync.setPrelimFinished(this, finished);
-        setChanged();
-        notifyObservers(Sync.change.finishedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       }
       else {
         if (pointsFor1 > pointsFor2) {
@@ -148,8 +152,8 @@ public class Preliminary extends Round implements iPreliminary {
         t.addGotHitPrelim(fencer2, -pointsFor1);
 
         sync.setPrelimFinished(this, finished);
-        setChanged();
-        notifyObservers(Sync.change.unfinishedPreliminary);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       }
     }
   }
@@ -177,6 +181,9 @@ public class Preliminary extends Round implements iPreliminary {
       throw new ObjectDeprecatedException();
     }
 
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.roundPreliminaryDeleted));
+    
     if (finished) //This is needet in case finished rounds will be deletable
     {
       setFinished(false);
@@ -188,7 +195,7 @@ public class Preliminary extends Round implements iPreliminary {
   }
 
   public boolean addParticipant (iFencer f) throws SQLException, ObjectDeprecatedException {
-    if (t.isPreliminaryFinished()) {
+    if (!t.isPreliminaryPhase()) {
       return false;
     }
     else {
@@ -197,7 +204,7 @@ public class Preliminary extends Round implements iPreliminary {
   }
 
   public void setPoints (iFencer f, int points) throws SQLException, ObjectDeprecatedException {
-    if (t.isPreliminaryFinished()) {
+    if (!t.isPreliminaryPhase()) {
       return;
     }
     else {

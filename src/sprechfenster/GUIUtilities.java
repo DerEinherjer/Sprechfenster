@@ -23,7 +23,7 @@ import model.iTournament;
 public class GUIUtilities {
 
   public static boolean IsTournamentStarted (iTournament tournament) throws SQLException {
-    return (tournament.isPreliminaryFinished() || tournament.getPreliminaryCount() > 0 && tournament.preliminaryWithoutTiming() == 0);
+    return !tournament.isPreparingPhase();
   }
 
   public static boolean ShowConfirmationDialog (String message) {

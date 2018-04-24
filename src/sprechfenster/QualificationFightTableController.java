@@ -202,7 +202,7 @@ public class QualificationFightTableController implements Initializable, Observe
 
   private void UpdateStatus () {
     if (Tournament != null) {
-      FightsTableView.setEditable(!Tournament.isPreliminaryFinished());
+      FightsTableView.setEditable(Tournament.isPreliminaryPhase());
     }
   }
 

@@ -68,7 +68,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
   private void HandleCreateQualificationRoundsButtonAction (ActionEvent event) {
     if (Tournament != null) {
       try {
-        Tournament.createPreliminaryTiming();
+        Tournament.startPreliminary();
         UpdateData();
       }
       catch (SQLException ex) {
@@ -88,7 +88,8 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
         CreateQualificationRoundsButton1.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
         CreateQualificationRoundsButton2.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
 
-        if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
+        //if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
+        if (Tournament.isPreparingPhase()) {
           List<iPreliminary> qualificationFights = Tournament.getAllPreliminary();
           if (qualificationFights != null) {
             try {

@@ -303,8 +303,7 @@ public class TournamentTest {
       round.setFinished(true);
     }
 
-    Boolean result = instance.finishPreliminary();
-    assertTrue(result);
+    instance.startFinalrounds();
 
     List<iFinalround> finalMatches = instance.getAllFinalrounds();
     //The finals use an elimination system:
