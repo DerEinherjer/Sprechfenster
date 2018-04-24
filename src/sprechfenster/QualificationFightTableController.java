@@ -150,7 +150,16 @@ public class QualificationFightTableController implements Initializable, Observe
     EditTableColumn.setCellFactory(editCellFactory);
     Sync.getInstance().addObserver(this);
   }
-
+  public TableView GetTableViewForPrinting()
+  {
+    return FightsTableView;
+  }
+  
+  public String GetTableTitle()
+  {
+    return MainPane.getText();
+  }
+  
   public void SetTournament (iTournament tournament) {
     Tournament = tournament;
     FencerNames = new ArrayList<String>();
@@ -208,11 +217,6 @@ public class QualificationFightTableController implements Initializable, Observe
 
   @Override
   public void update (Observable o, Object o1) {
-    if (o1 instanceof Sync.change) {
-      Sync.change changeType = (Sync.change) o1;
-      if (changeType == Sync.change.finishedPreliminary) {
         UpdateStatus();
-      }
-    }
   }
 }
