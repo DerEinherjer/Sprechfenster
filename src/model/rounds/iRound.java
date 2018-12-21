@@ -2,24 +2,17 @@ package model.rounds;
 
 import model.ObjectDeprecatedException;
 import model.iFencer;
-import model.iTournament;
 import java.sql.SQLException;
 import java.util.List;
+import model.iTournament;
 
 /**
  *
  * @author deus
  */
-public interface iRound {
+public interface iRound
+{
 
-  /**
-   * This function returns the index of the group in witch the fencers are.
-   * group number = index + 1.
-   *
-   * @return Index of the group.
-   * @throws ObjectDeprecatedException The preliminare got deleted.
-   */
-  public int getGroup () throws ObjectDeprecatedException;
 
   /**
    * This function returns a list of all feners who are assigned to this fight.

@@ -8,9 +8,8 @@ public class Test {
 
   public static void main (String args[]) {
     try {
-      iSync sync = iSync.getInstance();
 
-      iTournament t = sync.createTournament("Der ultimative Test");
+      iTournament t = new Tournament("Der ultimative Test");
       t.setFinalRounds(2);
       t.setGroups(2);
       t.setLanes(2);
@@ -18,7 +17,7 @@ public class Test {
       iFencer fencers[] = new iFencer[26];
 
       for (char i = 'A'; i <= 'Z'; i++) {
-        fencers[i - 'A'] = sync.createFencer(i + "", i + "", "", "", "");
+        fencers[i - 'A'] = new Fencer(i + "", i + "");
         fencers[i - 'A'].setBirthday("Geburtstag");
         if (!fencers[i - 'A'].getBirthday().equals("Geburtstag")) {
           System.out.println("Geburtstag wird nicht richtig behandelt");

@@ -1,8 +1,5 @@
 package model;
 
-import model.rounds.Preliminary;
-import model.rounds.Finalround;
-import model.rounds.Round;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,7 +14,7 @@ import java.util.Map;
 
 //TODO: Alle Felder aller Tabellen müessen immer einen Wert haben um aus der Init Funktion keine Sicherheitslücke zu machen
 class DBConnector {
-
+/*
   private static String databaseURL = "jdbc:h2:~/SprechfensterData";
   private static DBConnector dbConnector;
 
@@ -1208,5 +1205,5 @@ class DBConnector {
     ret = rs.getInt(1);
 
     return ret;
-  }
+  }*/
 }

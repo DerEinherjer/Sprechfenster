@@ -1,214 +1,161 @@
 package model.rounds;
 
-import model.Fencer;
-import model.ObjectDeprecatedException;
-import model.ObjectExistException;
-import model.Tournament;
-import model.iFencer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.EventPayload;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.DBConnection.DBEntetyRepresenter;
+import model.DBConnection.DBPreliminaryRepresenter;
+import model.Fencer;
+import model.ObjectDeprecatedException;
+import model.ObjectExistException;
 import model.Sync;
+import model.Tournament;
 
-public class Preliminary extends Round implements iPreliminary {
-  // -----
+public class Preliminary extends Round implements DBEntetyRepresenter, iPreliminary
+{
 
-  private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
-
-  public static void ClearDatabaseCache () {
-    preliminarys.clear();
-  }
-
-  public static Preliminary getPreliminary (int id) throws SQLException {
-    if (!preliminarys.containsKey(id)) {
-      sync.loadPreliminary(id);
-    }
-    return preliminarys.get(id);
-  }
-
-  public static List<Preliminary> getPreliminarys (Tournament t) {
-    List<Preliminary> ret = new ArrayList<>();
-    for (Map.Entry<Integer, Preliminary> entry : preliminarys.entrySet()) {
-      if (entry.getValue().t.equals(t)) {
-        ret.add(entry.getValue());
-      }
-    }
-    return ret;
-  }
-
-  public static void deletePreliminarys (Fencer f) throws SQLException {
-    List<Preliminary> remove = new ArrayList<>();
-    for (Preliminary p : preliminarys.values()) {
-      try {
-        if (p.isFencer(f)) {
-          remove.add(p);//DO NOT DELET HERE
-          //IT FUCKS UP THE ITERATOR
-        }
-      }
-      catch (ObjectDeprecatedException e) {
-      }
-    }
-
-    for (Preliminary p : remove) {
-      try {
-        p.delete();
-      }
-      catch (ObjectDeprecatedException e) {
-      }
-    }
-  }
-
-  public static void deleteAllPreliminaryRoundsForTournament (Tournament t) throws SQLException {
-    List<Preliminary> remove = new ArrayList<>();
-    for (Preliminary p : preliminarys.values()) {
-      try {
-        if (p.getTournament().equals(t)) {
-          remove.add(p);//DO NOT DELET HERE
-          //IT FUCKS UP THE ITERATOR
-        }
-      }
-      catch (ObjectDeprecatedException e) {
-      }
-    }
-
-    for (Preliminary p : remove) {
-      try {
-        p.delete();
-      }
-      catch (ObjectDeprecatedException e) {
-      }
-    }
-  }
-
-  public Preliminary (Map<String, Object> set) throws ObjectExistException, SQLException {
-    super(set);
-
-    //Checks if there is allready an Object for this ID
-    if (preliminarys.containsKey(this.ID)) {
-      throw new ObjectExistException(preliminarys.get(this.ID));
-    }
-    preliminarys.put(this.ID, this);
-
-    //Propagates the score to the Turnament if the fight is finished
-    propagateScore();
-    
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.roundPreliminaryCreated));
-  }
-
-  public String toString () {
-    if (!isValid) {
-      return "InvalidObject";
-    }
-    return group + " | " + fencer1.getFamilyName() + " | " + fencer2.getFamilyName();
-  }
-
-  public void setFinished (boolean finish) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-
-    if (!t.isPreliminaryPhase()) {
-      return;
-    }
-
-    if (finish != finished) {
-      finished = finish;
-      if (finished) {
-        if (pointsFor1 > pointsFor2) {
-          t.addWinPrelim(fencer1);
-        }
-        else {
-          if (pointsFor1 < pointsFor2) {
-            t.addWinPrelim(fencer2);
-          }
-        }
-
-        t.addHitsPrelim(fencer1, pointsFor1);
-        t.addHitsPrelim(fencer2, pointsFor2);
-        t.addGotHitPrelim(fencer1, pointsFor2);
-        t.addGotHitPrelim(fencer2, pointsFor1);
-
-        sync.setPrelimFinished(this, finished);
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      }
-      else {
-        if (pointsFor1 > pointsFor2) {
-          t.subWinPrelim(fencer1);
-        }
-        else {
-          if (pointsFor1 < pointsFor2) {
-            t.subWinPrelim(fencer2);
-          }
-        }
-
-        t.addHitsPrelim(fencer1, -pointsFor1);
-        t.addHitsPrelim(fencer2, -pointsFor2);
-        t.addGotHitPrelim(fencer1, -pointsFor2);
-        t.addGotHitPrelim(fencer2, -pointsFor1);
-
-        sync.setPrelimFinished(this, finished);
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      }
-    }
-  }
-
-  private void propagateScore () throws SQLException {
-    if (finished) {
-      if (pointsFor1 > pointsFor2) {
-        t.addWinPrelim(fencer1);
-      }
-      else {
-        if (pointsFor1 < pointsFor2) {
-          t.addWinPrelim(fencer2);
-        }
-      }
-
-      t.addHitsPrelim(fencer1, pointsFor1);
-      t.addHitsPrelim(fencer2, pointsFor2);
-      t.addGotHitPrelim(fencer1, pointsFor2);
-      t.addGotHitPrelim(fencer2, pointsFor1);
-    }
-  }
-
-  public void delete () throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.roundPreliminaryDeleted));
-    
-    if (finished) //This is needet in case finished rounds will be deletable
+    @Override
+    public void init() throws SQLException
     {
-      setFinished(false);
-    } //It will keep the score of the tournament correct.
-    sync.deletePreliminaryFromDatabase(this.ID);
-    preliminarys.remove(this.ID);
-    this.ID = -1;
-    isValid = false;
-  }
+        //The SQL-Table is Created in Round because it is also used in Finalround
+        DBPreliminaryRepresenter.loadPreliminary();
+    }
 
-  public boolean addParticipant (iFencer f) throws SQLException, ObjectDeprecatedException {
-    if (!t.isPreliminaryPhase()) {
-      return false;
+    @Override
+    public void onStartUp() throws SQLException
+    {
+        for (Map.Entry<Integer, Preliminary> entry : preliminarys.entrySet())
+        {
+            entry.getValue().initPhase2();
+        }
     }
-    else {
-      return super.addParticipant(f);
-    }
-  }
 
-  public void setPoints (iFencer f, int points) throws SQLException, ObjectDeprecatedException {
-    if (!t.isPreliminaryPhase()) {
-      return;
+    @Override
+    public void onExit()
+    {
+        Map<Integer, Preliminary> tmp = preliminarys;
+        preliminarys = new HashMap<>();
+        for (Map.Entry<Integer, Preliminary> entry : tmp.entrySet())
+        {
+            entry.getValue().invalidate();
+        }
     }
-    else {
-      super.setPoints(f, points);
+    
+    //#########################################################################
+  
+    private static Map<Integer, Preliminary> preliminarys = new HashMap<>();
+    
+    public static List<iPreliminary> getPreliminaryOfTournament(Tournament t)
+    {
+        List<iPreliminary> ret = new ArrayList<>();
+        for (Map.Entry<Integer, Preliminary> entry : preliminarys.entrySet())
+        {
+            if(entry.getValue().getTournament().equals(t))
+                ret.add(entry.getValue());
+        }
+        return ret;
     }
-  }
-}//
+    
+    private void invalidate()
+    {
+        ID = -1;
+        isValid = false;
+    }
+    
+    public static void deletePreliminaryOfTournament(Tournament t)
+    {
+        List<Preliminary> tmp = new ArrayList<>();
+        for (Map.Entry<Integer, Preliminary> entry : preliminarys.entrySet())
+        {
+            if(entry.getValue().getTournament().equals(t))
+                tmp.add(entry.getValue());
+        }
+        
+        for(Preliminary prelim : tmp)
+        {
+            try
+            {
+                prelim.delete();
+            } 
+            catch (SQLException ex)
+            {
+                Logger.getLogger(Preliminary.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+            catch (ObjectDeprecatedException ex) {}//can be ignored savely
+        }
+    }
+    
+    //#########################################################################
+    
+    public Preliminary(Map<String, Object> set) throws ObjectExistException, SQLException
+    {
+        super(set);
+        
+        preliminarys.put(ID, this);
+    }
+    
+    public Preliminary(Tournament t, Fencer f1, Fencer f2) throws SQLException
+    {
+        if(t.getParticipantGroup(f1) != t.getParticipantGroup(f2)) throw new IllegalArgumentException();
+        
+        this.ID = DBPreliminaryRepresenter.createPreliminary(t, f1, f2);
+        
+        preliminarys.put(ID, this);
+        
+        this.t = t;
+        
+        this.fencer1 = f1;
+        this.fencer2 = f2;
+        
+        this.group = -1;
+        this.round = -1;
+        this.lane = -1;
+        this.pointsFor1 = 0;
+        this.pointsFor2 = 0;
+        
+        this.finished = false;
+        
+        this.yellowFor1 = 0;
+        this.redFor1 = 0;
+        this.blackFor1 = 0;
+        
+        
+        this.yellowFor2 = 0;
+        this.redFor2 = 0;
+        this.blackFor2 = 0;
+        
+        t.addPreliminaryRoundToScore(fencer1, this);
+        t.addPreliminaryRoundToScore(fencer2, this);
+    }
+            
+    /**
+     * DON'T USE THIS!
+     * IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF 
+     * USED OTHERWISE.
+     */
+    public Preliminary(){};
+    
+    @Override
+    public void delete() throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        isValid = false;
+        preliminarys.remove(this);
+    }
+    
+    protected void initPhase2()
+    {
+        t.addPreliminaryRoundToScore(fencer1, this);
+        t.addPreliminaryRoundToScore(fencer2, this);
+    }
+    
+    public int getPreliminaryGroup() throws SQLException
+    {
+        return t.getParticipantGroup(fencer1);
+    }
+}

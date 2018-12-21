@@ -1,14 +1,11 @@
 package model;
 
-public interface iScore extends Comparable<iScore> {
 
-  public iFencer getFencer ();
-
-  public int getWins ();
-
-  public int getHits ();
-
-  public int getGotHit ();
-
-  public int getHitDifference ();
+public interface iScore
+{
+    public int getWins();
+    
+    public int getHits();
+    
+    public int getGotHit();
 }

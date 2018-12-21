@@ -1,8 +1,5 @@
 package model;
 
-import model.rounds.Preliminary;
-import model.rounds.Finalround;
-import model.rounds.Round;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +8,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-public class Sync extends iSync implements Observer {
-
+public class Sync{
+/*
   private DBConnector con;
 
   public enum change {
@@ -246,10 +243,7 @@ public class Sync extends iSync implements Observer {
   }
 
   boolean setTimeForFinalround (Finalround f, int round, int lane) throws SQLException {
-    /*boolean ret = con.setTimeForFinalround(f, round, lane);
-		setChanged();
-		notifyObservers(change.changedFinalround);
-		return ret;*/
+    
     return false;
   }
 
@@ -324,5 +318,5 @@ public class Sync extends iSync implements Observer {
   {
       setChanged();
       notifyObservers(arg);
-  }
+  }*/
 }

@@ -1,465 +1,518 @@
 package model.rounds;
 
-import model.Fencer;
-import model.ObjectDeprecatedException;
-import model.ObjectExistException;
-import static model.rounds.Preliminary.sync;
-import model.Sync;
-import model.Tournament;
-import model.iFencer;
-import model.iTournament;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import model.DBConnection.DBEntetyRepresenter;
+import model.DBConnection.DBRoundRepresenter;
 import model.EventPayload;
+import model.Fencer;
+import model.ObjectDeprecatedException;
+import model.ObjectExistException;
+import model.Sync;
+import model.Tournament;
+import model.iFencer;
+import model.iTournament;
 
-/**
- *
- * @author deus
- */
-public abstract class Round extends Observable {
+public class Round extends Observable implements DBEntetyRepresenter, iRound
+{
 
-  public static String getSQLString () {
-    return "CREATE TABLE IF NOT EXISTS Vorrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
-            + "TurnierID int,"
-            + "Gruppe int DEFAULT -1,"
-            + "Runde int DEFAULT -1,"
-            + "Bahn int DEFAULT -1,"
-            + "Teilnehmer1 int DEFAULT -1,"
-            + "Teilnehmer2 int DEFAULT -1,"
-            + "PunkteVon1 int DEFAULT 0,"
-            + "PunkteVon2 int DEFAULT 0,"
-            + "Beendet boolean DEFAULT FALSE,"
-            + "GelbVon1 int DEFAULT 0,"
-            + "RotVon1 int DEFAULT 0,"
-            + "SchwarzVon1 int DEFAULT 0,"
-            + "GelbVon2 int DEFAULT 0,"
-            + "RotVon2 int DEFAULT 0,"
-            + "SchwarzVon2 int DEFAULT 0,"
-            + "FinalStrucktur int DEFAULT -1);";
-  }
+    @Override
+    public void init() throws SQLException
+    {
+        DBRoundRepresenter.createTable();
+        //There is nothing to load this class is abstract
+    }
 
-  public static Sync sync;
+    @Override
+    public void onStartUp() throws SQLException
+    {
+        
+    }
 
-  boolean isValid = true;
-
-  int ID;
-  Tournament t;
-
-  Integer group = null;
-  Integer round = null;
-  Integer lane = null;
-  Fencer fencer1 = null;
-  Fencer fencer2 = null;
-  Integer pointsFor1 = null;
-  Integer pointsFor2 = null;
-  Boolean finished = null;
-
-  Integer yellowFor1 = null;
-  Integer redFor1 = null;
-  Integer blackFor1 = null;
-  Integer yellowFor2 = null;
-  Integer redFor2 = null;
-  Integer blackFor2 = null;
-
-  Round (Map<String, Object> set) throws ObjectExistException, SQLException {
-    this.ID = (Integer) set.get("ID");
-
-    //The DB returns all colum names in caps
-    this.t = Tournament.getTournament((Integer) set.get("TurnierID".toUpperCase()));
-
-    this.group = (Integer) set.get("Gruppe".toUpperCase());
-    this.round = (Integer) set.get("Runde".toUpperCase());
-    this.lane = (Integer) set.get("Bahn".toUpperCase());
-    this.fencer1 = Fencer.getFencer((Integer) set.get("Teilnehmer1".toUpperCase()));
-    this.fencer2 = Fencer.getFencer((Integer) set.get("Teilnehmer2".toUpperCase()));
-    this.pointsFor1 = (Integer) set.get("PunkteVon1".toUpperCase());
-    this.pointsFor2 = (Integer) set.get("PunkteVon2".toUpperCase());
-    this.finished = (Boolean) set.get("Beendet".toUpperCase());
+    @Override
+    public void onExit() {}
     
-    sync.observeThis(this);
-  }
-
-  public int getID () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return ID;
-  }
-
-  public int getGroup () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return group;
-  }
-
-  public int getRound () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return round;
-  }
-
-  public int getLane () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return lane;
-  }
-
-  public List<iFencer> getFencer () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    List<iFencer> ret = new ArrayList<>();
-    if (fencer1 != null) {
-      ret.add(fencer1);
-    }
-    if (fencer2 != null) {
-      ret.add(fencer2);
-    }
-    return ret;
-  }
-
-  public iTournament getTournament () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-
-    return t;
-  }
-
-  public boolean setTime (int round, int lane) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return false;
-    }
-
-    if (sync.setTime(this, round, lane)) {
-      this.round = round;
-      this.lane = lane;
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-    return false;
-  }
-
-  public void setPoints (iFencer f, int points) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished) {
-      return;
-    }
-    if (fencer1.equals(f)) {
-      pointsFor1 = points;
-    }
-    if (fencer2.equals(f)) {
-      pointsFor2 = points;
-    }
-    //set points in sync AFTER setting points in this object, since 
-    //the sync also triggers the update notification for the observers!
-    sync.setPoints(ID, ((Fencer) f).getID(), points);
+    //#########################################################################
     
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-  }
+    public static Sync sync;
 
-  public int getPoints (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
+    boolean isValid = true;
 
-    if (fencer1.equals(f)) {
-      return pointsFor1;
-    }
-    if (fencer2.equals(f)) {
-      return pointsFor2;
-    }
-    return -1;
-  }
+    int ID;
+    Tournament t;
 
-  public int getOpponentPoints (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
+    Integer group = null;
+    Integer round = null;
+    Integer lane = null;
+    Fencer fencer1 = null;
+    Fencer fencer2 = null;
+    Integer pointsFor1 = null;
+    Integer pointsFor2 = null;
+    Boolean finished = null;
 
-    if (fencer1.equals(f)) {
-      return pointsFor2;
-    }
-    if (fencer2.equals(f)) {
-      return pointsFor1;
-    }
-    return -1;
-  }
+    Integer yellowFor1 = null;
+    Integer redFor1 = null;
+    Integer blackFor1 = null;
+    Integer yellowFor2 = null;
+    Integer redFor2 = null;
+    Integer blackFor2 = null;
+    
+    /**
+     * DON'T USE THIS!
+     * IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF 
+     * USED OTHERWISE.
+     */
+    public Round(){};
+    
+    public Round (Map<String, Object> set) throws ObjectExistException, SQLException
+    {
+        this.ID = (Integer) set.get("ID");
 
-  public iFencer getWinner () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
+        //The DB returns all colum names in caps
+        this.t = Tournament.getTournament((Integer) set.get("TurnierID".toUpperCase()));
 
-    if (finished) {
-      if (pointsFor1 > pointsFor2) {
-        return fencer1;
-      }
-      if (pointsFor1 < pointsFor2) {
-        return fencer2;
-      }
-    }
-    return null;
-  }
+        this.group = (Integer) set.get("Gruppe".toUpperCase());
+        this.round = (Integer) set.get("Runde".toUpperCase());
+        this.lane = (Integer) set.get("Bahn".toUpperCase());
+        this.fencer1 = Fencer.getFencer((Integer) set.get("Teilnehmer1".toUpperCase()));
+        this.fencer2 = Fencer.getFencer((Integer) set.get("Teilnehmer2".toUpperCase()));
+        this.pointsFor1 = (Integer) set.get("PunkteVon1".toUpperCase());
+        this.pointsFor2 = (Integer) set.get("PunkteVon2".toUpperCase());
+        this.finished = (Boolean) set.get("Beendet".toUpperCase());
+        
+        this.yellowFor1 = (Integer) set.get("GelbVon1".toUpperCase());
+        this.yellowFor2 = (Integer) set.get("GelbVon2".toUpperCase());
+        this.redFor1 = (Integer) set.get("RotVon1".toUpperCase());
+        this.redFor2 = (Integer) set.get("RotVon2".toUpperCase());
+        this.blackFor1 = (Integer) set.get("SchwarzVon1".toUpperCase());
+        this.blackFor2 = (Integer) set.get("SchwarzVon2".toUpperCase());
 
-  public boolean isFinished () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
+        //sync.observeThis(this);
     }
-
-    return finished;
-  }
-
-  public boolean removeParticipant (iFencer f) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return false;
+    
+    public int getID()
+    {
+        return ID;
     }
 
-    if (fencer1 != null && fencer1.equals(f)) {
-      sync.removeParticipantFromPrelim(this, (Fencer) f);
-      fencer1 = null;
-      pointsFor1 = 0;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-    else {
-      if (fencer2 != null && fencer2.equals(f)) {
-        sync.removeParticipantFromPrelim(this, (Fencer) f);
-        fencer2 = null;
-        pointsFor2 = 0;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean addParticipant (iFencer f) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished) {
-      return false;
+    public int getGroup () throws ObjectDeprecatedException
+    {
+        if (!isValid) {
+          throw new ObjectDeprecatedException();
+        }
+        return group;
     }
 
-    if (fencer1 == null) {
-      sync.addParticipantToPrelim(this, (Fencer) f);
-      fencer1 = (Fencer) f;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-    else {
-      if (fencer2 == null) {
-        sync.addParticipantToPrelim(this, (Fencer) f);
-        fencer2 = (Fencer) f;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean switchParticipantOut (iFencer out, iFencer in) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return false;
+    public int getRound () throws ObjectDeprecatedException
+    {
+        if (!isValid)
+        {
+            throw new ObjectDeprecatedException();
+        }
+        return round;
     }
 
-    if (fencer1.equals(out) && !fencer2.equals(in)) {
-      sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
-      fencer1 = (Fencer) in;
-      pointsFor1 = 0;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-    else {
-      if (fencer2.equals(out) && !fencer1.equals(in)) {
-        sync.switchParticipantsInPrelim(this, (Fencer) out, (Fencer) in);
-        fencer2 = (Fencer) in;
-        pointsFor2 = 0;
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean isFencer (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
+    public int getLane () throws ObjectDeprecatedException
+    {
+        if (!isValid) {
+          throw new ObjectDeprecatedException();
+        }
+        return lane;
     }
 
-    if (fencer1 != null && fencer1.equals(f)) {
-      return true;
-    }
-    if (fencer1 != null && fencer2.equals(f)) {
-      return true;
-    }
-    return false;
-  }
-
-  public void setYellow (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return;
+    public List<iFencer> getFencer () throws ObjectDeprecatedException
+    {
+        if (!isValid) {
+          throw new ObjectDeprecatedException();
+        }
+        List<iFencer> ret = new ArrayList<>();
+        if (fencer1 != null) {
+          ret.add(fencer1);
+        }
+        if (fencer2 != null) {
+          ret.add(fencer2);
+        }
+        return ret;
     }
 
-    if (f.equals(fencer1)) {
-      sync.setYellowPrelim(this, (Fencer) f, count);
-      yellowFor1 = count;
+    @Override
+    public iTournament getTournament () throws ObjectDeprecatedException
+    {
+        if (!isValid) throw new ObjectDeprecatedException();
+ 
+        return t;
     }
-    else {
-      if (f.equals(fencer2)) {
-        sync.setYellowPrelim(this, (Fencer) f, count);
-        yellowFor2 = count;
-      }
-    }
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-  }
+    
+    @Override
+    public boolean setTime (int round, int lane) throws SQLException, ObjectDeprecatedException
+    {
+        if (!isValid)
+        {
+          throw new ObjectDeprecatedException();
+        }
+        if (finished || !t.isPreparingPhase())
+        {
+            
+            System.out.println("FALSCHE PHASE");
+            return false;
+        }
 
-  public void setRed (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return;
-    }
-
-    if (f.equals(fencer1)) {
-      sync.setRedPrelim(this, (Fencer) f, count);
-      redFor1 = count;
-    }
-    else {
-      if (f.equals(fencer2)) {
-        sync.setRedPrelim(this, (Fencer) f, count);
-        redFor2 = count;
-      }
-    }
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-  }
-
-  public void setBlack (iFencer f, int count) throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    if (finished || !t.isPreliminaryPhase()) {
-      return;
+        if (DBRoundRepresenter.setTime(this, round, lane))
+        {
+            this.round = round;
+            this.lane = lane;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        return false;
     }
 
-    if (f.equals(fencer1)) {
-      sync.setBlackPrelim(this, (Fencer) f, count);
-      blackFor1 = count;
-    }
-    else {
-      if (f.equals(fencer2)) {
-        sync.setBlackPrelim(this, (Fencer) f, count);
-        blackFor2 = count;
-      }
-    }
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-  }
-
-  public int getYellow (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
+    /*
+    *   Because of different side effects this has to be handled in the subclasses
+    */
+    @Override
+    public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedException
+    {
+        if(!t.isPreliminaryPhase()) return;
+        if(this.finished == finish) return;
+        
+        DBRoundRepresenter.setFinished(this, finish);
+        this.finished = finish;
+        
+        setChanged();
+        notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
     }
 
-    if (f.equals(fencer1)) {
-      return yellowFor1;
-    }
-    if (f.equals(fencer2)) {
-      return yellowFor2;
-    }
-    return -1;
-  }
-
-  public int getRed (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-
-    if (f.equals(fencer1)) {
-      return redFor1;
-    }
-    if (f.equals(fencer2)) {
-      return redFor2;
-    }
-    return -1;
-  }
-
-  public int getBlack (iFencer f) throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
+    public void setPoints (iFencer f, int points) throws SQLException, ObjectDeprecatedException 
+    {
+        if (!isValid)
+        {
+            throw new ObjectDeprecatedException();
+        }
+        if (finished)
+        {
+            return;
+        }
+        if (fencer1.equals(f))
+        {
+            
+            pointsFor1 = points;
+        }
+        else if (fencer2.equals(f))
+        {
+            pointsFor2 = points;
+        }
+        
+        setChanged();
+        notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
     }
 
-    if (f.equals(fencer1)) {
-      return blackFor1;
-    }
-    if (f.equals(fencer2)) {
-      return blackFor2;
-    }
-    return -1;
-  }
+    public int getPoints (iFencer f) throws ObjectDeprecatedException
+    {
+        if (!isValid)
+        {
+            throw new ObjectDeprecatedException();
+        }
 
-  @Override
-  public boolean equals (Object other) {
-    if (other == null) {
-      return false;
+        if (fencer1.equals(f))
+        {
+            return pointsFor1;
+        }
+        if (fencer2.equals(f))
+        {
+            return pointsFor2;
+        }
+        return -1;
     }
-    if (other == this) {
-      return true;
-    }
-    if (!(other instanceof Preliminary)) {
-      return false;
-    }
-    try {
-      if (((Preliminary) other).getID() == ID) {
-        return true;
-      }
-    }
-    catch (ObjectDeprecatedException e) {
-    }
-    return false;
-  }
 
-  public iFencer getLoser () {
-    if (finished) {
-      if (pointsFor1 > pointsFor2) {
-        return fencer2;
-      }
-      if (pointsFor1 < pointsFor2) {
-        return fencer1;
-      }
+    @Override
+    public int getOpponentPoints (iFencer f) throws ObjectDeprecatedException
+    {
+        if (!isValid)
+        {
+            throw new ObjectDeprecatedException();
+        }
+
+        if (fencer1.equals(f))
+        {
+            return pointsFor2;
+        }
+        if (fencer2.equals(f))
+        {
+            return pointsFor1;
+        }
+        return -1;
     }
-    return null;
-  }
+
+    @Override
+    public boolean isFinished() throws ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        return finished;
+    }
+
+    @Override
+    public iFencer getWinner() throws ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(!finished) return null;
+        
+        if(pointsFor1 == pointsFor2) return null;
+        
+        if(pointsFor1 > pointsFor2) return fencer1;
+        else return fencer2;
+    }
+
+    @Override
+    public iFencer getLoser() throws ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(!finished) return null;
+        
+        if(pointsFor1 == pointsFor2) return null;
+        
+        if(pointsFor1 > pointsFor2) return fencer2;
+        else return fencer1;
+    }
+
+    @Override
+    public boolean removeParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return false;
+        
+        if(fencer1.equals(f))
+        {
+            DBRoundRepresenter.removeParticipant(this, (Fencer)f);
+            fencer1 = null;
+            
+            t.removePreliminaryRoundFromScore((Fencer)f, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        
+        if(fencer2.equals(f))
+        {
+            DBRoundRepresenter.removeParticipant(this, (Fencer)f);
+            fencer2 = null;
+            
+            t.removePreliminaryRoundFromScore((Fencer)f, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return false;
+        
+        if(fencer1 == null)
+        {
+            DBRoundRepresenter.addParticipant(this, (Fencer)f);
+            fencer1 = (Fencer)f;
+            
+            t.addPreliminaryRoundToScore((Fencer)f, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        
+        if(fencer2 == null)
+        {
+            DBRoundRepresenter.addParticipant(this, (Fencer)f);
+            fencer2 = (Fencer)f;
+            
+            t.addPreliminaryRoundToScore((Fencer)f, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return false;
+        
+        if(fencer1.equals(out))
+        {
+            DBRoundRepresenter.switchParticipants(this, (Fencer)out, (Fencer)in);
+            fencer1 = (Fencer)in;
+            
+            t.removePreliminaryRoundFromScore((Fencer)out, this);
+            t.addPreliminaryRoundToScore((Fencer)in, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        if(fencer2.equals(out))
+        {
+            DBRoundRepresenter.switchParticipants(this, (Fencer)out, (Fencer)in);
+            fencer2 = (Fencer)in;
+            
+            t.removePreliminaryRoundFromScore((Fencer)out, this);
+            t.addPreliminaryRoundToScore((Fencer)in, this);
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isFencer(iFencer f) throws ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(fencer1.equals(f) ||fencer2.equals(f)) return true;
+        return false;
+    }
+
+    @Override
+    public void setYellow(iFencer f, int count) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return;
+        
+        if(fencer1.equals(f))
+        {
+            DBRoundRepresenter.setYellow(this, (Fencer)f, count);
+            yellowFor1 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+        if(fencer2.equals(f))
+        {
+            DBRoundRepresenter.setYellow(this, (Fencer)f, count);
+            yellowFor2 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+    }
+
+    @Override
+    public void setRed(iFencer f, int count) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return;
+        
+        if(fencer1.equals(f))
+        {
+            DBRoundRepresenter.setRed(this, (Fencer)f, count);
+            redFor1 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+        if(fencer2.equals(f))
+        {
+            DBRoundRepresenter.setRed(this, (Fencer)f, count);
+            redFor2 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+    }
+
+    @Override
+    public void setBlack(iFencer f, int count) throws SQLException, ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(finished) return;
+        
+        if(fencer1.equals(f))
+        {
+            DBRoundRepresenter.setBlack(this, (Fencer)f, count);
+            blackFor1 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+        if(fencer2.equals(f))
+        {
+            DBRoundRepresenter.setBlack(this, (Fencer)f, count);
+            blackFor2 = count;
+            
+            setChanged();
+            notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+            return;
+        }
+    }
+
+    @Override
+    public int getYellow(iFencer f) throws ObjectDeprecatedException
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(fencer1.equals(f)) return yellowFor1;
+        if(fencer2.equals(f)) return yellowFor2;
+        return -1;
+    }
+
+    @Override
+    public int getRed(iFencer f) throws ObjectDeprecatedException 
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(fencer1.equals(f)) return redFor1;
+        if(fencer2.equals(f)) return redFor2;
+        return -1;
+    }
+
+    @Override
+    public int getBlack(iFencer f) throws ObjectDeprecatedException 
+    {
+        if(!isValid) throw new ObjectDeprecatedException();
+        
+        if(fencer1.equals(f)) return blackFor1;
+        if(fencer2.equals(f)) return blackFor2;
+        return -1;
+    }
+
+    /*
+    *   Because of different side effects this has to be handled in the subclasses
+    */
+    @Override
+    public void delete() throws SQLException, ObjectDeprecatedException
+    {
+        t.removePreliminaryRoundFromScore(fencer1, this);
+        t.removePreliminaryRoundFromScore(fencer2, this);
+        
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

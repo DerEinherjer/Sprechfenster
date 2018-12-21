@@ -1,233 +1,162 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package model.rounds;
 
-import model.Fencer;
-import model.ObjectDeprecatedException;
-import model.ObjectExistException;
-import model.Tournament;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.EventPayload;
-import model.Sync;
+import model.DBConnection.DBEntetyRepresenter;
+import model.DBConnection.DBFinalroundRepresenter;
+import model.DBConnection.DBPreliminaryRepresenter;
+import model.ObjectDeprecatedException;
+import model.ObjectExistException;
 
-public class Finalround extends Round implements iFinalround {
-
-  private static Map<Integer, Finalround> finalrounds = new HashMap<>();
-
-  public static void ClearDatabaseCache () {
-    finalrounds.clear();
-  }
-
-  public static Finalround getFinalround (int id) throws SQLException {
-    if (!finalrounds.containsKey(id)) {
-      sync.loadFinalround(id);
-    }
-    return finalrounds.get(id);
-  }
-
-  public static List<Finalround> getFinalrounds (Tournament t) {
-    List<Finalround> ret = new ArrayList<>();
-    for (Finalround f : finalrounds.values()) {
-      try {
-        if (f.getTournament().equals(t)) {
-          ret.add(f);
-        }
-      }
-      catch (ObjectDeprecatedException ex) {
-        //Depricated Objectes can be ignored safely
-      }
-    }
-    return ret;
-  }
-
-  public static void deleteAllFinalRoundsOfTournament (Tournament tournamentToDelete) {
-    ArrayList<Finalround> toDelet = new ArrayList<>();
-    for (Map.Entry<Integer, Finalround> entry : finalrounds.entrySet()) 
+/**
+ *
+ * @author Asgard
+ */
+public class Finalround extends Round implements DBEntetyRepresenter, iFinalround
+{
+    @Override
+    public void init() throws SQLException
     {
-        Finalround f = entry.getValue();
-        try{
-            if(f.getTournament().equals(tournamentToDelete))
-            {
-                toDelet.add(f);
-            }
-        }
-        catch(Exception e){System.out.println(e.getMessage());}
+        //The SQL-Table is Created in Round because it is also used in Finalround
+        DBFinalroundRepresenter.createTable();
+        DBFinalroundRepresenter.loadFnialrounds();
     }
-    for(Finalround f : toDelet)
+
+    @Override
+    public void onStartUp() throws SQLException
     {
-        try{
-        f.delete();
-        }catch(Exception e){System.out.println(e.getMessage());}
-    }
-   }
-
-  public static String getSQLString () {
-    return "CREATE TABLE IF NOT EXISTS Finalrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
-            + "GewinnerRunde int DEFAULT -1,"
-            + "VerliererRunde int DEFAULT -1,"
-            + "FinalRunde int DEFAULT -1);";
-  }
-
-  // --------------------------------------------------------
-  private Finalround winnersround = null;
-  private Finalround losersround = null;
-  private Finalround preround1 = null;
-  private Finalround preround2 = null;
-  private Integer finalrunde = null;
-
-  public Finalround (Map<String, Object> set) throws ObjectExistException, SQLException {
-    super(set);
-
-    if (finalrounds.containsKey(this.ID)) {
-      throw new ObjectExistException(finalrounds.get(this.ID));
-    }
-    finalrounds.put(this.ID, this);
-
-    this.finalrunde = (Integer) set.get("FinalRunde".toUpperCase());
-
-    try {
-      this.winnersround = Finalround.getFinalround((Integer) set.get("GewinnerRunde".toUpperCase()));
-    }
-    catch (Exception e) {
-    }//Catches null-pointer for the finalround
-
-    try {
-      this.losersround = Finalround.getFinalround((Integer) set.get("VerliererRunde".toUpperCase()));
-    }
-    catch (Exception e) {
-    }//Catches nullpointer for all except the halffinal
-
-    if (winnersround != null) {
-      winnersround.initPrerounds(this);
-    }
-    if (losersround != null) {
-      losersround.initPrerounds(this);
+        for (Map.Entry<Integer, Finalround> entry : finalrounds.entrySet())
+        {
+            entry.getValue().initPhase2();
+        }
     }
     
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.roundFinalCreated));
-  }
-
-  void initPrerounds (Finalround f) {
-    if (preround1 == null) {
-      preround1 = f;
-    }
-    else {
-      if (preround2 == null) {
-        preround2 = f;
-      }
-    }
-  }
-
-  @Override
-  public void setFinished (boolean finish) throws SQLException, ObjectDeprecatedException {
-    if (this.isFinished() != finish) {
-      if (!finished) {
-        finished = finish;
-        if (winnersround != null) {
-          winnersround.addParticipant(getWinner());
+    @Override
+    public void onExit()
+    {
+        Map<Integer, Finalround> tmp = finalrounds;
+        finalrounds = new HashMap<>();
+        for (Map.Entry<Integer, Finalround> entry : tmp.entrySet())
+        {
+            entry.getValue().invalidate();
         }
-        if (losersround != null) {
-          losersround.addParticipant(getLoser());
-        }
+    }
+    
+    //#########################################################################
+    private static Map<Integer, Finalround> finalrounds = new HashMap<>();
+    
+    public static Finalround getFinalround(int id)
+    {
+        return finalrounds.get(id);
+    }
 
-        t.addWinFinal((Fencer) getWinner());
-
-        t.addHitsFinal(fencer1, pointsFor1);
-        t.addHitsFinal(fencer2, pointsFor2);
-
-        t.addGotHitFinal(fencer1, pointsFor2);
-        t.addGotHitFinal(fencer2, pointsFor1);
-
-        sync.setPrelimFinished(this, finished);
+    //#########################################################################
+    
+    private Integer finalRound = null;
+    
+    //Thos variables carry the roundIDs from Init Phase 1 to Phase 2 in which
+    //the ID can be dereferenced
+    private Integer winnerRoundID = null;
+    private Integer loserRoundID = null;
+    
+    private Finalround winnerRound = null;
+    private Finalround loserRound = null;
+    
+    public Finalround(Map<String, Object> set) throws ObjectExistException, SQLException
+    {
+        super(set);
         
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      }
-      else {
-        if (winnersround != null) {
-          winnersround.removeParticipant(getWinner());
-        }
-        if (losersround != null) {
-          losersround.removeParticipant(getLoser());
-        }
+        this.finalRound = (Integer) set.get("FinalRunde".toUpperCase());
         
-        System.out.println("ABZIEHEN");
-        t.subWinFinal((Fencer) getWinner());
-        finished = finish;
-
-        t.addHitsFinal(fencer1, -pointsFor1);
-        t.addHitsFinal(fencer2, -pointsFor2);
-
-        t.addGotHitFinal(fencer1, -pointsFor2);
-        t.addGotHitFinal(fencer2, -pointsFor1);
-
-        sync.setPrelimFinished(this, finished);
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      }
-    }
-  }
-
-  @Override
-  public Finalround getWinnerRound () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return winnersround;
-  }
-
-  @Override
-  public Finalround getLoserRound () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    return losersround;
-  }
-
-  @Override
-  public List<iFinalround> getPrerounds () throws ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
-    }
-    List<iFinalround> ret = new ArrayList<>();
-    if (preround1 != null) {
-      ret.add(preround1);
-    }
-
-    if (preround2 != null) {
-      ret.add(preround2);
-    }
-    return ret;
-  }
-
-  @Override
-  public void delete () throws SQLException, ObjectDeprecatedException {
-    if (!isValid) {
-      throw new ObjectDeprecatedException();
+        this.winnerRoundID = (Integer) set.get("GewinnerRunde".toUpperCase());
+        this.loserRoundID = (Integer) set.get("VerliererRunde".toUpperCase());
+        
+        finalrounds.put(ID, this);
     }
     
-    setChanged();
-    notifyObservers(new EventPayload(this, EventPayload.Type.roundFinalDeleted));
-    
-    if (finished) //This is needet in case finished rounds will be deletable
+    public Finalround(int finalRound)
     {
-      setFinished(false); //It will keep the score of the tournament correct.
+        this.ID = DBFinalroundRepresenter.createFinalround(t, finalRound);
+        
+        finalrounds.put(ID, this);
+        
+        this.t = t;
+        
+        this.fencer1 = null;
+        this.fencer2 = null;
+        
+        this.finalRound = finalRound;
+        this.round = -1;
+        this.lane = -1;
+        this.pointsFor1 = 0;
+        this.pointsFor2 = 0;
+        
+        this.finished = false;
+        
+        this.yellowFor1 = 0;
+        this.redFor1 = 0;
+        this.blackFor1 = 0;
+        
+        
+        this.yellowFor2 = 0;
+        this.redFor2 = 0;
+        this.blackFor2 = 0;
     }
-    sync.deleteFinalRoundFromDatabase(this.ID);
-    finalrounds.remove(this.ID);
-    this.ID = -1;
-    isValid = false;
-  }
+    
+    protected void initPhase2()
+    {
+        this.winnerRound = getFinalround(winnerRoundID);
+        this.loserRound = getFinalround(loserRoundID);
+    }
+    
+    public void addWinningRound(Finalround winningRound)
+    {
+        if(winnerRound==null)
+        {
+            winnerRound = winningRound;
+        }
+    }
+    
+    public void addLoosingRound(Finalround loosingRound)
+    {
+        if(winnerRound==null)
+        {
+            loserRound = loosingRound;
+        }
+    }
+    
+    @Override
+    public iFinalround getWinnerRound() throws ObjectDeprecatedException
+    {
+        return winnerRound;
+    }
 
-  @Override
-  public int getFinalRound () {
-    return finalrunde;
-  }
+    @Override
+    public iFinalround getLoserRound() throws ObjectDeprecatedException
+    {
+        return loserRound;
+    }
 
-  public boolean hasPrerounds () {
-    return preround1 != null && preround2 != null;
-  }
+    @Override
+    public List<iFinalround> getPrerounds() throws ObjectDeprecatedException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getFinalRound()
+    {
+        return finalRound;
+    }
+
+    private void invalidate()
+    {
+        this.ID = -1;
+    }
 }
