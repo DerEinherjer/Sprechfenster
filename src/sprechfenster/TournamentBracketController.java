@@ -22,14 +22,15 @@ import javafx.scene.layout.AnchorPane;
 import model.ObjectDeprecatedException;
 import model.iFencer;
 import model.iTournament;
-import model.rounds.iFinalround;
+import model.rounds.iFinalsMatch;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class TournamentBracketController extends Observable implements Initializable {
+public class TournamentBracketController extends Observable implements Initializable
+{
 
   @FXML
   private AnchorPane BracketAnchorPane;
@@ -48,7 +49,7 @@ public class TournamentBracketController extends Observable implements Initializ
   @FXML
   private Label LaneLabel;
 
-  private iFinalround Fight;
+  private iFinalsMatch Fight;
   private iTournament Tournament;
   private ArrayList<String> FencerNames;
 
@@ -56,21 +57,25 @@ public class TournamentBracketController extends Observable implements Initializ
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     GUIUtilities.FillNumberComboBox(LaneComboBox, 1, 20);
     GUIUtilities.FillNumberComboBox(FirstFencerPointsComboBox, 0, 30);
     GUIUtilities.FillNumberComboBox(SecondFencerPointsComboBox, 0, 30);
   }
 
-  public void SetData (iFinalround fight, iTournament tournament, ArrayList<String> fencerNames) {
+  public void SetData(iFinalsMatch fight, iTournament tournament, ArrayList<String> fencerNames)
+  {
     Fight = fight;
     Tournament = tournament;
     FencerNames = fencerNames;
     updateData();
   }
 
-  private void ParseAndSetValues () {
-    try {
+  private void ParseAndSetValues()
+  {
+    try
+    {
       int lane = Integer.parseInt(LaneComboBox.getValue());
       int firstFencerPoints = Integer.parseInt(FirstFencerPointsComboBox.getValue());
       int secondFencerPoints = Integer.parseInt(SecondFencerPointsComboBox.getValue());
@@ -80,72 +85,89 @@ public class TournamentBracketController extends Observable implements Initializ
       String secondFencerName = SecondFencerComboBox.getValue().trim();
       iFencer firstFencer = null;
       iFencer secondFencer = null;
-      for (iFencer fencer : Tournament.getAllParticipants()) {
-        if (firstFencer == null && firstFencerName.equals(fencer.getFullName())) {
+      for (iFencer fencer : Tournament.getAllParticipants())
+      {
+        if (firstFencer == null && firstFencerName.equals(fencer.getFullName()))
+        {
           firstFencer = fencer;
         }
-        if (secondFencer == null && secondFencerName.equals(fencer.getFullName())) {
+        if (secondFencer == null && secondFencerName.equals(fencer.getFullName()))
+        {
           secondFencer = fencer;
         }
       }
-      if (!Fight.getFencer().contains(firstFencer)) {
-              Fight.switchParticipantOut(Fight.getFencer().get(0), firstFencer);
-            }
-            if (!Fight.getFencer().contains(secondFencer)) {
-              Fight.switchParticipantOut(Fight.getFencer().get(1), secondFencer);
-            }
-      if (Fight.getPoints(firstFencer) != firstFencerPoints) {
+      if (!Fight.getFencer().contains(firstFencer))
+      {
+        Fight.switchParticipantOut(Fight.getFencer().get(0), firstFencer);
+      }
+      if (!Fight.getFencer().contains(secondFencer))
+      {
+        Fight.switchParticipantOut(Fight.getFencer().get(1), secondFencer);
+      }
+      if (Fight.getPoints(firstFencer) != firstFencerPoints)
+      {
         Fight.setPoints(firstFencer, firstFencerPoints);
       }
-      if (Fight.getPoints(secondFencer) != secondFencerPoints) {
+      if (Fight.getPoints(secondFencer) != secondFencerPoints)
+      {
         Fight.setPoints(secondFencer, secondFencerPoints);
       }
-      if (Fight.getLane() != lane) {
+      if (Fight.getLane() != lane)
+      {
         Fight.setTime(Fight.getRound(), lane);
       }
-      if (Fight.isFinished() != fightIsFinished) {
+      if (Fight.isFinished() != fightIsFinished)
+      {
         Fight.setFinished(fightIsFinished);
       }
-    }
-    catch (SQLException | ObjectDeprecatedException ex) {
+    } catch (SQLException | ObjectDeprecatedException ex)
+    {
       LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
     }
   }
 
-  public void handleAnyAction (ActionEvent event) {
+  public void handleAnyAction(ActionEvent event)
+  {
     ParseAndSetValues();
     setChanged();
     notifyObservers();
   }
 
-  public void updateData () {
-    if (Fight != null && Tournament != null) {
-      try {
-        if (Fight.getFencer().size() == 2) {
+  public void updateData()
+  {
+    if (Fight != null && Tournament != null)
+    {
+      try
+      {
+        if (Fight.getFencer().size() == 2)
+        {
           FirstFencerComboBox.getItems().setAll(FencerNames);
           SecondFencerComboBox.getItems().setAll(FencerNames);
           iFencer firstFencer = Fight.getFencer().get(0);
           iFencer secondFencer = Fight.getFencer().get(1);
-          for (String name : FencerNames) {
-            if (name.equals(firstFencer.getFullName())) {
+          for (String name : FencerNames)
+          {
+            if (name.equals(firstFencer.getFullName()))
+            {
               FirstFencerComboBox.getSelectionModel().select(name);
             }
-            if (name.equals(secondFencer.getFullName())) {
+            if (name.equals(secondFencer.getFullName()))
+            {
               SecondFencerComboBox.getSelectionModel().select(name);
             }
           }
           FirstFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(0)));
           SecondFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(1)));
-        }
-        else {
+        } else
+        {
           FirstFencerComboBox.getSelectionModel().clearSelection();
           SecondFencerComboBox.getSelectionModel().clearSelection();
         }
         GUIUtilities.FillNumberComboBox(LaneComboBox, 1, Tournament.getLanes());
         LaneComboBox.getSelectionModel().select(Fight.getLane() - 1);
         FightFinishedCheckBox.setSelected(Fight.isFinished());
-      }
-      catch (ObjectDeprecatedException ex) {
+      } catch (ObjectDeprecatedException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }

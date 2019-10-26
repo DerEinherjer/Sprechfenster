@@ -6,8 +6,6 @@
 package sprechfenster;
 
 import model.ObjectDeprecatedException;
-import model.rounds.iPreliminary;
-import model.Sync;
 import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
@@ -39,13 +37,15 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.iFencer;
 import sprechfenster.presenter.FightPresenter;
+import model.rounds.iQualificationMatch;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class QualificationFightTableController implements Initializable, Observer {
+public class QualificationFightTableController implements Initializable, Observer
+{
 
   @FXML
   TitledPane MainPane;
@@ -83,7 +83,8 @@ public class QualificationFightTableController implements Initializable, Observe
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     FightsTableView.setFixedCellSize(30);
     FightsTableView.prefHeightProperty().bind(FightsTableView.fixedCellSizeProperty().multiply(Bindings.size(FightsTableView.getItems()).add(1.01)));
 
@@ -105,21 +106,27 @@ public class QualificationFightTableController implements Initializable, Observe
     Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
             = //
             (final TableColumn<FightPresenter, String> param)
-            -> {
-      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>() {
+            ->
+    {
+      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
+      {
         final Button EditButton = new Button("Ändern");
 
         @Override
-        public void updateItem (String item, boolean empty) {
+        public void updateItem(String item, boolean empty)
+        {
           super.updateItem(item, empty);
-          if (empty) {
+          if (empty)
+          {
             setGraphic(null);
             setText(null);
-          }
-          else {
+          } else
+          {
             EditButton.setOnAction((ActionEvent event)
-                    -> {
-              try {
+                    ->
+            {
+              try
+              {
                 FightPresenter fight = getTableView().getItems().get(getIndex());
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
                         "sprechfenster/resources/fxml/EditFightDialog.fxml"
@@ -133,8 +140,8 @@ public class QualificationFightTableController implements Initializable, Observe
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initOwner(EditButton.getScene().getWindow());
                 stage.showAndWait();
-              }
-              catch (IOException ex) {
+              } catch (IOException ex)
+              {
                 sprechfenster.LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
               }
 
@@ -148,58 +155,68 @@ public class QualificationFightTableController implements Initializable, Observe
     };
 
     EditTableColumn.setCellFactory(editCellFactory);
-    Sync.getInstance().addObserver(this);
   }
+
   public TableView GetTableViewForPrinting()
   {
     return FightsTableView;
   }
-  
+
   public String GetTableTitle()
   {
     return MainPane.getText();
   }
-  
-  public void SetTournament (iTournament tournament) {
+
+  public void SetTournament(iTournament tournament)
+  {
     Tournament = tournament;
     FencerNames = new ArrayList<String>();
-    if (Tournament != null) {
-      try {
-        for (iFencer fencer : Tournament.getAllParticipants()) {
+    if (Tournament != null)
+    {
+      try
+      {
+        for (iFencer fencer : Tournament.getAllParticipants())
+        {
           FencerNames.add(fencer.getFullName());
         }
-      }
-      catch (SQLException ex) {
+      } catch (SQLException ex)
+      {
         Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  public void SetGroupNumber (int groupNumber) {
+  public void SetGroupNumber(int groupNumber)
+  {
     GroupNumber = groupNumber;
     LaneNumber = Integer.MIN_VALUE;
     MainPane.setText("Gruppe " + Integer.toString(groupNumber));
   }
-  
-  public void SetLaneNumber (int laneNumber)
+
+  public void SetLaneNumber(int laneNumber)
   {
     LaneNumber = laneNumber;
     GroupNumber = Integer.MIN_VALUE;
     MainPane.setText("Bahn " + Integer.toString(LaneNumber));
   }
 
-  public void SetFights (List<iPreliminary> qualificationFights) {
+  public void SetFights(List<iQualificationMatch> qualificationFights)
+  {
     FightsTableView.getItems().clear();
-    if (qualificationFights != null) {
+    if (qualificationFights != null)
+    {
       int MaxRound = 0;
-      for (iPreliminary qualificationFight : qualificationFights) {
-        try {
-          if (qualificationFight.getGroup() == GroupNumber ||qualificationFight.getLane() == LaneNumber) {
+      for (iQualificationMatch qualificationFight : qualificationFights)
+      {
+        try
+        {
+          if (qualificationFight.getQualificationGroup()== GroupNumber || qualificationFight.getLane() == LaneNumber)
+          {
             MaxRound = Math.max(MaxRound, qualificationFight.getRound());
             FightsTableView.getItems().add(new FightPresenter(qualificationFight));
           }
-        }
-        catch (ObjectDeprecatedException ex) {
+        } catch (SQLException | ObjectDeprecatedException ex)
+        {
           Logger.getLogger(QualificationFightTableController.class.getName()).log(Level.SEVERE, null, ex);
         }
       }
@@ -209,14 +226,17 @@ public class QualificationFightTableController implements Initializable, Observe
     UpdateStatus();
   }
 
-  private void UpdateStatus () {
-    if (Tournament != null) {
-      FightsTableView.setEditable(Tournament.isPreliminaryPhase());
+  private void UpdateStatus()
+  {
+    if (Tournament != null)
+    {
+      FightsTableView.setEditable(Tournament.isQualificationPhase());
     }
   }
 
   @Override
-  public void update (Observable o, Object o1) {
-        UpdateStatus();
+  public void update(Observable o, Object o1)
+  {
+    UpdateStatus();
   }
 }

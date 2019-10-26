@@ -12,7 +12,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 
-public class EditCell<S, T> extends TableCell<S, T> {
+public class EditCell<S, T> extends TableCell<S, T>
+{
 
   // Text field for editing
   // TODO: allow this to be a plugable control.
@@ -21,51 +22,63 @@ public class EditCell<S, T> extends TableCell<S, T> {
   // Converter for converting the text in the text field to the user type, and vice-versa:
   private final StringConverter<T> converter;
 
-  public EditCell (StringConverter<T> converter) {
+  public EditCell(StringConverter<T> converter)
+  {
     this.converter = converter;
 
-    itemProperty().addListener((obx, oldItem, newItem) -> {
-      if (newItem == null) {
+    itemProperty().addListener((obx, oldItem, newItem) ->
+    {
+      if (newItem == null)
+      {
         setText(null);
-      }
-      else {
+      } else
+      {
         setText(converter.toString(newItem));
       }
     });
     setGraphic(textField);
     setContentDisplay(ContentDisplay.TEXT_ONLY);
 
-    textField.setOnAction(evt -> {
+    textField.setOnAction(evt ->
+    {
       commitEdit(this.converter.fromString(textField.getText()));
     });
-    textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-      if (!isNowFocused) {
+    textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) ->
+    {
+      if (!isNowFocused)
+      {
         commitEdit(this.converter.fromString(textField.getText()));
       }
     });
-    textField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-      if (event.getCode() == KeyCode.ESCAPE) {
+    textField.addEventFilter(KeyEvent.KEY_PRESSED, event ->
+    {
+      if (event.getCode() == KeyCode.ESCAPE)
+      {
         textField.setText(converter.toString(getItem()));
         cancelEdit();
         event.consume();
-      }
-      else {
-        if (event.getCode() == KeyCode.RIGHT) {
+      } else
+      {
+        if (event.getCode() == KeyCode.RIGHT)
+        {
           getTableView().getSelectionModel().selectRightCell();
           event.consume();
-        }
-        else {
-          if (event.getCode() == KeyCode.LEFT) {
+        } else
+        {
+          if (event.getCode() == KeyCode.LEFT)
+          {
             getTableView().getSelectionModel().selectLeftCell();
             event.consume();
-          }
-          else {
-            if (event.getCode() == KeyCode.UP) {
+          } else
+          {
+            if (event.getCode() == KeyCode.UP)
+            {
               getTableView().getSelectionModel().selectAboveCell();
               event.consume();
-            }
-            else {
-              if (event.getCode() == KeyCode.DOWN) {
+            } else
+            {
+              if (event.getCode() == KeyCode.DOWN)
+              {
                 getTableView().getSelectionModel().selectBelowCell();
                 event.consume();
               }
@@ -80,15 +93,18 @@ public class EditCell<S, T> extends TableCell<S, T> {
    * Convenience converter that does nothing (converts Strings to themselves and
    * vice-versa...).
    */
-  public static final StringConverter<String> IDENTITY_CONVERTER = new StringConverter<String>() {
+  public static final StringConverter<String> IDENTITY_CONVERTER = new StringConverter<String>()
+  {
 
     @Override
-    public String toString (String object) {
+    public String toString(String object)
+    {
       return object;
     }
 
     @Override
-    public String fromString (String string) {
+    public String fromString(String string)
+    {
       return string;
     }
 
@@ -99,13 +115,15 @@ public class EditCell<S, T> extends TableCell<S, T> {
    *
    * @return
    */
-  public static <S> EditCell<S, String> createStringEditCell () {
+  public static <S> EditCell<S, String> createStringEditCell()
+  {
     return new EditCell<S, String>(IDENTITY_CONVERTER);
   }
 
   // set the text of the text field and display the graphic
   @Override
-  public void startEdit () {
+  public void startEdit()
+  {
     super.startEdit();
     textField.setText(converter.toString(getItem()));
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -114,21 +132,25 @@ public class EditCell<S, T> extends TableCell<S, T> {
 
   // revert to text display
   @Override
-  public void cancelEdit () {
+  public void cancelEdit()
+  {
     super.cancelEdit();
     setContentDisplay(ContentDisplay.TEXT_ONLY);
   }
 
   // commits the edit. Update property if possible and revert to text display
   @Override
-  public void commitEdit (T item) {
+  public void commitEdit(T item)
+  {
 
     // This block is necessary to support commit on losing focus, because the baked-in mechanism
     // sets our editing state to false before we can intercept the loss of focus.
     // The default commitEdit(...) method simply bails if we are not editing...
-    if (!isEditing() && !item.equals(getItem())) {
+    if (!isEditing() && !item.equals(getItem()))
+    {
       TableView<S> table = getTableView();
-      if (table != null) {
+      if (table != null)
+      {
         TableColumn<S, T> column = getTableColumn();
         CellEditEvent<S, T> event = new CellEditEvent<>(table,
                 new TablePosition<S, T>(table, getIndex(), column),

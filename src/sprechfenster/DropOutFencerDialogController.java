@@ -26,7 +26,8 @@ import model.iFencer;
 import model.iTournament;
 import sprechfenster.presenter.FencerPresenter;
 
-public class DropOutFencerDialogController implements Initializable {
+public class DropOutFencerDialogController implements Initializable
+{
 
   @FXML
   Pane MainDialogPane;
@@ -42,47 +43,59 @@ public class DropOutFencerDialogController implements Initializable {
   iTournament Tournament;
 
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     ParticipantsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     ParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
   }
 
-  public void setTournament (iTournament tournament) {
+  public void setTournament(iTournament tournament)
+  {
     Tournament = tournament;
     updateParticipantsList();
   }
 
   @FXML
-  private void handleDropOutFencerButtonAction (ActionEvent event) {
+  private void handleDropOutFencerButtonAction(ActionEvent event)
+  {
 
-    if (Tournament != null) {
-      try {
+    if (Tournament != null)
+    {
+      try
+      {
         List<iFencer> participants = Tournament.getAllParticipants();
         ObservableList<FencerPresenter> selectedPresenters = ParticipantsTableView.getSelectionModel().getSelectedItems();
-        if (selectedPresenters.size() > 0) {
-          if (GUIUtilities.IsTournamentStarted(Tournament)) {
+        if (selectedPresenters.size() > 0)
+        {
+          if (GUIUtilities.IsTournamentStarted(Tournament))
+          {
             boolean confirmed = GUIUtilities.ShowConfirmationDialog("Ausgewählte Fechter werden aus dem laufenden Turnier ausgeschieden. Forfahren?");
-            if (confirmed) {
-              for (FencerPresenter fencerPresenter : selectedPresenters) {
+            if (confirmed)
+            {
+              for (FencerPresenter fencerPresenter : selectedPresenters)
+              {
                 boolean fencerRemoved = participants.remove(fencerPresenter.getFencer());
-                if (fencerRemoved) {
+                if (fencerRemoved)
+                {
                   Tournament.dropOut(fencerPresenter.getFencer());
                 }
               }
             }
-          }
-          else {
-            for (FencerPresenter fencerPresenter : selectedPresenters) {
+          } else
+          {
+            for (FencerPresenter fencerPresenter : selectedPresenters)
+            {
               boolean fencerRemoved = participants.remove(fencerPresenter.getFencer());
-              if (fencerRemoved) {
+              if (fencerRemoved)
+              {
                 Tournament.removeParticipant(fencerPresenter.getFencer());
               }
             }
           }
         }
 
-      }
-      catch (SQLException ex) {
+      } catch (SQLException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
@@ -90,30 +103,37 @@ public class DropOutFencerDialogController implements Initializable {
   }
 
   @FXML
-  private void handleCancelButtonAction (ActionEvent event) {
+  private void handleCancelButtonAction(ActionEvent event)
+  {
     closeDialog();
   }
 
-  private void updateParticipantsList () {
-    if (Tournament != null) {
-      try {
+  private void updateParticipantsList()
+  {
+    if (Tournament != null)
+    {
+      try
+      {
         List<FencerPresenter> presenters = new ArrayList<>();
-        for (iFencer fencer : Tournament.getAllParticipants()) {
+        for (iFencer fencer : Tournament.getAllParticipants())
+        {
           presenters.add(new FencerPresenter(fencer, Tournament));
         }
         ParticipantsTableView.getItems().setAll(presenters);
-      }
-      catch (SQLException ex) {
+      } catch (SQLException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  private void closeDialog () {
+  private void closeDialog()
+  {
     getDialogStage().close();
   }
 
-  private Stage getDialogStage () {
+  private Stage getDialogStage()
+  {
     return (Stage) MainDialogPane.getScene().getWindow();
   }
 }

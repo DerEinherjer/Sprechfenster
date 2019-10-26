@@ -1,11 +1,11 @@
 package model;
 
-
-public interface iScore
+public interface iScore extends Comparable
 {
-    public int getWins();
-    
-    public int getHits();
-    
-    public int getGotHit();
+
+  public int getWins();
+
+  public int getHits();
+
+  public int getGotHit();
 }

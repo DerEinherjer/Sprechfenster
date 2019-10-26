@@ -11,7 +11,8 @@ import java.util.logging.Logger;
  *
  * @author Stefan
  */
-public class LoggingUtilities {
+public class LoggingUtilities
+{
 
   public static final Logger LOGGER = Logger.getLogger("SprechFensterLogger");
 }

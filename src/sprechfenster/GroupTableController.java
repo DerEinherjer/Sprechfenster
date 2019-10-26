@@ -26,9 +26,11 @@ import sprechfenster.presenter.FencerPresenter;
  *
  * @author Stefan
  */
-public class GroupTableController implements Initializable {
+public class GroupTableController implements Initializable
+{
 
-  public enum TournamentPhase {
+  public enum TournamentPhase
+  {
     Invalid,
     FinalPhase,
     QualificationPhase
@@ -54,7 +56,8 @@ public class GroupTableController implements Initializable {
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     FencerNameTableColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
     WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundWins"));
     PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundPoints"));
@@ -65,31 +68,38 @@ public class GroupTableController implements Initializable {
     PointsTableColumn.setComparator(GUIUtilities::ComparePointsStrings);
   }
 
-  public void SetGroupName (String groupName) {
+  public void SetGroupName(String groupName)
+  {
     MainPane.setText(groupName);
   }
 
-  public void SetTournament (iTournament tournament) {
+  public void SetTournament(iTournament tournament)
+  {
     Tournament = tournament;
   }
 
-  public void SetPhase (TournamentPhase phase) {
+  public void SetPhase(TournamentPhase phase)
+  {
     Phase = phase;
-    if (Phase == TournamentPhase.FinalPhase) {
+    if (Phase == TournamentPhase.FinalPhase)
+    {
       WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundWins"));
       PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("FinalRoundScore"));
-    }
-    else {
+    } else
+    {
       WinsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundWins"));
       PointsTableColumn.setCellValueFactory(new PropertyValueFactory<>("QualificationRoundPoints"));
     }
   }
 
-  public void AddFencers (List<iFencer> fencers) {
+  public void AddFencers(List<iFencer> fencers)
+  {
     ObservableList items = GroupTableView.getItems();
-    for (iFencer fencer : fencers) {
+    for (iFencer fencer : fencers)
+    {
       FencerPresenter fencerPresenter = new FencerPresenter(fencer, Tournament);
-      if (items.filtered(presenter -> ((FencerPresenter) presenter).getFencer() == fencer).isEmpty()) {
+      if (items.filtered(presenter -> ((FencerPresenter) presenter).getFencer() == fencer).isEmpty())
+      {
         items.add(fencerPresenter);
       }
     }

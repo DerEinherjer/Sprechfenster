@@ -20,47 +20,47 @@
         </ScrollPane>
       </children>
     </AnchorPane>
-      <TabPane>
-         <tabs>
-            <Tab fx:id="GroupsTab" text="Gruppenansicht">
-               <content>
-                <AnchorPane fx:id="RightAnchorPane">
-                  <children>
-                        <ToolBar layoutX="8.0" layoutY="10.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <items>
-                          <Button fx:id="CreateQualificationRoundsButton1" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
-                            <Button fx:id="PrintGroupsViewButton" mnemonicParsing="false" onAction="#HandlePrintGroupsViewButtonAction" text="Drucken" />
-                          </items>
-                        </ToolBar>
-                    <ScrollPane fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
-                      <content>
-                        <VBox fx:id="FightsPerGroupBox" spacing="25.0" />
-                      </content>
-                    </ScrollPane>
-                  </children>
-                </AnchorPane>
-               </content>
-            </Tab>
-            <Tab fx:id="LanesTab" text="Bahnansicht">
-              <content>
-                <AnchorPane minHeight="10.0" minWidth="10.0">
-                     <children>
-                        <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <items>
-                              <Button fx:id="CreateQualificationRoundsButton2" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
-                            <Button fx:id="PrintLanesViewButton" mnemonicParsing="false" onAction="#HandlePrintLanesViewButtonAction" text="Drucken" />
-                          </items>
-                        </ToolBar>
-                        <ScrollPane fx:id="LanesTab1" fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
-                           <content>
-                              <VBox fx:id="FightsPerLaneBox" spacing="25.0" />
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </Tab>
-         </tabs>
-      </TabPane>
+    <TabPane>
+      <tabs>
+        <Tab fx:id="GroupsTab" text="Gruppenansicht">
+          <content>
+            <AnchorPane fx:id="RightAnchorPane">
+              <children>
+                <ToolBar layoutX="8.0" layoutY="10.0" prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <items>
+                    <Button fx:id="CreateQualificationRoundsButton1" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
+                    <Button fx:id="PrintGroupsViewButton" mnemonicParsing="false" onAction="#HandlePrintGroupsViewButtonAction" text="Drucken" />
+                  </items>
+                </ToolBar>
+                <ScrollPane fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+                  <content>
+                    <VBox fx:id="FightsPerGroupBox" spacing="25.0" />
+                  </content>
+                </ScrollPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+        <Tab fx:id="LanesTab" text="Bahnansicht">
+          <content>
+            <AnchorPane minHeight="10.0" minWidth="10.0">
+              <children>
+                <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <items>
+                    <Button fx:id="CreateQualificationRoundsButton2" mnemonicParsing="false" onAction="#HandleCreateQualificationRoundsButtonAction" text="Vorrunden beginnen" />
+                    <Button fx:id="PrintLanesViewButton" mnemonicParsing="false" onAction="#HandlePrintLanesViewButtonAction" text="Drucken" />
+                  </items>
+                </ToolBar>
+                <ScrollPane fx:id="LanesTab1" fitToWidth="true" minHeight="10.0" minWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+                  <content>
+                    <VBox fx:id="FightsPerLaneBox" spacing="25.0" />
+                  </content>
+                </ScrollPane>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
   </items>
 </SplitPane>

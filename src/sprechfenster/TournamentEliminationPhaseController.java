@@ -6,9 +6,6 @@
 package sprechfenster;
 
 import model.ObjectDeprecatedException;
-import model.Sync;
-import model.rounds.iFinalround;
-import model.iSync;
 import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
@@ -48,13 +45,15 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.iFencer;
 import sprechfenster.presenter.FightPresenter;
+import model.rounds.iFinalsMatch;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class TournamentEliminationPhaseController implements Initializable, Observer {
+public class TournamentEliminationPhaseController implements Initializable, Observer
+{
 
   @FXML
   Button CreateEliminationRoundsButton;
@@ -89,7 +88,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   TableColumn<FightPresenter, Boolean> FinishedTableColumn;
 
   private iTournament Tournament;
-  private ArrayList<ArrayList<iFinalround>> RoundToFights;
+  private ArrayList<ArrayList<iFinalsMatch>> RoundToFights;
   private ArrayList<String> FencerNames;
 
   private final ArrayList<TournamentBracketController> BracketControllers = new ArrayList<TournamentBracketController>();
@@ -103,12 +102,13 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
-    iSync.getInstance().addObserver(this);
+  public void initialize(URL url, ResourceBundle rb)
+  {
     InitializeTableTab();
   }
 
-  private void InitializeTableTab () {
+  private void InitializeTableTab()
+  {
     RoundTableColumn.setCellValueFactory(new PropertyValueFactory<>("Round"));
     RoundTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToRoundNumber));
     LaneTableColumn.setCellValueFactory(new PropertyValueFactory<>("Lane"));
@@ -126,21 +126,27 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
             = //
             (final TableColumn<FightPresenter, String> param)
-            -> {
-      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>() {
+            ->
+    {
+      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
+      {
         final Button EditButton = new Button("Ändern");
 
         @Override
-        public void updateItem (String item, boolean empty) {
+        public void updateItem(String item, boolean empty)
+        {
           super.updateItem(item, empty);
-          if (empty) {
+          if (empty)
+          {
             setGraphic(null);
             setText(null);
-          }
-          else {
+          } else
+          {
             EditButton.setOnAction((ActionEvent event)
-                    -> {
-              try {
+                    ->
+            {
+              try
+              {
                 FightPresenter fight = getTableView().getItems().get(getIndex());
                 FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
                         "sprechfenster/resources/fxml/EditFightDialog.fxml"
@@ -154,8 +160,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initOwner(EditButton.getScene().getWindow());
                 stage.showAndWait();
-              }
-              catch (IOException ex) {
+              } catch (IOException ex)
+              {
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
               }
 
@@ -170,16 +176,20 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     EditTableColumn.setCellFactory(editCellFactory);
   }
 
-  public void SetTournament (iTournament tournament) {
+  public void SetTournament(iTournament tournament)
+  {
     Tournament = tournament;
     FencerNames = new ArrayList<String>();
-    if (Tournament != null) {
-      try {
-        for (iFencer fencer : Tournament.getAllParticipants()) {
+    if (Tournament != null)
+    {
+      try
+      {
+        for (iFencer fencer : Tournament.getAllParticipants())
+        {
           FencerNames.add(fencer.getFullName());
         }
-      }
-      catch (SQLException ex) {
+      } catch (SQLException ex)
+      {
         Logger.getLogger(TournamentEliminationPhaseController.class.getName()).log(Level.SEVERE, null, ex);
       }
     }
@@ -187,16 +197,21 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
 
   }
 
-  private void updateRounds () {
-    RoundToFights = new ArrayList<ArrayList<iFinalround>>();
-    if (Tournament != null) {
-      for (int i = 0; i < Tournament.getFinalRounds(); i++) {
-        ArrayList<iFinalround> fightsForRound = new ArrayList<iFinalround>();
+  private void updateRounds()
+  {
+    RoundToFights = new ArrayList<ArrayList<iFinalsMatch>>();
+    if (Tournament != null)
+    {
+      for (int i = 0; i < Tournament.getFinalRounds(); i++)
+      {
+        ArrayList<iFinalsMatch> fightsForRound = new ArrayList<iFinalsMatch>();
         RoundToFights.add(fightsForRound);
       }
-      for (iFinalround round : Tournament.getAllFinalrounds()) {
+      for (iFinalsMatch round : Tournament.getAllFinalsMatches())
+      {
         int roundNumber = round.getFinalRound();
-        if (roundNumber == -1) {
+        if (roundNumber == -1)
+        {
           roundNumber = Tournament.getFinalRounds();
         }
         RoundToFights.get(roundNumber - 1).add(round);
@@ -205,16 +220,20 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   }
 
   @FXML
-  private void handleCreateEliminationRoundsButtonAction (ActionEvent event) {
-    if (Tournament != null) {
-      try {
+  private void handleCreateEliminationRoundsButtonAction(ActionEvent event)
+  {
+    if (Tournament != null)
+    {
+      try
+      {
         boolean confirmed = GUIUtilities.ShowConfirmationDialog("Die Vorrunden können nicht mehr verändert werden, wenn das Finale begonnen wird. Fortfahren?");
-        if (confirmed) {
-          Tournament.startFinalrounds();
+        if (confirmed)
+        {
+          Tournament.startFinalsPhase();
           updateAll();
         }
-      }
-      catch (SQLException | ObjectDeprecatedException ex) {
+      } catch (SQLException | ObjectDeprecatedException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
         System.out.println("exc2");
       }
@@ -222,35 +241,43 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   }
 
   @FXML
-  private void handleAbortEliminationRoundsButtonAction (ActionEvent event) {
-    if (Tournament != null) {
-      try {
+  private void handleAbortEliminationRoundsButtonAction(ActionEvent event)
+  {
+    if (Tournament != null)
+    {
+      try
+      {
         Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION,
                 "Alle bisherigen Finalrunden-Ergebnisse werden gelöscht. Fortfahren?",
                 ButtonType.YES, ButtonType.NO);
         Optional<ButtonType> result = confirmationDialog.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.YES) {
-          Tournament.abortFinalrounds();
+        if (result.isPresent() && result.get() == ButtonType.YES)
+        {
+          Tournament.abortFinalsPhase();
           updateAll();
         }
-      }
-      catch (SQLException ex) {
+      } catch (SQLException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  private void updateAll () {
+  private void updateAll()
+  {
     updateRounds();
     updateTableTabData();
     createBracketTabData();
   }
 
-  private void updateTableTabData () {
+  private void updateTableTabData()
+  {
     FightsTableView.getItems().clear();
     FencersPane.getChildren().clear();
-    if (Tournament != null) {
-      try {
+    if (Tournament != null)
+    {
+      try
+      {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
         Node finalRoundScoreGroupTable = loader.load();
         GroupTableController finalRoundsScoreController = loader.getController();
@@ -269,37 +296,43 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FencersPane.getChildren().add(preliminaryRoundScoreGroupTable);
 
         StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
-        CreateEliminationRoundsButton.setDisable(Tournament.isPreliminaryPhase());
-        AbortEliminationRoundsButton.setDisable(Tournament.isFinalPhase());
+        CreateEliminationRoundsButton.setDisable(Tournament.isQualificationPhase());
+        AbortEliminationRoundsButton.setDisable(Tournament.isFinalsPhase());
         int maxRound = 0;
-        for (iFinalround finalRound : Tournament.getAllFinalrounds()) {
+        for (iFinalsMatch finalRound : Tournament.getAllFinalsMatches())
+        {
           maxRound = Math.max(maxRound, finalRound.getRound());
-          if (finalRound.getFencer().size() == 2) {
+          if (finalRound.getFencer().size() == 2)
+          {
             FightsTableView.getItems().add(new FightPresenter(finalRound));
           }
         }
         StringToRoundNumber.setMinAndMaxValues(maxRound, 1);
-      }
-      catch (IOException | SQLException | ObjectDeprecatedException ex) {
+      } catch (IOException | SQLException | ObjectDeprecatedException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  private void createBracketTabData () {
-    for (TournamentBracketController controller : BracketControllers) {
+  private void createBracketTabData()
+  {
+    for (TournamentBracketController controller : BracketControllers)
+    {
       controller.deleteObserver(this);
     }
     BracketControllers.clear();
     BracketViewHBox.getChildren().clear();
-    if (Tournament != null) {
+    if (Tournament != null)
+    {
       final int finalRounds = Tournament.getFinalRounds();
       int round = 0;
       boolean isLastRound;
       boolean firstPlaceMatch = false;
       int spacingBetweenBrackets = 1;
       int spacingForFirstBracket = 0;
-      for (int i = finalRounds - 1; i >= 0; i--) {
+      for (int i = finalRounds - 1; i >= 0; i--)
+      {
         round++;
         isLastRound = round == finalRounds;
         VBox roundMatchesBox = new VBox(0);
@@ -307,67 +340,80 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         Label roundTitle = new Label("Runde " + round);
         roundMatchesBox.getChildren().add(roundTitle);
         int numberOfMatchesInRound = (int) Math.pow(2, i);
-        if (isLastRound) {
+        if (isLastRound)
+        {
           //add one match for the third place
           numberOfMatchesInRound++;
         }
-        for (int j = 0; j < numberOfMatchesInRound; j++) {
-          try {
-            if (j == 0) {
+        for (int j = 0; j < numberOfMatchesInRound; j++)
+        {
+          try
+          {
+            if (j == 0)
+            {
               //initial spacing from the top, for the first match only
               int numberOfDummys = spacingForFirstBracket;
-              for (int x = 0; x < numberOfDummys; x++) {
+              for (int x = 0; x < numberOfDummys; x++)
+              {
                 addVerticalSpacer(roundMatchesBox);
               }
-              if (isLastRound) {
+              if (isLastRound)
+              {
                 Label matchTitle = new Label("Finale");
                 roundMatchesBox.getChildren().add(matchTitle);
                 firstPlaceMatch = true;
               }
-            }
-            else {
-              if (isLastRound) {
+            } else
+            {
+              if (isLastRound)
+              {
                 //Small fixed spacing between final match and match for third place
                 addVerticalSpacer(roundMatchesBox);
                 Label matchTitle = new Label("3. Platz");
                 roundMatchesBox.getChildren().add(matchTitle);
                 firstPlaceMatch = false;
-              }
-              else {
+              } else
+              {
                 //apply spacing between two matches
-                for (int x = 0; x < spacingBetweenBrackets; x++) {
+                for (int x = 0; x < spacingBetweenBrackets; x++)
+                {
                   addVerticalSpacer(roundMatchesBox);
                 }
               }
             }
-            iFinalround fight = null;
+            iFinalsMatch fight = null;
             int roundIndex = round - 1;
-            if (roundIndex < RoundToFights.size() && j < RoundToFights.get(roundIndex).size()) {
-              if (isLastRound) {
+            if (roundIndex < RoundToFights.size() && j < RoundToFights.get(roundIndex).size())
+            {
+              if (isLastRound)
+              {
                 //special handling for last round: make sure the final match appears under the correct label,
                 //and the third place match appears below it (also under its own label)
-                for (iFinalround match : RoundToFights.get(roundIndex)) {
-                  if (firstPlaceMatch && match.getFinalRound() != -1) {
+                for (iFinalsMatch match : RoundToFights.get(roundIndex))
+                {
+                  if (firstPlaceMatch && match.getFinalRound() != -1)
+                  {
                     //first place match has a final round != -1
                     fight = match;
-                  }
-                  else {
-                    if (!firstPlaceMatch && match.getFinalRound() == -1) {
+                  } else
+                  {
+                    if (!firstPlaceMatch && match.getFinalRound() == -1)
+                    {
                       //third place match has final round == -1
                       fight = match;
                     }
                   }
                 }
-              }
-              else {
+              } else
+              {
                 fight = RoundToFights.get(roundIndex).get(j);
               }
             }
             TournamentBracketController bracketController = addBracketForFight(fight, roundMatchesBox);
             BracketControllers.add(bracketController);
             bracketController.addObserver(this);
-          }
-          catch (IOException e) {
+          } catch (IOException e)
+          {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
           }
         }
@@ -381,7 +427,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     }
   }
 
-  private TournamentBracketController addBracketForFight (iFinalround fight, VBox matchesBox) throws IOException {
+  private TournamentBracketController addBracketForFight(iFinalsMatch fight, VBox matchesBox) throws IOException
+  {
     //load the control for the next match and display it
     FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentBracket.fxml"));
     Node bracket = loader.load();
@@ -391,7 +438,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     return bracketController;
   }
 
-  private void addVerticalSpacer (VBox box) throws IOException {
+  private void addVerticalSpacer(VBox box) throws IOException
+  {
     Separator spacer = new Separator();
     spacer.setOrientation(Orientation.VERTICAL);
     spacer.setMinHeight(116);
@@ -401,19 +449,10 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   }
 
   @Override
-  public void update (Observable o, Object o1) {
-    if (o1 instanceof Sync.change) {
-      if (((Sync.change) o1) == Sync.change.finishedPreliminary||((Sync.change) o1) == Sync.change.finishedFinalround||((Sync.change) o1) == Sync.change.unfinishedPreliminary||((Sync.change) o1) == Sync.change.unfinishedFinalround) {
-        /* currently does not work as intended since notification is triggered before all data for the final phase is available
-                updateRounds();
-                updateTableTabData();
-                createBracketTabData();*/
-      }
-    }
-    if (o instanceof TournamentBracketController) {
-      updateTableTabData();
-      createBracketTabData();
-    }
+  public void update(Observable o, Object o1)
+  {
+    updateTableTabData();
+    createBracketTabData();
   }
 
 }

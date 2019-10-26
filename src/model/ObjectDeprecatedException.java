@@ -1,5 +1,6 @@
 package model;
 
-public class ObjectDeprecatedException extends RuntimeException {
+public class ObjectDeprecatedException extends RuntimeException
+{
 
 }

@@ -7,7 +7,6 @@ package sprechfenster;
 
 import model.ObjectDeprecatedException;
 import model.iFencer;
-import model.rounds.iRound;
 import model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
@@ -22,13 +21,15 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.rounds.iMatch;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class EditFightDialogController implements Initializable {
+public class EditFightDialogController implements Initializable
+{
 
   @FXML
   private AnchorPane MainDialogPane;
@@ -51,7 +52,7 @@ public class EditFightDialogController implements Initializable {
   @FXML
   private Button CanceledButton;
 
-  private iRound Fight;
+  private iMatch Fight;
   private iTournament Tournament;
   private ArrayList<String> FencerNames;
 
@@ -59,31 +60,39 @@ public class EditFightDialogController implements Initializable {
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     GUIUtilities.FillNumberComboBox(RoundComboBox, 1, 20);
     GUIUtilities.FillNumberComboBox(FirstFencerPointsComboBox, 0, 30);
     GUIUtilities.FillNumberComboBox(SecondFencerPointsComboBox, 0, 30);
   }
 
-  public void SetData (iRound fight, iTournament tournament, ArrayList<String> fencerNames) {
+  public void SetData(iMatch fight, iTournament tournament, ArrayList<String> fencerNames)
+  {
     Fight = fight;
     Tournament = tournament;
     FencerNames = fencerNames;
     updateData();
   }
 
-  private void updateData () {
-    if (Fight != null && Tournament != null) {
-      try {
+  private void updateData()
+  {
+    if (Fight != null && Tournament != null)
+    {
+      try
+      {
         iFencer firstFencer = Fight.getFencer().get(0);
         iFencer secondFencer = Fight.getFencer().get(1);
         FirstFencerComboBox.getItems().setAll(FencerNames);
         SecondFencerComboBox.getItems().setAll(FencerNames);
-        for (String name : FencerNames) {
-          if (name.equals(firstFencer.getFullName())) {
+        for (String name : FencerNames)
+        {
+          if (name.equals(firstFencer.getFullName()))
+          {
             FirstFencerComboBox.getSelectionModel().select(name);
           }
-          if (name.equals(secondFencer.getFullName())) {
+          if (name.equals(secondFencer.getFullName()))
+          {
             SecondFencerComboBox.getSelectionModel().select(name);
           }
         }
@@ -94,31 +103,38 @@ public class EditFightDialogController implements Initializable {
         FirstFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(0)));
         SecondFencerPointsComboBox.getSelectionModel().select(Fight.getPoints(Fight.getFencer().get(1)));
         FightFinishedCheckBox.setSelected(Fight.isFinished());
-      }
-      catch (ObjectDeprecatedException ex) {
+      } catch (ObjectDeprecatedException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
   @FXML
-  private void handleFinishedButtonAction (ActionEvent event) {
-    if (Fight != null && Tournament != null) {
-      try {
+  private void handleFinishedButtonAction(ActionEvent event)
+  {
+    if (Fight != null && Tournament != null)
+    {
+      try
+      {
         Boolean allValuesOk = true;
         iFencer firstFencer = null;
         iFencer secondFencer = null;
         String firstFencerName = FirstFencerComboBox.getValue().trim();
         String secondFencerName = SecondFencerComboBox.getValue().trim();
-        for (iFencer fencer : Tournament.getAllParticipants()) {
-          if (firstFencer == null && firstFencerName.equals(fencer.getFullName())) {
+        for (iFencer fencer : Tournament.getAllParticipants())
+        {
+          if (firstFencer == null && firstFencerName.equals(fencer.getFullName()))
+          {
             firstFencer = fencer;
           }
-          if (secondFencer == null && secondFencerName.equals(fencer.getFullName())) {
+          if (secondFencer == null && secondFencerName.equals(fencer.getFullName()))
+          {
             secondFencer = fencer;
           }
         }
-        if (firstFencer == null || secondFencer == null || firstFencer == secondFencer) {
+        if (firstFencer == null || secondFencer == null || firstFencer == secondFencer)
+        {
           allValuesOk = false;
         }
         int lane = Integer.parseInt(LaneComboBox.getValue());
@@ -127,43 +143,50 @@ public class EditFightDialogController implements Initializable {
         int secondFencerPoints = Integer.parseInt(SecondFencerPointsComboBox.getValue());
         Boolean fightIsFinished = FightFinishedCheckBox.isSelected();
 
-        if (allValuesOk) {
-          try {
-            if (!Fight.getFencer().contains(firstFencer)) {
+        if (allValuesOk)
+        {
+          try
+          {
+            if (!Fight.getFencer().contains(firstFencer))
+            {
               Fight.switchParticipantOut(Fight.getFencer().get(0), firstFencer);
             }
-            if (!Fight.getFencer().contains(secondFencer)) {
+            if (!Fight.getFencer().contains(secondFencer))
+            {
               Fight.switchParticipantOut(Fight.getFencer().get(1), secondFencer);
             }
             Fight.setPoints(firstFencer, firstFencerPoints);
             Fight.setPoints(secondFencer, secondFencerPoints);
             Fight.setTime(round, lane);
             Fight.setFinished(fightIsFinished);
-          }
-          catch (ObjectDeprecatedException ex) {
+          } catch (ObjectDeprecatedException ex)
+          {
             LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
           }
         }
-      }
-      catch (NumberFormatException | SQLException ex) {
+      } catch (NumberFormatException | SQLException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
-      }
-      finally {
+      } finally
+      {
         CloseDialog();
       }
     }
   }
 
   @FXML
-  private void handleCanceledButtonAction (ActionEvent event) {
+  private void handleCanceledButtonAction(ActionEvent event)
+  {
     CloseDialog();
   }
 
-  private void CloseDialog () {
+  private void CloseDialog()
+  {
     GetDialogStage().close();
   }
 
-  private Stage GetDialogStage () {
+  private Stage GetDialogStage()
+  {
     return (Stage) MainDialogPane.getScene().getWindow();
   }
 

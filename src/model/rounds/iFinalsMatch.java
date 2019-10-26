@@ -3,13 +3,14 @@ package model.rounds;
 import model.ObjectDeprecatedException;
 import java.util.List;
 
-public interface iFinalround extends iRound {
+public interface iFinalsMatch extends iMatch
+{
 
-  public iFinalround getWinnerRound () throws ObjectDeprecatedException;
+  public iFinalsMatch getWinnerMatch() throws ObjectDeprecatedException;
 
-  public iFinalround getLoserRound () throws ObjectDeprecatedException;
+  public iFinalsMatch getLoserMatch() throws ObjectDeprecatedException;
 
-  public List<iFinalround> getPrerounds () throws ObjectDeprecatedException;
+  public List<iFinalsMatch> getPreviousMatches() throws ObjectDeprecatedException;
 
   /**
    * This function returns the final round the match is part of (quarterfinal;
@@ -17,5 +18,5 @@ public interface iFinalround extends iRound {
    *
    * @return the number of the round
    */
-  public int getFinalRound ();
+  public int getFinalRound();
 }

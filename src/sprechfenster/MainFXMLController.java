@@ -5,9 +5,7 @@
  */
 package sprechfenster;
 
-import model.Sync;
 import model.iFencer;
-import model.iSync;
 import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
@@ -16,10 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,9 +24,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
@@ -44,6 +38,8 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.Fencer;
+import model.Tournament;
 import sprechfenster.presenter.FencerPresenter;
 import sprechfenster.presenter.TournamentPresenter;
 
@@ -51,7 +47,8 @@ import sprechfenster.presenter.TournamentPresenter;
  *
  * @author Stefan
  */
-public class MainFXMLController implements Initializable, iFencerSelection, Observer {
+public class MainFXMLController implements Initializable, iFencerSelection, Observer
+{
 
   @FXML
   AnchorPane MainAnchorPane;
@@ -113,27 +110,30 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   @FXML
   TableColumn AgeColumn;
 
-  private iSync DataModel;
   private TournamentParticipantsController TournamentParticipantsController;
   private TournamentQualificationPhaseController QualificationPhaseController;
   private TournamentEliminationPhaseController EliminationPhaseController;
   private iTournament ActiveTournament;
 
   @Override
-  public ObservableList<FencerPresenter> GetSelectedFencers () {
+  public ObservableList<FencerPresenter> GetSelectedFencers()
+  {
     return FencerTableView.getSelectionModel().getSelectedItems();
   }
 
   @FXML
-  private void handleSummaryButtonAction (ActionEvent event) {
+  private void handleSummaryButtonAction(ActionEvent event)
+  {
     SetupOverview();
     UpdateOverview();
   }
 
   @FXML
-  private void handleNewTournamentButtonAction (ActionEvent event) {
+  private void handleNewTournamentButtonAction(ActionEvent event)
+  {
     Parent root;
-    try {
+    try
+    {
       root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/NewTournamentDialog.fxml"));
       Stage stage = new Stage();
       stage.setTitle("Neues Turnier");
@@ -142,34 +142,40 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
       stage.initModality(Modality.APPLICATION_MODAL);
       stage.showAndWait();
       UpdateOverview();
-    }
-    catch (IOException e) {
+    } catch (IOException e)
+    {
       LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
     }
   }
 
   @FXML
-  private void handleLoadTournamentButtonAction (ActionEvent event) {
+  private void handleLoadTournamentButtonAction(ActionEvent event)
+  {
     TournamentPresenter tournamentPresenter = (TournamentPresenter) TournamentTableView.getSelectionModel().getSelectedItem();
     iTournament tournament = null;
-    if (tournamentPresenter == null) {
+    if (tournamentPresenter == null)
+    {
       ObservableList items = TournamentTableView.getItems();
-      if (items.size() > 0) {
+      if (items.size() > 0)
+      {
         tournamentPresenter = (TournamentPresenter) items.get(0);
       }
     }
-    if (tournamentPresenter != null) {
+    if (tournamentPresenter != null)
+    {
       tournament = tournamentPresenter.getTournament();
       SetupTournamentParticipants(tournament);
     }
   }
 
   @FXML
-  private void FencerTableViewOnDragDetected (MouseEvent event) {
+  private void FencerTableViewOnDragDetected(MouseEvent event)
+  {
     Dragboard db = FencerTableView.startDragAndDrop(TransferMode.ANY);
     StringBuilder fencerIdsBuilder = new StringBuilder();
     fencerIdsBuilder.append("FencerIDs;");
-    for (FencerPresenter presenter : GetSelectedFencers()) {
+    for (FencerPresenter presenter : GetSelectedFencers())
+    {
       fencerIdsBuilder.append(presenter.getFencer().getID());
       fencerIdsBuilder.append(';');
     }
@@ -179,7 +185,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     event.consume();
   }
 
-  private void SetupOverview () {
+  private void SetupOverview()
+  {
     ContentAnchorPane.getChildren().clear();
     ContentAnchorPane.getChildren().add(ContentSplitPane);
     LeftContentAnchorPane.getChildren().clear();
@@ -195,17 +202,22 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     items.add(DeleteFencerButton);
     items.add(DeleteTournamentButton);
     ActiveTournament = null;
-    if (EliminationPhaseController != null) {
+    if (EliminationPhaseController != null)
+    {
       EliminationPhaseController.SetTournament(null);
     }
-    if (QualificationPhaseController != null) {
+    if (QualificationPhaseController != null)
+    {
       QualificationPhaseController.SetTournament(null);
     }
   }
 
-  private void SetupTournamentParticipants (iTournament tournament) {
-    if (tournament != null) {
-      try {
+  private void SetupTournamentParticipants(iTournament tournament)
+  {
+    if (tournament != null)
+    {
+      try
+      {
         ContentAnchorPane.getChildren().clear();
         ContentAnchorPane.getChildren().add(ContentSplitPane);
         LeftContentAnchorPane.getChildren().clear();
@@ -218,17 +230,20 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         LeftContentAnchorPane.getChildren().add(tournamentPlanningView);
         ActiveTournament = tournament;
         SetupToolbarForActiveTournament();
-      }
-      catch (IOException ex) {
+      } catch (IOException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
 
     }
   }
 
-  private void SetupTournamentQualificationPhase (iTournament tournament) {
-    if (tournament != null) {
-      try {
+  private void SetupTournamentQualificationPhase(iTournament tournament)
+  {
+    if (tournament != null)
+    {
+      try
+      {
         ContentAnchorPane.getChildren().clear();
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationPhase.fxml"));
         Node tournamentQualificationPhaseView = loader.load();
@@ -236,16 +251,19 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         QualificationPhaseController = loader.<TournamentQualificationPhaseController>getController();
         QualificationPhaseController.SetTournament(tournament);
         SetupToolbarForActiveTournament();
-      }
-      catch (IOException ex) {
+      } catch (IOException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  private void SetupTournamentFinalEliminationPhase (iTournament tournament) {
-    if (tournament != null) {
-      try {
+  private void SetupTournamentFinalEliminationPhase(iTournament tournament)
+  {
+    if (tournament != null)
+    {
+      try
+      {
         ContentAnchorPane.getChildren().clear();
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/EliminiationPhase.fxml"));
         Node tournamentFinalEliminationPhaseView = loader.load();
@@ -253,14 +271,15 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         EliminationPhaseController = loader.<TournamentEliminationPhaseController>getController();
         EliminationPhaseController.SetTournament(tournament);
         SetupToolbarForActiveTournament();
-      }
-      catch (IOException ex) {
+      } catch (IOException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
   }
 
-  private void SetupToolbarForActiveTournament () {
+  private void SetupToolbarForActiveTournament()
+  {
     ObservableList<Node> items = MainToolBar.getItems();
     items.clear();
     items.add(OverviewButton);
@@ -272,9 +291,11 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   }
 
   @FXML
-  private void handleNewFencerButtonAction (ActionEvent event) {
+  private void handleNewFencerButtonAction(ActionEvent event)
+  {
     Parent root;
-    try {
+    try
+    {
       root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/NewFencerDialog.fxml"));
       Stage stage = new Stage();
       stage.setTitle("Neuer Fechter");
@@ -283,16 +304,18 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
       stage.initModality(Modality.APPLICATION_MODAL);
       stage.showAndWait();
       UpdateOverview();
-    }
-    catch (IOException e) {
+    } catch (IOException e)
+    {
       LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
     }
   }
 
   @FXML
-  private void handleDropOutFencerButtonAction (ActionEvent event) {
+  private void handleDropOutFencerButtonAction(ActionEvent event)
+  {
     Parent root;
-    try {
+    try
+    {
       FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/DropOutFencerDialog.fxml"));
       root = loader.load();
       DropOutFencerDialogController controller = loader.<DropOutFencerDialogController>getController();
@@ -304,21 +327,25 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
       stage.initModality(Modality.APPLICATION_MODAL);
       stage.showAndWait();
       UpdateOverview();
-    }
-    catch (IOException e) {
+    } catch (IOException e)
+    {
       LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
     }
   }
 
   @FXML
-  private void handleDeleteTournamentButtonAction (ActionEvent event) {
+  private void handleDeleteTournamentButtonAction(ActionEvent event)
+  {
     boolean confirmed = GUIUtilities.ShowConfirmationDialog("Sollen die ausgewählten Turniere wirklich gelöscht werden?");
-    if (confirmed) {
-      for (TournamentPresenter presenter : TournamentTableView.getSelectionModel().getSelectedItems()) {
-        try {
+    if (confirmed)
+    {
+      for (TournamentPresenter presenter : TournamentTableView.getSelectionModel().getSelectedItems())
+      {
+        try
+        {
           presenter.getTournament().delete();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e)
+        {
           LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
         }
       }
@@ -327,14 +354,18 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   }
 
   @FXML
-  private void handleDeleteFencerButtonAction (ActionEvent event) {
+  private void handleDeleteFencerButtonAction(ActionEvent event)
+  {
     boolean confirmed = GUIUtilities.ShowConfirmationDialog("Sollen die ausgewählten Fechter wirklich gelöscht werden?");
-    if (confirmed) {
-      for (FencerPresenter presenter : FencerTableView.getSelectionModel().getSelectedItems()) {
-        try {
+    if (confirmed)
+    {
+      for (FencerPresenter presenter : FencerTableView.getSelectionModel().getSelectedItems())
+      {
+        try
+        {
           presenter.getFencer().delete();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e)
+        {
           LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
         }
       }
@@ -343,25 +374,26 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   }
 
   @FXML
-  private void handleShowGroupsButtonAction (ActionEvent event) {
+  private void handleShowGroupsButtonAction(ActionEvent event)
+  {
     SetupTournamentQualificationPhase(ActiveTournament);
   }
 
   @FXML
-  private void handleShowFinalRoundsButtonAction (ActionEvent event) {
+  private void handleShowFinalRoundsButtonAction(ActionEvent event)
+  {
     SetupTournamentFinalEliminationPhase(ActiveTournament);
   }
 
   @FXML
-  private void handleShowParticipantsButtonAction (ActionEvent event) {
+  private void handleShowParticipantsButtonAction(ActionEvent event)
+  {
     SetupTournamentParticipants(ActiveTournament);
   }
 
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
-    DataModel = iSync.getInstance();
-    DataModel.addObserver(this);
-
+  public void initialize(URL url, ResourceBundle rb)
+  {
     FencerColumn.setCellValueFactory(new PropertyValueFactory<>("FullName"));
     FencingSchoolColumn.setCellValueFactory(new PropertyValueFactory<>("FencingSchool"));
     AgeColumn.setCellValueFactory(new PropertyValueFactory<>("Age"));
@@ -377,37 +409,24 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   }
 
   @Override
-  public void update (Observable o, Object o1) {
-    if (o1 instanceof Sync.change) {
-      Sync.change changeType = (Sync.change) o1;
-      if (changeType == Sync.change.createdFencer
-              || changeType == Sync.change.createdTournament
-              || changeType == Sync.change.changedFencerValue
-              || changeType == Sync.change.changedTournamentValue) {
-        UpdateOverview();
-      }
-    }
-    else {
-      UpdateOverview();
-    }
-
+  public void update(Observable o, Object o1)
+  {
+    UpdateOverview();
   }
 
-  private void UpdateOverview () {
-    try {
-      List<TournamentPresenter> tournaments = new ArrayList<>();
-      List<FencerPresenter> fencers = new ArrayList<>();
-      for (iFencer fencer : DataModel.getAllFencer()) {
-        fencers.add(new FencerPresenter(fencer, null));
-      }
-      for (iTournament tournament : DataModel.getAllTournaments()) {
-        tournaments.add(new TournamentPresenter(tournament));
-      }
-      FencerTableView.getItems().setAll(fencers);
-      TournamentTableView.getItems().setAll(tournaments);
+  private void UpdateOverview()
+  {
+    List<TournamentPresenter> tournaments = new ArrayList<>();
+    List<FencerPresenter> fencers = new ArrayList<>();
+    for (iFencer fencer : Fencer.getAllFencer())
+    {
+      fencers.add(new FencerPresenter(fencer, null));
     }
-    catch (SQLException ex) {
-      LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
+    for (iTournament tournament : Tournament.getAllTournaments())
+    {
+      tournaments.add(new TournamentPresenter(tournament));
     }
+    FencerTableView.getItems().setAll(fencers);
+    TournamentTableView.getItems().setAll(tournaments);
   }
 }

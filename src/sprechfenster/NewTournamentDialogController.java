@@ -5,7 +5,6 @@
  */
 package sprechfenster;
 
-import model.iSync;
 import model.iTournament;
 import java.io.File;
 import java.net.URL;
@@ -23,13 +22,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.Tournament;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class NewTournamentDialogController implements Initializable {
+public class NewTournamentDialogController implements Initializable
+{
 
   @FXML
   AnchorPane MainDialogPane;
@@ -50,7 +51,8 @@ public class NewTournamentDialogController implements Initializable {
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     GUIUtilities.FillNumberComboBox(GroupsComboBox, 1, 20);
     GUIUtilities.FillNumberComboBox(FinalRoundsComboBox, 1, 20);
     GUIUtilities.FillNumberComboBox(LanesComboBox, 1, 10);
@@ -58,12 +60,14 @@ public class NewTournamentDialogController implements Initializable {
   }
 
   @FXML
-  private void handleCanceledButtonAction (ActionEvent event) {
+  private void handleCanceledButtonAction(ActionEvent event)
+  {
     CloseDialog();
   }
 
   @FXML
-  private void handleChangeImageButtonAction (ActionEvent event) {
+  private void handleChangeImageButtonAction(ActionEvent event)
+  {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open Resource File");
     fileChooser.getExtensionFilters().add(
@@ -74,44 +78,53 @@ public class NewTournamentDialogController implements Initializable {
   }
 
   @FXML
-  private void handleFinishedButtonAction (ActionEvent event) {
+  private void handleFinishedButtonAction(ActionEvent event)
+  {
     boolean allFieldsFilled = true;
-    if (NameTextField.getText().isEmpty()) {
+    if (NameTextField.getText().isEmpty())
+    {
       allFieldsFilled = false;
     }
-    if (StartingDatePicker.getValue() == null) {
+    if (StartingDatePicker.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (GroupsComboBox.getValue() == null) {
+    if (GroupsComboBox.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (FinalRoundsComboBox.getValue() == null) {
+    if (FinalRoundsComboBox.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (LanesComboBox.getValue() == null) {
+    if (LanesComboBox.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (allFieldsFilled) {
-      iSync dataModel = iSync.getInstance();
-      try {
-        iTournament newTournament = dataModel.createTournament(NameTextField.getText());
+    if (allFieldsFilled)
+    {
+      try
+      {
+        iTournament newTournament = new Tournament(NameTextField.getText());
         newTournament.setDate(GUIUtilities.GetDateStringFromDatePicker(StartingDatePicker));
         newTournament.setGroups(GUIUtilities.GetIntegerFromStringComboBox(GroupsComboBox));
         newTournament.setFinalRounds(GUIUtilities.GetIntegerFromStringComboBox(FinalRoundsComboBox));
         newTournament.setLanes(GUIUtilities.GetIntegerFromStringComboBox(LanesComboBox));
-      }
-      catch (Exception ex) {
+      } catch (Exception ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
     CloseDialog();
   }
 
-  private void CloseDialog () {
+  private void CloseDialog()
+  {
     GetDialogStage().close();
   }
 
-  private Stage GetDialogStage () {
+  private Stage GetDialogStage()
+  {
     return (Stage) MainDialogPane.getScene().getWindow();
   }
 

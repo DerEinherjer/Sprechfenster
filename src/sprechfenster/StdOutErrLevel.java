@@ -4,9 +4,11 @@ import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.util.logging.Level;
 
-public class StdOutErrLevel extends Level {
+public class StdOutErrLevel extends Level
+{
 
-  private StdOutErrLevel (String name, int value) {
+  private StdOutErrLevel(String name, int value)
+  {
     super(name, value);
   }
 
@@ -16,12 +18,15 @@ public class StdOutErrLevel extends Level {
   public static Level STDERR
           = new StdOutErrLevel("STDERR", Level.INFO.intValue() + 54);
 
-  protected Object readResolve ()
-          throws ObjectStreamException {
-    if (this.intValue() == STDOUT.intValue()) {
+  protected Object readResolve()
+          throws ObjectStreamException
+  {
+    if (this.intValue() == STDOUT.intValue())
+    {
       return STDOUT;
     }
-    if (this.intValue() == STDERR.intValue()) {
+    if (this.intValue() == STDERR.intValue())
+    {
       return STDERR;
     }
     throw new InvalidObjectException("Unknown instance :" + this);

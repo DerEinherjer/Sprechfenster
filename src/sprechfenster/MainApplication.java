@@ -21,10 +21,12 @@ import javafx.stage.Stage;
  *
  * @author Stefan
  */
-public class MainApplication extends Application {
+public class MainApplication extends Application
+{
 
   @Override
-  public void start (Stage stage) throws Exception {
+  public void start(Stage stage) throws Exception
+  {
     Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/MainFXML.fxml"));
     Scene scene = new Scene(root);
     stage.setTitle("Sprechfenster");
@@ -35,10 +37,13 @@ public class MainApplication extends Application {
   /**
    * @param args the command line arguments
    */
-  public static void main (String[] args) {
-    try {
+  public static void main(String[] args)
+  {
+    try
+    {
       File configFile = new File("dist/SprechFensterLogging.config");
-      if (!configFile.exists()) {
+      if (!configFile.exists())
+      {
         configFile = new File("SprechFensterLogging.config");
       }
       FileInputStream configStream = new FileInputStream(configFile);
@@ -51,8 +56,8 @@ public class MainApplication extends Application {
       System.setOut(new PrintStream(los, true));
       los = new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDERR);
       System.setErr(new PrintStream(los, true));
-    }
-    catch (IOException ex) {
+    } catch (IOException ex)
+    {
       ex.printStackTrace();
       System.out.println("WARNING: Could not open configuration file");
       System.out.println("WARNING: Logging not configured (console output only)");

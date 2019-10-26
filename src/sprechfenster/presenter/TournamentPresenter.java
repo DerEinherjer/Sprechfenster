@@ -11,26 +11,32 @@ import model.iTournament;
  *
  * @author Stefan
  */
-public class TournamentPresenter {
+public class TournamentPresenter
+{
 
   private iTournament Tournament;
 
-  public TournamentPresenter (iTournament tournamentToPresent) {
-    if (tournamentToPresent == null) {
+  public TournamentPresenter(iTournament tournamentToPresent)
+  {
+    if (tournamentToPresent == null)
+    {
       throw new IllegalArgumentException("tournamentToPresent must not be null");
     }
     this.Tournament = tournamentToPresent;
   }
 
-  public iTournament getTournament () {
+  public iTournament getTournament()
+  {
     return Tournament;
   }
 
-  public String getName () {
+  public String getName()
+  {
     return Tournament.getName();
   }
 
-  public String getDate () {
+  public String getDate()
+  {
     return Tournament.getDate();
   }
 }

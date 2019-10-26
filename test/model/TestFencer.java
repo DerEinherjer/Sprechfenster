@@ -8,7 +8,7 @@ package model;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.DBConnection.DBSuperClass;
+import model.DBConnection.DBBaseClass;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,63 +20,66 @@ import static org.junit.Assert.*;
  *
  * @author Asgard
  */
-public class TestFencer {
-    
-    public TestFencer() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() throws SQLException
+public class TestFencer
+{
+
+  public TestFencer()
+  {
+  }
+
+  @BeforeClass
+  public static void setUpClass()
+  {
+  }
+
+  @AfterClass
+  public static void tearDownClass()
+  {
+  }
+
+  @Before
+  public void setUp() throws SQLException
+  {
+    DBBaseClass.initTestPhase();
+  }
+
+  @After
+  public void tearDown() throws SQLException
+  {
+  }
+
+  @Test
+  public void testFencer()
+  {
+
+    try
     {
-        DBSuperClass.initTestPhase();
-    }
-    
-    @After
-    public void tearDown() throws SQLException
+      Fencer f = new Fencer("Peter", "Müller");
+
+      assertEquals("Peter", f.getName());
+      assertEquals("Müller", f.getFamilyName());
+
+      f.setName("Michael");
+      f.setFamilyName("Schmidt");
+      f.setBirthday("1970-01-01");
+      f.setFencingSchool("Fechten mit Stil");
+      f.setNationality("Deutsch");
+
+      DBBaseClass.reset();
+
+      assertEquals(1, Fencer.getAllFencer().size());
+      f = Fencer.getAllFencer().get(0);
+
+      assertEquals("Michael", f.getName());
+      assertEquals("Schmidt", f.getFamilyName());
+      assertEquals("1970-01-01", f.getBirthday());
+      assertEquals("Fechten mit Stil", f.getFencingSchool());
+      assertEquals("Deutsch", f.getNationality());
+    } catch (SQLException e)
     {
+      e.printStackTrace();
+      assert (false);
     }
-    
-    @Test
-    public void testFencer()
-    {
-        
-        try 
-        {
-            Fencer f = new Fencer("Peter", "Müller");
-            
-            assertEquals("Peter", f.getName());
-            assertEquals("Müller", f.getFamilyName());
-            
-            f.setName("Michael");
-            f.setFamilyName("Schmidt");
-            f.setBirthday("1970-01-01");
-            f.setFencingSchool("Fechten mit Stil");
-            f.setNationality("Deutsch");
-            
-            DBSuperClass.reset();
-            
-            assertEquals(1, Fencer.getAllFencer().size());
-            f = Fencer.getAllFencer().get(0);
-            
-            assertEquals("Michael", f.getName());
-            assertEquals("Schmidt", f.getFamilyName());
-            assertEquals("1970-01-01", f.getBirthday());
-            assertEquals("Fechten mit Stil", f.getFencingSchool());
-            assertEquals("Deutsch", f.getNationality());
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-            assert(false);
-        }
-        
-    }
+
+  }
 }

@@ -15,18 +15,22 @@ import sprechfenster.presenter.FightPresenter;
  *
  * @author Stefan
  */
-public class FightEditingCell extends TableCell<FightPresenter, Integer> {
+public class FightEditingCell extends TableCell<FightPresenter, Integer>
+{
 
   private TextField TextField;
   private StringConverter<Integer> StringConverter;
 
-  public FightEditingCell (StringConverter<Integer> converter) {
+  public FightEditingCell(StringConverter<Integer> converter)
+  {
     StringConverter = converter;
   }
 
   @Override
-  public void startEdit () {
-    if (!isEmpty()) {
+  public void startEdit()
+  {
+    if (!isEmpty())
+    {
       super.startEdit();
       createTextField();
       setText(null);
@@ -36,7 +40,8 @@ public class FightEditingCell extends TableCell<FightPresenter, Integer> {
   }
 
   @Override
-  public void cancelEdit () {
+  public void cancelEdit()
+  {
     super.cancelEdit();
 
     setText(StringConverter.toString(getItem()));
@@ -44,40 +49,48 @@ public class FightEditingCell extends TableCell<FightPresenter, Integer> {
   }
 
   @Override
-  public void updateItem (Integer item, boolean empty) {
+  public void updateItem(Integer item, boolean empty)
+  {
     super.updateItem(item, empty);
 
-    if (empty) {
+    if (empty)
+    {
       setText(null);
       setGraphic(null);
-    }
-    else {
-      if (isEditing()) {
-        if (TextField != null) {
+    } else
+    {
+      if (isEditing())
+      {
+        if (TextField != null)
+        {
           TextField.setText(getString());
         }
         setText(null);
         setGraphic(TextField);
-      }
-      else {
+      } else
+      {
         setText(getString());
         setGraphic(null);
       }
     }
   }
 
-  private void createTextField () {
+  private void createTextField()
+  {
     TextField = new TextField(getString());
     TextField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
     TextField.focusedProperty().addListener((ObservableValue<? extends Boolean> arg0,
-            Boolean arg1, Boolean arg2) -> {
-      if (!arg2) {
+            Boolean arg1, Boolean arg2) ->
+    {
+      if (!arg2)
+      {
         commitEdit(StringConverter.fromString(TextField.getText()));
       }
     });
   }
 
-  private String getString () {
+  private String getString()
+  {
     return getItem() == null ? "" : getItem().toString();
   }
 }

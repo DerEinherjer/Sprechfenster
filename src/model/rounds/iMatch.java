@@ -10,9 +10,8 @@ import model.iTournament;
  *
  * @author deus
  */
-public interface iRound
+public interface iMatch
 {
-
 
   /**
    * This function returns a list of all feners who are assigned to this fight.
@@ -20,7 +19,7 @@ public interface iRound
    * @return List of fencers.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public List<iFencer> getFencer () throws ObjectDeprecatedException;
+  public List<iFencer> getFencer() throws ObjectDeprecatedException;
 
   /**
    * This function returns the round in wich the fight is fought.
@@ -28,7 +27,7 @@ public interface iRound
    * @return Index of the assigned round.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getRound () throws ObjectDeprecatedException;
+  public int getRound() throws ObjectDeprecatedException;
 
   /**
    * This function returns the lane this fight is assigned to.
@@ -36,7 +35,7 @@ public interface iRound
    * @return Index of the lane;
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getLane () throws ObjectDeprecatedException;
+  public int getLane() throws ObjectDeprecatedException;
 
   /**
    * This function sets the round in wich and the lane on wich this fight will
@@ -49,7 +48,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean setTime (int round, int lane) throws SQLException, ObjectDeprecatedException;
+  public boolean setTime(int round, int lane) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function marks the fight as fought. Most of the setter will stop
@@ -59,7 +58,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public void setFinished (boolean finisch) throws SQLException, ObjectDeprecatedException;
+  public void setFinished(boolean finisch) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This functions sets the point for a given fencer in this fight.
@@ -69,7 +68,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public void setPoints (iFencer f, int points) throws SQLException, ObjectDeprecatedException;
+  public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function returns the points that a given fencer earned in this fight.
@@ -78,7 +77,7 @@ public interface iRound
    * @return The points the fencer earned.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getPoints (iFencer f) throws ObjectDeprecatedException;
+  public int getPoints(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function returns the points wich the OTHER fencer earned.
@@ -87,7 +86,7 @@ public interface iRound
    * @return Points wich was earned.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getOpponentPoints (iFencer f) throws ObjectDeprecatedException;
+  public int getOpponentPoints(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function returns the status of the fight.
@@ -95,7 +94,7 @@ public interface iRound
    * @return true = finished; false = unfinished
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean isFinished () throws ObjectDeprecatedException;
+  public boolean isFinished() throws ObjectDeprecatedException;
 
   /**
    * This funktion returns the winner of the fight. if the fight is not finished
@@ -104,7 +103,7 @@ public interface iRound
    * @return Winner of the fight.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public iFencer getWinner () throws ObjectDeprecatedException;
+  public iFencer getWinner() throws ObjectDeprecatedException;
 
   /**
    * This funktion returns the loser of the fight. if the fight is not finished
@@ -113,7 +112,7 @@ public interface iRound
    * @return Loser of the fight.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public iFencer getLoser () throws ObjectDeprecatedException;
+  public iFencer getLoser() throws ObjectDeprecatedException;
 
   /**
    * This function returns the turnament wich the fight belongs to.
@@ -121,7 +120,7 @@ public interface iRound
    * @return The tournament.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public iTournament getTournament () throws ObjectDeprecatedException;
+  public iTournament getTournament() throws ObjectDeprecatedException;
 
   /**
    * This Function removes a given fencer from the fight.
@@ -131,7 +130,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean removeParticipant (iFencer f) throws SQLException, ObjectDeprecatedException;
+  public boolean removeParticipant(iFencer f) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function will add a fencer to the fight if there a less than two and
@@ -142,7 +141,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean addParticipant (iFencer f) throws SQLException, ObjectDeprecatedException;
+  public boolean addParticipant(iFencer f) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function switches one fenecr out for an other one. This only works if
@@ -154,7 +153,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean switchParticipantOut (iFencer out, iFencer in) throws SQLException, ObjectDeprecatedException;
+  public boolean switchParticipantOut(iFencer out, iFencer in) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function returns true if the fencer participates in this fight.
@@ -163,7 +162,7 @@ public interface iRound
    * @return Returns true if fencer participates.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean isFencer (iFencer f) throws ObjectDeprecatedException;
+  public boolean isFencer(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function sets the number of yellow cards for a fencer in this fight.
@@ -173,7 +172,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public void setYellow (iFencer f, int count) throws SQLException, ObjectDeprecatedException;
+  public void setYellow(iFencer f, int count) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function sets the number of red cards for a fencer in this fight.
@@ -183,7 +182,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public void setRed (iFencer f, int count) throws SQLException, ObjectDeprecatedException;
+  public void setRed(iFencer f, int count) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function sets the number of black cards for a fencer in this fight.
@@ -193,7 +192,7 @@ public interface iRound
    * @throws SQLException Cloud not be updated in the database.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public void setBlack (iFencer f, int count) throws SQLException, ObjectDeprecatedException;
+  public void setBlack(iFencer f, int count) throws SQLException, ObjectDeprecatedException;
 
   /**
    * This function returns the nummber of yellow cards the fencer got in this
@@ -203,7 +202,7 @@ public interface iRound
    * @return Number of yellow cards the fencer got.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getYellow (iFencer f) throws ObjectDeprecatedException;
+  public int getYellow(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function returns the nummber of red cards the fencer got in this
@@ -213,7 +212,7 @@ public interface iRound
    * @return Number of red cards the fencer got.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getRed (iFencer f) throws ObjectDeprecatedException;
+  public int getRed(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function returns the nummber of black cards the fencer got in this
@@ -223,7 +222,7 @@ public interface iRound
    * @return Number of black cards the fencer got.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public int getBlack (iFencer f) throws ObjectDeprecatedException;
+  public int getBlack(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function deletes the preliminary this object is representing and marks
@@ -232,5 +231,5 @@ public interface iRound
    * @throws SQLException Number of black cards the fencer got.
    * @throws ObjectDeprecatedException Allready delete, genius.
    */
-  public void delete () throws SQLException, ObjectDeprecatedException;
+  public void delete() throws SQLException, ObjectDeprecatedException;
 }

@@ -6,9 +6,9 @@
 package sprechfenster;
 
 import model.iFencer;
-import model.iSync;
 import java.io.File;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
@@ -27,13 +27,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import model.Fencer;
 
 /**
  * FXML Controller class
  *
  * @author Stefan
  */
-public class NewFencerDialogController implements Initializable {
+public class NewFencerDialogController implements Initializable
+{
 
   @FXML
   AnchorPane MainDialogPane;
@@ -69,7 +71,8 @@ public class NewFencerDialogController implements Initializable {
    * Initializes the controller class.
    */
   @Override
-  public void initialize (URL url, ResourceBundle rb) {
+  public void initialize(URL url, ResourceBundle rb)
+  {
     FencingSchoolComboBox.getItems().addAll("7 Schwerter", "Krîfon", "Asteria", "Schwert und Bogen", "Der Fechtboden", "Institut für Stabfechten", "TG Münster");
     FencingSchoolComboBox.getSelectionModel().selectFirst();
     NationalityComboBox.getItems().addAll("Deutschland", "Österreich", "Schweiz");
@@ -79,34 +82,43 @@ public class NewFencerDialogController implements Initializable {
   }
 
   @FXML
-  private void handleFinishedButtonAction (ActionEvent event) {
+  private void handleFinishedButtonAction(ActionEvent event)
+  {
     boolean allFieldsFilled = true;
-    if (FirstNameTextField.getText().isEmpty()) {
+    if (FirstNameTextField.getText().isEmpty())
+    {
       allFieldsFilled = false;
     }
-    if (LastNameTextField.getText().isEmpty()) {
+    if (LastNameTextField.getText().isEmpty())
+    {
       allFieldsFilled = false;
     }
-    if (FencingSchoolComboBox.getValue() == null) {
+    if (FencingSchoolComboBox.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (BirthdayDatePicker.getValue() == null) {
+    if (BirthdayDatePicker.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (NationalityComboBox.getValue() == null) {
+    if (NationalityComboBox.getValue() == null)
+    {
       allFieldsFilled = false;
     }
-    if (allFieldsFilled) {
-      iSync dataModel = iSync.getInstance();
-      try {
+    if (allFieldsFilled)
+    {
+      try
+      {
         String firstName = FirstNameTextField.getText();
         String familyName = LastNameTextField.getText();
         String birthDay = BirthdayDatePicker.getValue().format(DateTimeFormatter.ISO_DATE);
         String nationality = NationalityComboBox.getValue().toString();
         String fencingSchool = FencingSchoolComboBox.getValue().toString();
-        iFencer newFencer = dataModel.createFencer(firstName, familyName, birthDay, nationality, fencingSchool);
-      }
-      catch (Exception ex) {
+        //adds the fencer to the db as a side-effect
+        iFencer newFencer = new Fencer(firstName, familyName, birthDay, nationality, fencingSchool);
+      
+      } catch (SQLException ex)
+      {
         LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
       }
     }
@@ -114,12 +126,14 @@ public class NewFencerDialogController implements Initializable {
   }
 
   @FXML
-  private void handleCanceledButtonAction (ActionEvent event) {
+  private void handleCanceledButtonAction(ActionEvent event)
+  {
     CloseDialog();
   }
 
   @FXML
-  private void handleChangeImageButtonAction (ActionEvent event) {
+  private void handleChangeImageButtonAction(ActionEvent event)
+  {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open Resource File");
     fileChooser.getExtensionFilters().add(
@@ -129,11 +143,13 @@ public class NewFencerDialogController implements Initializable {
     FencerPortraitImageView.setImage(image);
   }
 
-  private void CloseDialog () {
+  private void CloseDialog()
+  {
     GetDialogStage().close();
   }
 
-  private Stage GetDialogStage () {
+  private Stage GetDialogStage()
+  {
     return (Stage) MainDialogPane.getScene().getWindow();
   }
 }

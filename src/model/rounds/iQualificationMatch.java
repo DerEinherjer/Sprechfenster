@@ -11,7 +11,8 @@ import java.sql.SQLException;
  *
  * @author Asgard
  */
-public interface iPreliminary extends iRound
+public interface iQualificationMatch extends iMatch
 {
-    public int getPreliminaryGroup() throws SQLException;
+
+  public int getQualificationGroup() throws SQLException;
 }

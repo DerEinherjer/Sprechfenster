@@ -11,44 +11,52 @@ import javafx.util.StringConverter;
  *
  * @author Stefan
  */
-public class LimitedIntegerStringConverter extends StringConverter<Integer> {
+public class LimitedIntegerStringConverter extends StringConverter<Integer>
+{
 
   int MaxValue;
   int MinValue;
 
-  public LimitedIntegerStringConverter (int maxValue, int minValue) {
+  public LimitedIntegerStringConverter(int maxValue, int minValue)
+  {
     MaxValue = maxValue;
     MinValue = minValue;
 
   }
 
-  public void setMinAndMaxValues (int maxValue, int minValue) {
+  public void setMinAndMaxValues(int maxValue, int minValue)
+  {
     MaxValue = maxValue;
     MinValue = minValue;
   }
 
   @Override
-  public String toString (Integer object) {
+  public String toString(Integer object)
+  {
     return Integer.toString(object);
   }
 
   @Override
-  public Integer fromString (String string) {
-    try {
+  public Integer fromString(String string)
+  {
+    try
+    {
       int parsed = Integer.parseInt(string);
-      if (parsed >= MinValue && parsed <= MaxValue) {
+      if (parsed >= MinValue && parsed <= MaxValue)
+      {
         return parsed;
-      }
-      else {
-        if (parsed < MinValue) {
+      } else
+      {
+        if (parsed < MinValue)
+        {
           return 1;
-        }
-        else {
+        } else
+        {
           return MaxValue;
         }
       }
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e)
+    {
       return 1;
     }
   }

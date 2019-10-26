@@ -6,16 +6,19 @@ package model;
  *
  * @author deus
  */
-public class ObjectExistException extends Exception {
+public class ObjectExistException extends Exception
+{
 
   private Object object;
 
-  public ObjectExistException (Object object) {
+  public ObjectExistException(Object object)
+  {
     super("There is allready an object for this set of data.");
     this.object = object;
   }
 
-  public Object getObject () {
+  public Object getObject()
+  {
     return object;
   }
 }
