@@ -37,16 +37,14 @@ public interface iTournament
   public int getGroups();
 
   /**
-   * This function returns the number of round of the final. 1 Only Finale 2
-   * fencer 2 Semi-Finals 4 fencer 3 Quater-Finals 8 fencer ...
+   * This function returns the number of round of the final. 1 Only Finale 2 fencer 2 Semi-Finals 4 fencer 3 Quater-Finals 8 fencer ...
    *
    * @return Number of Rounds in the Final
    */
   public int getFinalRounds();
 
   /**
-   * This function returns the number of lanes which are availible for the
-   * Tournament.
+   * This function returns the number of lanes which are availible for the Tournament.
    *
    * @return Number of lanes
    */
@@ -69,8 +67,7 @@ public interface iTournament
   public void setDate(String date) throws SQLException;
 
   /**
-   * This function sets the number of groups in which the preliminary will be
-   * fought. WARNING: This can only be set befor the preliminary is started
+   * This function sets the number of groups in which the preliminary will be fought. WARNING: This can only be set befor the preliminary is started
    *
    * @param groups New number of groups
    * @throws SQLException
@@ -78,9 +75,7 @@ public interface iTournament
   public void setGroups(int groups) throws SQLException;
 
   /**
-   * This function sets the number of rounds of the final. 1 Only Finale 2
-   * fencer 2 Semi-Finals 4 fencer 3 Quater-Finals 8 fencer WARNING: This can
-   * only be set befor the preliminary is started
+   * This function sets the number of rounds of the final. 1 Only Finale 2 fencer 2 Semi-Finals 4 fencer 3 Quater-Finals 8 fencer WARNING: This can only be set befor the preliminary is started
    *
    * @param rounds New number of rounds
    * @throws SQLException
@@ -88,8 +83,7 @@ public interface iTournament
   public void setFinalRounds(int rounds) throws SQLException;
 
   /**
-   * This function sets the number of lanes which are availible for the
-   * tournament. WARNING: This can only be set befor the preliminary is started
+   * This function sets the number of lanes which are availible for the tournament. WARNING: This can only be set befor the preliminary is started
    *
    * @param lanes New number of lanes
    * @throws SQLException
@@ -97,9 +91,7 @@ public interface iTournament
   public void setLanes(int lanes) throws SQLException;
 
   /**
-   * This function adds a fencer to the tournament. The fencer is automatical
-   * put in the preliminary group with the fewest fencer. WARNING: This can only
-   * be set befor the preliminary is started
+   * This function adds a fencer to the tournament. The fencer is automatical put in the preliminary group with the fewest fencer. WARNING: This can only be set befor the preliminary is started
    *
    * @param f The fencer which will be added to the tournament
    * @throws SQLException
@@ -107,9 +99,7 @@ public interface iTournament
   public void addParticipant(iFencer f) throws SQLException;
 
   /**
-   * This function adds a fencer to the tournament. The fencer will be put in
-   * the given preliminary group. WARNING: This can only be set befor the
-   * preliminary is started
+   * This function adds a fencer to the tournament. The fencer will be put in the given preliminary group. WARNING: This can only be set befor the preliminary is started
    *
    * @param f The fencer which will be added to the tournament
    * @param group The group the fencer will be put in
@@ -118,8 +108,7 @@ public interface iTournament
   public void addParticipant(iFencer f, int group) throws SQLException;
 
   /**
-   * This functions checks if a fencer is already participating in the
-   * tournament.
+   * This functions checks if a fencer is already participating in the tournament.
    *
    * @param f The fencer the function checks for
    * @return TRUE if the fencer is participating in this tournament
@@ -128,8 +117,7 @@ public interface iTournament
   public boolean isParticipant(iFencer f) throws SQLException;
 
   /**
-   * This function returns all fencer which are participating in this
-   * tournament.
+   * This function returns all fencer which are participating in this tournament.
    *
    * @return All particepating fencer
    * @throws SQLException
@@ -155,8 +143,7 @@ public interface iTournament
   public int getParticipantGroup(iFencer f) throws SQLException;
 
   /**
-   * This function revoces the participation of a given fencer WARNING: This can
-   * only be set befor the preliminary is started
+   * This function revoces the participation of a given fencer WARNING: This can only be set befor the preliminary is started
    *
    * @param f The fencer which will be removed from the tournament
    * @throws SQLException
@@ -164,9 +151,7 @@ public interface iTournament
   public void removeParticipant(iFencer f) throws SQLException;
 
   /**
-   * This functions "removes" a fencer from an already started tournament. This
-   * can happen if a fencer get disqualified of hurt badly. He will loose all
-   * open fights 0:5.
+   * This functions "removes" a fencer from an already started tournament. This can happen if a fencer get disqualified of hurt badly. He will loose all open fights 0:5.
    *
    * @param f The fencer which drops out
    * @throws SQLException
@@ -183,8 +168,7 @@ public interface iTournament
   public void setEntryFee(iFencer f, boolean paid) throws SQLException;
 
   /**
-   * This functions marks a fencer as "equipment got checked" or "equipment got
-   * not checked".
+   * This functions marks a fencer as "equipment got checked" or "equipment got not checked".
    *
    * @param f Fencer which will be marked
    * @param checked If TRUE fencer will be marked as "equipment got checked"
@@ -219,18 +203,8 @@ public interface iTournament
   public List<iQualificationMatch> getAllQualificationMatches() throws SQLException;
 
   /**
-   * This function returns the number of preliminary fights.
-   *
-   * @return number of fights
-   * @throws SQLException
-   */
-  public int getQualificationMatchCount() throws SQLException;
-
-  /**
-   * This function returns all preliminary fights a an array, which represents
-   * an schedule. The first parameter is the round, the second parameter the
-   * lane in which will be fought. WARNING: The schedule will MOST LIKELY
-   * contain NULL-pointer.
+   * This function returns all preliminary fights a an array, which represents an schedule. The first parameter is the round, the second parameter the lane in which will be fought. WARNING: The
+   * schedule will MOST LIKELY contain NULL-pointer.
    *
    * @return Schedule as array
    * @throws SQLException
@@ -268,15 +242,6 @@ public interface iTournament
    * @throws SQLException
    */
   public List<iScore> getFinalsPhaseScores() throws SQLException;
-
-  /**
-   * This function returns the qualification phase scores for all fencers sorted
-   * in the respectiv groups they fought in.
-   *
-   * @return Array of scores representing the groups
-   * @throws SQLException
-   */
-  public List<iScore>[] getQualificationPhaseScoresInGroups() throws SQLException;
 
   /**
    * This function retourns all fights of the final.
@@ -331,33 +296,28 @@ public interface iTournament
   public void setComment(iFencer f, String comment) throws SQLException;
 
   /**
-   * This function deletes the tournamen. All will be gone. WARNING: Be
-   * carefull.
+   * This function deletes the tournamen. All will be gone. WARNING: Be carefull.
    *
    * @throws SQLException
    */
   public void delete() throws SQLException;
 
   /**
-   * This function changes the status of the Tournament from preparing phase to
-   * preliminary.
+   * This function changes the status of the Tournament from preparing phase to preliminary.
    *
    * @throws SQLException
    */
   public void startQualificationPhase() throws SQLException;
 
   /**
-   * This function will change the status of the tournament back from
-   * preliminary to preparing phase. WARNING: All data enterd in the preliminary
-   * phase will be lost.
+   * This function will change the status of the tournament back from preliminary to preparing phase. WARNING: All data enterd in the preliminary phase will be lost.
    *
    * @throws SQLException
    */
   public void abortQualificationPhase() throws SQLException;
 
   /**
-   * This function will change the status of the tournament from preliminary to
-   * final.
+   * This function will change the status of the tournament from preliminary to final.
    *
    * @throws SQLException
    * @throws ObjectDeprecatedException
@@ -365,24 +325,21 @@ public interface iTournament
   public void startFinalsPhase() throws SQLException, ObjectDeprecatedException;
 
   /**
-   * This function will change the status of the tournament back from final to
-   * preliminary. WARNING: All data enterd in the final phase will be lost.
+   * This function will change the status of the tournament back from final to preliminary. WARNING: All data enterd in the final phase will be lost.
    *
    * @throws SQLException
    */
   public void abortFinalsPhase() throws SQLException;
 
   /**
-   * This function will change the satus of the tournament from final to
-   * finished.
+   * This function will change the satus of the tournament from final to finished.
    *
    * @throws SQLException
    */
   public void finishTournament() throws SQLException;
 
   /**
-   * This function will change the status of the tournament back from finished
-   * to final.
+   * This function will change the status of the tournament back from finished to final.
    *
    * @throws SQLException
    */

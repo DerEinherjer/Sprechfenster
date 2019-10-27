@@ -64,14 +64,12 @@ public class DBTournament extends DBBaseClass
     {
       try
       {
-        new Tournament(rowToHash(rs));
+        Tournament t = new Tournament(rowToHash(rs));//adds tournament to static list as a side effect
       } catch (ObjectExistException ex)
       {
       }//Can be ignored savely
     }
     rs.close();
-
-    return;
   }
 
   private static PreparedStatement snStmt = null;

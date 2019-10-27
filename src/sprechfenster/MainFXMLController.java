@@ -5,8 +5,6 @@
  */
 package sprechfenster;
 
-import model.iFencer;
-import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -40,6 +38,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Fencer;
 import model.Tournament;
+import model.iFencer;
+import model.iTournament;
 import sprechfenster.presenter.FencerPresenter;
 import sprechfenster.presenter.TournamentPresenter;
 
@@ -110,7 +110,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   @FXML
   TableColumn AgeColumn;
 
-  private TournamentParticipantsController TournamentParticipantsController;
+  private TournamentParticipantsController ParticipantsController;
   private TournamentQualificationPhaseController QualificationPhaseController;
   private TournamentEliminationPhaseController EliminationPhaseController;
   private iTournament ActiveTournament;
@@ -224,9 +224,9 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
 
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentParticipants.fxml"));
         Node tournamentPlanningView = loader.load();
-        TournamentParticipantsController = loader.<TournamentParticipantsController>getController();
-        TournamentParticipantsController.setFencerSelectionInterface(this);
-        TournamentParticipantsController.setTournament(tournament);
+        ParticipantsController = loader.<TournamentParticipantsController>getController();
+        ParticipantsController.setFencerSelectionInterface(this);
+        ParticipantsController.setTournament(tournament);
         LeftContentAnchorPane.getChildren().add(tournamentPlanningView);
         ActiveTournament = tournament;
         SetupToolbarForActiveTournament();
@@ -389,6 +389,24 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
   private void handleShowParticipantsButtonAction(ActionEvent event)
   {
     SetupTournamentParticipants(ActiveTournament);
+  }
+
+  @FXML
+  private void handleUpdateAllAction(ActionEvent event)
+  {
+    UpdateOverview();
+    if (ParticipantsController != null)
+    {
+      ParticipantsController.update(null, this);
+    }
+    if (QualificationPhaseController != null)
+    {
+      QualificationPhaseController.update(null, this);
+    }
+    if (EliminationPhaseController != null)
+    {
+      EliminationPhaseController.update(null, this);
+    }
   }
 
   @Override

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import javafx.application.Application;
@@ -16,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.DBConnection.DBBaseClass;
 
 /**
  *
@@ -56,6 +58,8 @@ public class MainApplication extends Application
       System.setOut(new PrintStream(los, true));
       los = new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDERR);
       System.setErr(new PrintStream(los, true));
+      
+      
     } catch (IOException ex)
     {
       ex.printStackTrace();

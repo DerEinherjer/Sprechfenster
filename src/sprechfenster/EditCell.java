@@ -16,7 +16,6 @@ public class EditCell<S, T> extends TableCell<S, T>
 {
 
   // Text field for editing
-  // TODO: allow this to be a plugable control.
   private final TextField textField = new TextField();
 
   // Converter for converting the text in the text field to the user type, and vice-versa:

@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.DBConnection.DBEntity;
 import model.DBConnection.DBQualificationPhase;
 import model.Fencer;
 import model.ObjectDeprecatedException;
 import model.ObjectExistException;
 import model.Tournament;
-import model.DBConnection.DBEntity;
 
 public class QualificationMatch extends TournamentMatch implements DBEntity, iQualificationMatch
 {
@@ -27,7 +27,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   @Override
   public void onStartUp() throws SQLException
   {
-    for (Map.Entry<Integer, QualificationMatch> entry : preliminarys.entrySet())
+    for (Map.Entry<Integer, QualificationMatch> entry : qualificationMatches.entrySet())
     {
       entry.getValue().initPhase2();
     }
@@ -36,8 +36,8 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   @Override
   public void onExit()
   {
-    Map<Integer, QualificationMatch> tmp = preliminarys;
-    preliminarys = new HashMap<>();
+    Map<Integer, QualificationMatch> tmp = qualificationMatches;
+    qualificationMatches = new HashMap<>();
     for (Map.Entry<Integer, QualificationMatch> entry : tmp.entrySet())
     {
       entry.getValue().invalidate();
@@ -45,12 +45,12 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   }
 
   //#########################################################################
-  private static Map<Integer, QualificationMatch> preliminarys = new HashMap<>();
+  private static Map<Integer, QualificationMatch> qualificationMatches = new HashMap<>();
 
-  public static List<iQualificationMatch> getQualificationMatchOfTournament(Tournament t)
+  public static List<iQualificationMatch> getQualificationMatchesOfTournament(Tournament t)
   {
     List<iQualificationMatch> ret = new ArrayList<>();
-    for (Map.Entry<Integer, QualificationMatch> entry : preliminarys.entrySet())
+    for (Map.Entry<Integer, QualificationMatch> entry : qualificationMatches.entrySet())
     {
       if (entry.getValue().getTournament().equals(t))
       {
@@ -69,7 +69,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   public static void deleteQualificationMatchOfTournament(Tournament t)
   {
     List<QualificationMatch> tmp = new ArrayList<>();
-    for (Map.Entry<Integer, QualificationMatch> entry : preliminarys.entrySet())
+    for (Map.Entry<Integer, QualificationMatch> entry : qualificationMatches.entrySet())
     {
       if (entry.getValue().getTournament().equals(t))
       {
@@ -96,7 +96,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   {
     super(set);
 
-    preliminarys.put(ID, this);
+    qualificationMatches.put(ID, this);
   }
 
   public QualificationMatch(Tournament t, Fencer f1, Fencer f2) throws SQLException
@@ -108,7 +108,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
 
     this.ID = DBQualificationPhase.createQualificationPhase(t, f1, f2);
 
-    preliminarys.put(ID, this);
+    qualificationMatches.put(ID, this);
 
     this.t = t;
 
@@ -136,15 +136,14 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   }
 
   /**
-   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE
-   * PROGRAMM IF USED OTHERWISE.
+   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF USED OTHERWISE.
    */
   public QualificationMatch()
   {
   }
 
   ;
-    
+
     @Override
   public void delete() throws SQLException, ObjectDeprecatedException
   {
@@ -154,7 +153,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     }
 
     isValid = false;
-    preliminarys.remove(this);
+    qualificationMatches.remove(this);
   }
 
   protected void initPhase2()

@@ -6,14 +6,15 @@
 package model.rounds;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.DBConnection.DBEntity;
 import model.DBConnection.DBFinalsPhase;
-import model.DBConnection.DBQualificationPhase;
 import model.ObjectDeprecatedException;
 import model.ObjectExistException;
-import model.DBConnection.DBEntity;
+import model.Tournament;
 
 /**
  *
@@ -33,7 +34,7 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   @Override
   public void onStartUp() throws SQLException
   {
-    for (Map.Entry<Integer, FinalsMatch> entry : finalrounds.entrySet())
+    for (Map.Entry<Integer, FinalsMatch> entry : finalsMatches.entrySet())
     {
       entry.getValue().initPhase2();
     }
@@ -42,8 +43,8 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   @Override
   public void onExit()
   {
-    Map<Integer, FinalsMatch> tmp = finalrounds;
-    finalrounds = new HashMap<>();
+    Map<Integer, FinalsMatch> tmp = finalsMatches;
+    finalsMatches = new HashMap<>();
     for (Map.Entry<Integer, FinalsMatch> entry : tmp.entrySet())
     {
       entry.getValue().invalidate();
@@ -51,11 +52,24 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   }
 
   //#########################################################################
-  private static Map<Integer, FinalsMatch> finalrounds = new HashMap<>();
+  private static Map<Integer, FinalsMatch> finalsMatches = new HashMap<>();
 
   public static FinalsMatch getFinalround(int id)
   {
-    return finalrounds.get(id);
+    return finalsMatches.get(id);
+  }
+
+  public static List<iFinalsMatch> getFinalsMatchesOfTournament(Tournament t)
+  {
+    List<iFinalsMatch> ret = new ArrayList<>();
+    for (Map.Entry<Integer, FinalsMatch> entry : finalsMatches.entrySet())
+    {
+      if (entry.getValue().getTournament().equals(t))
+      {
+        ret.add(entry.getValue());
+      }
+    }
+    return ret;
   }
 
   //#########################################################################
@@ -78,14 +92,14 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
     this.winnerRoundID = (Integer) set.get("GewinnerRunde".toUpperCase());
     this.loserRoundID = (Integer) set.get("VerliererRunde".toUpperCase());
 
-    finalrounds.put(ID, this);
+    finalsMatches.put(ID, this);
   }
 
   public FinalsMatch(int finalRound)
   {
     this.ID = DBFinalsPhase.createFinalround(t, finalRound);
 
-    finalrounds.put(ID, this);
+    finalsMatches.put(ID, this);
 
     this.t = t;
 

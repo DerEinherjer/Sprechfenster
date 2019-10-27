@@ -40,11 +40,14 @@ public abstract class DBBaseClass
   {
     //Add all classes with db representation so that they get automaticaly
     //initiated. They need the DBEntetyRepresenter interface.
-    dbEntities.add(new Fencer());
+    
+    //Order of entities is important since initialization in "init" needs to take interdependencies into account
     dbEntities.add(new Tournament());
-    dbEntities.add(new TournamentParticipation());
     dbEntities.add(new TournamentMatch());
     dbEntities.add(new QualificationMatch());
+    dbEntities.add(new TournamentParticipation());
+    dbEntities.add(new Fencer());
+    
 
     try
     {

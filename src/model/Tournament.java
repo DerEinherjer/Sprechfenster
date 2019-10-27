@@ -7,79 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Observer;
+import model.DBConnection.DBEntity;
 import model.DBConnection.DBTournament;
+import static model.DBConnection.DBTournament.createTournament;
 import model.rounds.FinalsMatch;
 import model.rounds.QualificationMatch;
 import model.rounds.TournamentMatch;
-import model.DBConnection.DBEntity;
 import model.rounds.iFinalsMatch;
 import model.rounds.iQualificationMatch;
-import static model.DBConnection.DBTournament.createTournament;
 
 public class Tournament extends Observable implements DBEntity, iTournament
 {
 
-  @Override
-  public void init() throws SQLException
-  {
-    DBTournament.createTable();
-    DBTournament.loadTournaments();
-  }
-
-  @Override
-  public void onStartUp() throws SQLException
-  {
-    for (Map.Entry<Integer, Tournament> entry : tournaments.entrySet())
-    {
-      entry.getValue().updateParticipants();
-    }
-  }
-
-  @Override
-  public void onExit()
-  {
-    Map<Integer, Tournament> tmp = tournaments;
-    tournaments = new HashMap<>();
-
-    for (Map.Entry<Integer, Tournament> entry : tmp.entrySet())
-    {
-      entry.getValue().invalidate();
-    }
-  }
-
-  //#########################################################################
-  //static Sync sync;
-  private static Map<Integer, Tournament> tournaments = new HashMap<>();
-
-  public static List<Tournament> getAllTournaments()
-  {
-    List<Tournament> ret = new ArrayList<>();
-    for (Map.Entry<Integer, Tournament> entry : tournaments.entrySet())
-    {
-      ret.add(entry.getValue());
-    }
-    return ret;
-  }
-
-  public static Tournament getTournament(int id)
-  {
-    return tournaments.get(id);
-  }
-
-  //#########################################################################
-  private int ID;
-
-  private boolean isValid = true;
-
-  private String name = null;
-  private String date = null;
-  private Integer groups = null;
-  private Integer numberFinalrounds = null;
-  private Integer lanes = null;
-  private Status status = null;
-  private Boolean separateQualificationGroups = null;
-
+  // <editor-fold defaultstate="collapsed" desc=" Types ">
   enum Status
   {
     PreparingPhase(0),
@@ -112,12 +52,42 @@ public class Tournament extends Observable implements DBEntity, iTournament
     }
   }
 
+// </editor-fold>
+  // <editor-fold defaultstate="collapsed" desc=" statics ">
+  private static Map<Integer, Tournament> tournaments = new HashMap<>();
+
+  public static List<Tournament> getAllTournaments()
+  {
+    List<Tournament> ret = new ArrayList<>();
+    for (Map.Entry<Integer, Tournament> entry : tournaments.entrySet())
+    {
+      ret.add(entry.getValue());
+    }
+    return ret;
+  }
+
+  public static Tournament getTournament(int id)
+  {
+    return tournaments.get(id);
+  }
+
+// </editor-fold>
+  //#########################################################################
+  private int ID;
+  private boolean isValid = true;
+  private String name = null;
+  private String date = null;
+  private Integer groups = null;
+  private Integer numberFinalrounds = null;
+  private Integer lanes = null;
+  private Status status = null;
+  private Boolean separateQualificationGroups = null;
   private Map<Integer, TournamentParticipation> participants = new HashMap<>();
   private Map<Fencer, Score> qualificationScore = new HashMap<>();
+  private Map<Fencer, Score> finalsScore = new HashMap<>();
 
   /**
-   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE
-   * PROGRAMM IF USED OTHERWISE.
+   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF USED OTHERWISE.
    */
   public Tournament()
   {
@@ -154,13 +124,41 @@ public class Tournament extends Observable implements DBEntity, iTournament
     this.status = Status.valueOf(Integer.parseInt((String) set.get("Status".toUpperCase())));
     this.separateQualificationGroups = (Boolean) set.get("VorgruppenSeparieren".toUpperCase());//TODO: Include in Test-Case
 
+    //TODO: set internal state accordung to status
     switch (status)
     {
       case Completed:
       case FinalsPhase:
       case QualificationPhase:
-
       case PreparingPhase:
+    }
+  }
+
+  @Override
+  public void init() throws SQLException
+  {
+    DBTournament.createTable();
+    DBTournament.loadTournaments();
+  }
+
+  @Override
+  public void onStartUp() throws SQLException
+  {
+    for (Map.Entry<Integer, Tournament> entry : tournaments.entrySet())
+    {
+      entry.getValue().updateParticipants();
+    }
+  }
+
+  @Override
+  public void onExit()
+  {
+    Map<Integer, Tournament> tmp = tournaments;
+    tournaments = new HashMap<>();
+
+    for (Map.Entry<Integer, Tournament> entry : tmp.entrySet())
+    {
+      entry.getValue().invalidate();
     }
   }
 
@@ -368,16 +366,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
-  private void updateParticipants()
-  {
-    if (!isValid)
-    {
-      throw new ObjectDeprecatedException();
-    }
-
-    participants = TournamentParticipation.getAllParticipantsForTournament(this);
-  }
-
   @Override
   public boolean isParticipant(iFencer f) throws SQLException
   {
@@ -548,17 +536,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return new ArrayList<>();
     }
 
-    return QualificationMatch.getQualificationMatchOfTournament(this);
-  }
-
-  @Override
-  public int getQualificationMatchCount() throws SQLException
-  {
-    if (!isValid)
-    {
-      throw new ObjectDeprecatedException();
-    }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return QualificationMatch.getQualificationMatchesOfTournament(this);
   }
 
   @Override
@@ -569,7 +547,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       throw new ObjectDeprecatedException();
     }
 
-    List<iQualificationMatch> prelims = QualificationMatch.getQualificationMatchOfTournament(this);
+    List<iQualificationMatch> prelims = QualificationMatch.getQualificationMatchesOfTournament(this);
 
     int lanes = -1;
     int rounds = -1;
@@ -606,13 +584,13 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       return null;
     }
-
-    if (!qualificationScore.containsKey(f))
+    Fencer fencer = (Fencer) f;
+    if (!qualificationScore.containsKey(fencer))
     {
-      qualificationScore.put((Fencer) f, new Score((Fencer) f));
+      qualificationScore.put(fencer, new Score(fencer));
     }
 
-    return (iScore) qualificationScore.get(f);
+    return (iScore) qualificationScore.get(fencer);
   }
 
   @Override
@@ -622,7 +600,16 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (status == Status.PreparingPhase || status == Status.QualificationPhase)
+    {
+      return null;
+    }
+    Fencer fencer = (Fencer) f;
+    if (!finalsScore.containsKey(fencer))
+    {
+      finalsScore.put(fencer, new Score(fencer));
+    }
+    return (iScore) finalsScore.get(fencer);
   }
 
   @Override
@@ -632,7 +619,11 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    if (status == Status.PreparingPhase)
+    {
+      return null;
+    }
+    return new ArrayList<>(qualificationScore.values());
   }
 
   @Override
@@ -642,17 +633,11 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public List<iScore>[] getQualificationPhaseScoresInGroups() throws SQLException
-  {
-    if (!isValid)
+    if (status == Status.PreparingPhase || status == Status.QualificationPhase)
     {
-      throw new ObjectDeprecatedException();
+      return null;
     }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return new ArrayList<>(finalsScore.values());
   }
 
   @Override
@@ -662,7 +647,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return FinalsMatch.getFinalsMatchesOfTournament(this);
   }
 
   @Override
@@ -812,7 +797,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
           {
             break;//All not already places PrelimFights have a fighter who is already fighting at this point in time
           }
-          //Delete the match from the 
+          //Delete the match from the
           prelim.remove(next);
           next.setTime(time, lane);
           lastFights.put(next.getFencer().get(0), time);
@@ -823,48 +808,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
     }
 
     status = Status.QualificationPhase;
-  }
-
-  private boolean areAllQualificationMatchesFinished()
-  {
-    for (iQualificationMatch p : QualificationMatch.getQualificationMatchOfTournament(this))
-    {
-      if (!p.isFinished())
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public List<iQualificationMatch> getQualificationMatchesFromGroup(int group) throws SQLException
-  {
-    List<iQualificationMatch> ret = new ArrayList<>();
-    for (iQualificationMatch p : QualificationMatch.getQualificationMatchOfTournament(this))
-    {
-      if (p.getQualificationGroup() == group)
-      {
-        ret.add(p);
-      }
-    }
-    return ret;
-  }
-
-  private List<Score> getScoreFromGroup() throws SQLException
-  {
-    List<Score> ret = new ArrayList<>();
-    for (int g = 0; g < groups; g++)
-    {
-      for (iFencer f : getParticipantsOfGroup(g))
-      {
-        if (!qualificationScore.containsKey(f))
-        {
-          qualificationScore.put((Fencer) f, new Score((Fencer) f));
-        }
-        ret.add((Score) qualificationScore.get(f));
-      }
-    }
-    return ret;
   }
 
   @Override
@@ -1030,37 +973,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
     return status == Status.Completed;
   }
 
-  private void invalidate()
-  {
-    ID = -1;
-    isValid = false;
-  }
-
-  public void debug()//TODO: Delete
-  {
-    System.out.println("Anzahl einträge: " + participants.entrySet().size());
-    for (Map.Entry<Integer, TournamentParticipation> entry : participants.entrySet())
-    {
-      System.out.println(entry.getKey() + " | " + entry.getValue().getID() + " | " + entry.getValue().getFencer().getName() + " | " + entry.getValue().getFencer().getID());
-    }
-    System.out.println("\n");
-  }
-
-  public void printSchedule() throws SQLException
-  {
-    iQualificationMatch[][] schedule = getQualificationMatchSchedule();
-
-    for (int i = 0; i < schedule.length; i++)
-    {
-      for (int c = 0; c < schedule[i].length; c++)
-      {
-        System.out.print(schedule[i][c].getFencer().get(0).getName() + "" + schedule[i][c].getFencer().get(1).getName() + "\t");
-      }
-
-      System.out.println("");
-    }
-  }
-
   public void addQualificationMatchToScore(Fencer f, TournamentMatch r)
   {
     if (!qualificationScore.containsKey(f))
@@ -1077,6 +989,51 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       qualificationScore.get(f).removeMatch(r);
     }
+  }
+
+  private void invalidate()
+  {
+    ID = -1;
+    isValid = false;
+  }
+
+  private List<Score> getScoreFromGroup() throws SQLException
+  {
+    List<Score> ret = new ArrayList<>();
+    for (int g = 0; g < groups; g++)
+    {
+      for (iFencer f : getParticipantsOfGroup(g))
+      {
+        if (!qualificationScore.containsKey(f))
+        {
+          qualificationScore.put((Fencer) f, new Score((Fencer) f));
+        }
+        ret.add((Score) qualificationScore.get(f));
+      }
+    }
+    return ret;
+  }
+
+  private void updateParticipants()
+  {
+    if (!isValid)
+    {
+      throw new ObjectDeprecatedException();
+    }
+
+    participants = TournamentParticipation.getAllParticipantsForTournament(this);
+  }
+
+  private boolean areAllQualificationMatchesFinished()
+  {
+    for (iQualificationMatch p : QualificationMatch.getQualificationMatchesOfTournament(this))
+    {
+      if (!p.isFinished())
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

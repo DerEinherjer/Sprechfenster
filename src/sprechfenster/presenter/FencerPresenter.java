@@ -5,9 +5,6 @@
  */
 package sprechfenster.presenter;
 
-import model.iFencer;
-import model.iScore;
-import model.iTournament;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -17,6 +14,9 @@ import java.util.Observer;
 import java.util.logging.Level;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import model.iFencer;
+import model.iScore;
+import model.iTournament;
 import sprechfenster.LoggingUtilities;
 
 /**
@@ -116,7 +116,7 @@ public class FencerPresenter implements Observer
     {
       LoggingUtilities.LOGGER.log(Level.SEVERE, null, e);
     }
-    return "-";
+    return "0";
   }
 
   private String getQualificationRoundPoints()
@@ -129,7 +129,7 @@ public class FencerPresenter implements Observer
         return String.format("%d/%d", score.getHits(), score.getGotHit());
       }
     }
-    return "-/-";
+    return "0/0";
   }
 
   private String getQualificationRoundWins()
@@ -142,7 +142,7 @@ public class FencerPresenter implements Observer
         return Integer.toString(score.getWins());
       }
     }
-    return "-";
+    return "0";
   }
 
   private String getFinalRoundScore()
@@ -155,7 +155,7 @@ public class FencerPresenter implements Observer
         return String.format("%d/%d", score.getHits(), score.getGotHit());
       }
     }
-    return "-";
+    return "0/0";
   }
 
   private String getFinalRoundWins()
@@ -168,7 +168,7 @@ public class FencerPresenter implements Observer
         return Integer.toString(score.getWins());
       }
     }
-    return "-";
+    return "0";
   }
 
   @Override

@@ -79,8 +79,18 @@ public class CreatePreliminarySchedule
 
     t.startQualificationPhase();
 
-    t.printSchedule();
+    iQualificationMatch[][] schedule = t.getQualificationMatchSchedule();
 
+    for (int i = 0; i < schedule.length; i++)
+    {
+      for (int j = 0; j < schedule[i].length; j++)
+      {
+        System.out.print(schedule[i][j].getFencer().get(0).getName() + "" + schedule[i][j].getFencer().get(1).getName() + "\t");
+      }
+
+      System.out.println("");
+    }
+    
     iQualificationMatch p = t.getAllQualificationMatches().get(0);
 
     iFencer f1 = p.getFencer().get(0);

@@ -33,9 +33,9 @@ public class Test
       //t.createPreliminaryTiming();
       printSchedule(t.getQualificationMatchSchedule());
 
-      int count = t.getQualificationMatchCount();
+      int count = t.getAllQualificationMatches().size();
       t.getAllQualificationMatches().get(0).delete();
-      if (count - 1 == t.getQualificationMatchCount())
+      if (count - 1 == t.getAllQualificationMatches().size())
       {
         System.out.println("Turnier findet ein Prelim weniger");
       } else

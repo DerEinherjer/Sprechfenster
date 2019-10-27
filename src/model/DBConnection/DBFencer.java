@@ -21,10 +21,12 @@ public abstract class DBFencer extends DBBaseClass
 
   private static String getSQLString()
   {
-    return "CREATE TABLE IF NOT EXISTS Finalrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
-            + "GewinnerRunde int DEFAULT -1,"
-            + "VerliererRunde int DEFAULT -1,"
-            + "FinalRunde int DEFAULT -1);";
+    return "CREATE TABLE IF NOT EXISTS Fechter (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
+            + "Vorname varchar(255) DEFAULT 'Max',"
+            + "Nachname varchar(255) DEFAULT 'Musterman',"
+            + "Geburtstag varchar(255) DEFAULT '1970-01-01',"
+            + "Fechtschule varchar(255) DEFAULT 'Keine Fechtschule',"
+            + "Nationalitaet varchar(255) DEFAULT 'Nicht Angegeben');";
   }
 
   public static void createTable() throws SQLException
