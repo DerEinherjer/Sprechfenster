@@ -1,12 +1,12 @@
 package model;
 
-import model.DBConnection.DBTournamentParticipation;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.DBConnection.DBEntity;
+import model.DBConnection.DBTournamentParticipation;
 
 public class TournamentParticipation implements DBEntity
 {
@@ -84,8 +84,7 @@ public class TournamentParticipation implements DBEntity
   private String comment = null;
 
   /**
-   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE
-   * PROGRAMM IF USED OTHERWISE.
+   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF USED OTHERWISE.
    */
   public TournamentParticipation()
   {

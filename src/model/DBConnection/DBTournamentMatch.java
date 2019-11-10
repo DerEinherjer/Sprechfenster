@@ -40,78 +40,77 @@ public class DBTournamentMatch extends DBBaseClass
   private PreparedStatement stfp1Stmt = null;
   private PreparedStatement stfp2Stmt = null;
 
-  private static PreparedStatement stStmt1 = null;
-  private static PreparedStatement stStmt2 = null;
-  private static PreparedStatement stStmt3 = null;
+  private static PreparedStatement getTournamentLanes = null;
+  private static PreparedStatement findQualificationRound = null;
+  private static PreparedStatement updateQualificationRound = null;
 
-  public static boolean setTime(TournamentMatch p, int round, int lane) throws SQLException
+  public static boolean setQualificationMatchTime(TournamentMatch p, int round, int lane) throws SQLException
   {
-    if (stStmt1 == null)
+    if (round < 1 || lane < 1)
     {
-      String sql = "SELECT * FROM Vorrunden WHERE Runde = ? AND Bahn = ?;";
-      stStmt1 = DBConnection.prepareStatement(sql);
-
-      sql = "SELECT Bahnen FROM Turniere WHERE ID = ?;";
-      stStmt2 = DBConnection.prepareStatement(sql);
-
-      sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
-      stStmt3 = DBConnection.prepareStatement(sql);
-    }
-
-    stStmt1.setInt(1, round);
-    stStmt1.setInt(2, lane);
-
-    ResultSet rs = stStmt1.executeQuery();
-
-    if (rs.next())
-    {
-      rs.close();
       return false;
     }
-    rs.close();
-
-    stStmt2.setInt(1, p.getTournament().getID());
-
-    rs = stStmt2.executeQuery();
-
-    if (!rs.next())
+    if (getTournamentLanes == null)
     {
+      String sql = "SELECT Bahnen FROM Turniere WHERE ID = ?";
+      getTournamentLanes = DBConnection.prepareStatement(sql);
+    }
+    getTournamentLanes.setInt(1, p.getTournament().getID());
+    ResultSet rs = getTournamentLanes.executeQuery();
+    boolean hasResult = rs.next();
+    boolean laneOk = false;
+    if (hasResult)
+    {
+      if (lane <= rs.getInt("Bahnen"))
+      {
+        laneOk = true;
+      }
       rs.close();
-      return false;//somthing is fucked up
+      if (!laneOk)
+      {
+        return false;
+      }
     }
 
-    if (lane > rs.getInt("Bahnen"))
+    if (findQualificationRound == null)
     {
-      rs.close();
-      return false;//Slot already taken
+      String sql = "SELECT * FROM Vorrunden WHERE ID = ?";
+      findQualificationRound = DBConnection.prepareStatement(sql);
     }
+    findQualificationRound.setInt(1, p.getID());
+    rs = findQualificationRound.executeQuery();
+    hasResult = rs.next();
     rs.close();
+    if (!hasResult)
+    {
+      return false;
+    }
 
-    stStmt3.setInt(1, round);
-    stStmt3.setInt(2, lane);
-    stStmt3.setInt(3, p.getID());
-
-    stStmt3.executeUpdate();
-
+    if (updateQualificationRound == null)
+    {
+      String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
+      updateQualificationRound = DBConnection.prepareStatement(sql);
+    }
+    updateQualificationRound.setInt(1, round);
+    updateQualificationRound.setInt(2, lane);
+    updateQualificationRound.setInt(3, p.getID());
+    updateQualificationRound.executeUpdate();
     return true;
   }
 
   private static PreparedStatement spStmt = null;
 
-  public static void setPoints(int prelimID, int fencerID, int points) throws SQLException
+  public static void setPoints(int prelimID, int pointsFencer1, int pointsFencer2) throws SQLException
   {
     if (spStmt == null)
     {
-      String sql = "UPDATE Vorrunden SET PunkteVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE PunkteVon1 END, "
-              + "PunkteVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE PunkteVon2 END WHERE ID = ?;";
+      String sql = "UPDATE Vorrunden SET PunkteVon1 = ?, PunkteVon2 = ? WHERE ID = ?;";
       spStmt = DBConnection.prepareStatement(sql);
     }
 
-    spStmt.setInt(1, fencerID);
-    spStmt.setInt(2, points);
-    spStmt.setInt(3, fencerID);
-    spStmt.setInt(4, points);
-    spStmt.setInt(5, prelimID);
+    spStmt.setInt(1, prelimID);
+    spStmt.setInt(2, pointsFencer1);
+    spStmt.setInt(3, pointsFencer2);
     spStmt.executeUpdate();
   }
 

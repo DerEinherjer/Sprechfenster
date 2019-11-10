@@ -866,7 +866,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     List<Score> wildcards = new ArrayList<>();
 
     //Get the first X fencers from every group and put all other fencers in
-    //the wildcart pot
+    //the wildcard pot
     for (int i = 0; i < groups; i++)
     {
       List<Score> tmp = getScoreFromGroup();
@@ -921,7 +921,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
     }
 
     //TODO: Event werfen
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
@@ -1045,7 +1044,8 @@ public class Tournament extends Observable implements DBEntity, iTournament
     participants = TournamentParticipation.getAllParticipantsForTournament(this);
   }
 
-  private boolean areAllQualificationMatchesFinished()
+  @Override
+  public boolean areAllQualificationMatchesFinished()
   {
     for (iQualificationMatch p : QualificationMatch.getQualificationMatchesOfTournament(this))
     {

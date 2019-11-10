@@ -40,6 +40,7 @@ public class Score extends Observable implements iScore, Observer, Comparable
 
     matches.add(r);
     r.addObserver(this);
+    update(null, EventPayload.Type.valueChanged);
   }
 
   public void removeMatch(TournamentMatch r)
@@ -72,31 +73,29 @@ public class Score extends Observable implements iScore, Observer, Comparable
   @Override
   public void update(Observable o, Object arg)
   {
-    if (((EventPayload) arg).type == EventPayload.Type.valueChanged)
+    wins = 0;
+    hits = 0;
+    gotHit = 0;
+
+    for (TournamentMatch r : matches)
     {
-      wins = 0;
-      hits = 0;
-      gotHit = 0;
-
-      for (TournamentMatch r : matches)
+      try
       {
-        try
+        if (r.isFinished())
         {
-          if (r.isFinished())
+          iFencer winner = r.getWinner();
+          if (winner != null && winner.equals(fencer))
           {
-            if (r.getWinner().equals(fencer))
-            {
-              wins++;
-            }
-
-            hits += r.getPoints(fencer);
-            gotHit += r.getPoints(fencer);
+            wins++;
           }
-        } catch (ObjectDeprecatedException e)
-        {
-          //Depricated object wasen't removed properply; adjust and ignor
-          matches.remove(r);
+
+          hits += r.getPoints(fencer);
+          gotHit += r.getOpponentPoints(fencer);
         }
+      } catch (ObjectDeprecatedException e)
+      {
+        //Depricated object wasen't removed properply; adjust and ignor
+        matches.remove(r);
       }
     }
 

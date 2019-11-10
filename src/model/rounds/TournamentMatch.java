@@ -158,7 +158,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
       return false;
     }
 
-    if (DBTournamentMatch.setTime(this, round, lane))
+    if (DBTournamentMatch.setQualificationMatchTime(this, round, lane))
     {
       this.round = round;
       this.lane = lane;
@@ -211,7 +211,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       pointsFor2 = points;
     }
-
+    DBTournamentMatch.setPoints(this.ID, pointsFor1, pointsFor2);
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }

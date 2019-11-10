@@ -92,9 +92,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   private ArrayList<String> FencerNames;
 
   private final ArrayList<TournamentBracketController> BracketControllers = new ArrayList<TournamentBracketController>();
-  ;
-
-    private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
+  private final LimitedIntegerStringConverter StringToRoundNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToLaneNumber = new LimitedIntegerStringConverter(1, 1);
   private final LimitedIntegerStringConverter StringToPointsConverter = new LimitedIntegerStringConverter(Integer.MAX_VALUE, 0);
 
@@ -296,7 +294,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FencersPane.getChildren().add(preliminaryRoundScoreGroupTable);
 
         StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
-        CreateEliminationRoundsButton.setDisable(Tournament.isQualificationPhase());
+        CreateEliminationRoundsButton.setDisable(Tournament.areAllQualificationMatchesFinished());
         AbortEliminationRoundsButton.setDisable(Tournament.isFinalsPhase());
         int maxRound = 0;
         for (iFinalsMatch finalRound : Tournament.getAllFinalsMatches())

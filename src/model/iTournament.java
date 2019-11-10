@@ -211,6 +211,8 @@ public interface iTournament
    */
   public iQualificationMatch[][] getQualificationMatchSchedule() throws SQLException;
 
+  public boolean areAllQualificationMatchesFinished();
+
   /**
    * Gets the score of a fencer for the preliminarys.
    *

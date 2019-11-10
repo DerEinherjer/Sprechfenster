@@ -17,6 +17,8 @@ import model.Tournament;
 public class QualificationMatch extends TournamentMatch implements DBEntity, iQualificationMatch
 {
 
+  private static Map<Integer, QualificationMatch> qualificationMatches = new HashMap<>();
+
   @Override
   public void init() throws SQLException
   {
@@ -45,8 +47,6 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   }
 
   //#########################################################################
-  private static Map<Integer, QualificationMatch> qualificationMatches = new HashMap<>();
-
   public static List<iQualificationMatch> getQualificationMatchesOfTournament(Tournament t)
   {
     List<iQualificationMatch> ret = new ArrayList<>();
@@ -97,6 +97,8 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     super(set);
 
     qualificationMatches.put(ID, this);
+    t.addQualificationMatchToScore(fencer1, this);
+    t.addQualificationMatchToScore(fencer2, this);
   }
 
   public QualificationMatch(Tournament t, Fencer f1, Fencer f2) throws SQLException
