@@ -3,7 +3,7 @@ package model.DBConnection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import static model.DBConnection.DBBaseClass.con;
+import static model.DBConnection.DBBaseClass.DBConnection;
 import model.Fencer;
 import model.ObjectDeprecatedException;
 import model.rounds.TournamentMatch;
@@ -34,7 +34,7 @@ public class DBTournamentMatch extends DBBaseClass
 
   public static void createTable() throws SQLException
   {
-    con.prepareStatement(getSQLString()).executeUpdate();
+    DBConnection.prepareStatement(getSQLString()).executeUpdate();
   }
 
   private PreparedStatement stfp1Stmt = null;
@@ -49,13 +49,13 @@ public class DBTournamentMatch extends DBBaseClass
     if (stStmt1 == null)
     {
       String sql = "SELECT * FROM Vorrunden WHERE Runde = ? AND Bahn = ?;";
-      stStmt1 = con.prepareStatement(sql);
+      stStmt1 = DBConnection.prepareStatement(sql);
 
       sql = "SELECT Bahnen FROM Turniere WHERE ID = ?;";
-      stStmt2 = con.prepareStatement(sql);
+      stStmt2 = DBConnection.prepareStatement(sql);
 
-      sql = "UPDATE Vorrunden SET Runde = ? AND Bahn = ? WHERE ID = ?;";
-      stStmt3 = con.prepareStatement(sql);
+      sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
+      stStmt3 = DBConnection.prepareStatement(sql);
     }
 
     stStmt1.setInt(1, round);
@@ -80,16 +80,16 @@ public class DBTournamentMatch extends DBBaseClass
       return false;//somthing is fucked up
     }
 
-    if (lane >= rs.getInt("Bahnen"))
+    if (lane > rs.getInt("Bahnen"))
     {
       rs.close();
       return false;//Slot already taken
     }
     rs.close();
 
-    stStmt3.setInt(1, p.getID());
-    stStmt3.setInt(2, round);
-    stStmt3.setInt(3, lane);
+    stStmt3.setInt(1, round);
+    stStmt3.setInt(2, lane);
+    stStmt3.setInt(3, p.getID());
 
     stStmt3.executeUpdate();
 
@@ -104,7 +104,7 @@ public class DBTournamentMatch extends DBBaseClass
     {
       String sql = "UPDATE Vorrunden SET PunkteVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE PunkteVon1 END, "
               + "PunkteVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE PunkteVon2 END WHERE ID = ?;";
-      spStmt = con.prepareStatement(sql);
+      spStmt = DBConnection.prepareStatement(sql);
     }
 
     spStmt.setInt(1, fencerID);
@@ -123,7 +123,7 @@ public class DBTournamentMatch extends DBBaseClass
     {
       String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? THEN -1 ELSE Teilnehmer1 END, "
               + "Teilnehmer2 = CASE WHEN Teilnehmer2 = ? THEN -1 ELSE Teilnehmer2 END WHERE ID = ?;";
-      rpfpStmt = con.prepareStatement(sql);
+      rpfpStmt = DBConnection.prepareStatement(sql);
     }
     try
     {
@@ -144,7 +144,7 @@ public class DBTournamentMatch extends DBBaseClass
     {
       String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = -1 THEN ? ELSE Teilnehmer1 END, "
               + "Teilnehmer2 = CASE WHEN Teilnehmer2 = -1 AND Teilnehmer1 != -1 THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
-      aptpStmt = con.prepareStatement(sql);
+      aptpStmt = DBConnection.prepareStatement(sql);
     }
     try
     {
@@ -165,7 +165,7 @@ public class DBTournamentMatch extends DBBaseClass
     {
       String sql = "UPDATE Vorrunden SET Teilnehmer1 = CASE WHEN Teilnehmer1 = ? AND Teilnehmer2 != ? THEN ? ELSE Teilnehmer1 END, "
               + "Teilnehmer2 = CASE WHEN Teilnehmer2 = ? AND Teilnehmer1 != ? THEN ? ELSE Teilnehmer2 END WHERE ID = ?;";
-      spipStmt = con.prepareStatement(sql);
+      spipStmt = DBConnection.prepareStatement(sql);
     }
     try
     {
@@ -191,7 +191,7 @@ public class DBTournamentMatch extends DBBaseClass
       String sql = "UPDATE Vorrunden SET GelbVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE GelbVon1 END,"
               + "GelbVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE GelbVon2 END "
               + "WHERE ID = ?";
-      sypStmt = con.prepareStatement(sql);
+      sypStmt = DBConnection.prepareStatement(sql);
     }
 
     try
@@ -217,7 +217,7 @@ public class DBTournamentMatch extends DBBaseClass
       String sql = "UPDATE Vorrunden SET RotVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE RotVon1 END,"
               + "RotVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE RotVon2 END "
               + "WHERE ID = ?";
-      srpStmt = con.prepareStatement(sql);
+      srpStmt = DBConnection.prepareStatement(sql);
     }
 
     try
@@ -243,7 +243,7 @@ public class DBTournamentMatch extends DBBaseClass
       String sql = "UPDATE Vorrunden SET SchwarzVon1 = CASE WHEN Teilnehmer1 = ? THEN ? ELSE SchwarzVon1 END,"
               + "SchwarzVon2 = CASE WHEN Teilnehmer2 = ? THEN ? ELSE SchwarzVon2 END "
               + "WHERE ID = ?";
-      sbpStmt = con.prepareStatement(sql);
+      sbpStmt = DBConnection.prepareStatement(sql);
     }
 
     try
@@ -267,7 +267,7 @@ public class DBTournamentMatch extends DBBaseClass
     if (sfStmt == null)
     {
       String sql = "UPDATE Vorrunden SET Beendet = ? WHERE ID = ?;";
-      sfStmt = con.prepareStatement(sql);
+      sfStmt = DBConnection.prepareStatement(sql);
     }
 
     try

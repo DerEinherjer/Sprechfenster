@@ -466,13 +466,13 @@ public class TournamentTest
       iFencer fencer2 = null;
       iFinalsMatch preround1 = match.getPreviousMatches().get(0);
       iFinalsMatch preround2 = match.getPreviousMatches().get(1);
-      if (preround1.isFencer(fencers.get(0)) && preround2.isFencer(fencers.get(1)))
+      if (preround1.isFencerInMatch(fencers.get(0)) && preround2.isFencerInMatch(fencers.get(1)))
       {
         fencer1 = fencers.get(0);
         fencer2 = fencers.get(1);
       } else
       {
-        if (preround1.isFencer(fencers.get(1)) && preround2.isFencer(fencers.get(0)))
+        if (preround1.isFencerInMatch(fencers.get(1)) && preround2.isFencerInMatch(fencers.get(0)))
         {
           fencer1 = fencers.get(1);
           fencer2 = fencers.get(0);
@@ -523,13 +523,13 @@ public class TournamentTest
       {
         System.out.println("get(1) ist null");
       }
-      if (preround1.isFencer(fencers.get(0)) && preround2.isFencer(fencers.get(1)))
+      if (preround1.isFencerInMatch(fencers.get(0)) && preround2.isFencerInMatch(fencers.get(1)))
       {
         fencer1 = fencers.get(0);
         fencer2 = fencers.get(1);
       } else
       {
-        if (preround1.isFencer(fencers.get(1)) && preround2.isFencer(fencers.get(0)))
+        if (preround1.isFencerInMatch(fencers.get(1)) && preround2.isFencerInMatch(fencers.get(0)))
         {
           fencer1 = fencers.get(1);
           fencer2 = fencers.get(0);

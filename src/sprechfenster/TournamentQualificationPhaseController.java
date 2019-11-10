@@ -5,8 +5,6 @@
  */
 package sprechfenster;
 
-import model.ObjectDeprecatedException;
-import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -16,7 +14,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,15 +26,14 @@ import javafx.print.Paper;
 import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
+import model.ObjectDeprecatedException;
+import model.iTournament;
 import model.rounds.iQualificationMatch;
 
 /**
@@ -175,8 +171,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
         CreateQualificationRoundsButton1.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
         CreateQualificationRoundsButton2.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
 
-        //if (Tournament.preliminaryWithoutTiming() < Tournament.getPreliminaryCount()) {
-        if (Tournament.isPreparingPhase())
+        if (Tournament.isQualificationPhase())
         {
           List<iQualificationMatch> qualificationFights = Tournament.getAllQualificationMatches();
           if (qualificationFights != null)
@@ -240,7 +235,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
                 LoggingUtilities.LOGGER.log(Level.SEVERE, null, ex);
                 groupNumber = Integer.MAX_VALUE;
               }
-              if (groupNumber <= GroupControllers.size())
+              if (groupNumber <= GroupControllers.size() && groupNumber >= 1)
               {
                 GroupTableController groupController = GroupControllers.get(groupNumber - 1);
                 try

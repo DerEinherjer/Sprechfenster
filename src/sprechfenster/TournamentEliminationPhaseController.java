@@ -5,8 +5,6 @@
  */
 package sprechfenster;
 
-import model.ObjectDeprecatedException;
-import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -43,9 +41,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.ObjectDeprecatedException;
 import model.iFencer;
-import sprechfenster.presenter.FightPresenter;
+import model.iTournament;
 import model.rounds.iFinalsMatch;
+import sprechfenster.presenter.FightPresenter;
 
 /**
  * FXML Controller class
@@ -304,7 +304,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
           maxRound = Math.max(maxRound, finalRound.getRound());
           if (finalRound.getFencer().size() == 2)
           {
-            FightsTableView.getItems().add(new FightPresenter(finalRound));
+            FightsTableView.getItems().add(new FightPresenter(finalRound, Tournament));
           }
         }
         StringToRoundNumber.setMinAndMaxValues(maxRound, 1);

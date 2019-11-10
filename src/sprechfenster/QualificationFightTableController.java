@@ -5,8 +5,6 @@
  */
 package sprechfenster;
 
-import model.ObjectDeprecatedException;
-import model.iTournament;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -35,9 +33,11 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.ObjectDeprecatedException;
 import model.iFencer;
-import sprechfenster.presenter.FightPresenter;
+import model.iTournament;
 import model.rounds.iQualificationMatch;
+import sprechfenster.presenter.FightPresenter;
 
 /**
  * FXML Controller class
@@ -101,19 +101,19 @@ public class QualificationFightTableController implements Initializable, Observe
     GroupTableColumn.setCellValueFactory(new PropertyValueFactory<>("Group"));
     FinishedTableColumn.setCellFactory(CheckBoxTableCell.forTableColumn(FinishedTableColumn));
     FinishedTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
-    EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+    EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));//just a dummy
 
-    Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
+    Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, Boolean>> editCellFactory
             = //
             (final TableColumn<FightPresenter, String> param)
             ->
     {
-      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
+      final TableCell<FightPresenter, Boolean> cell = new TableCell<FightPresenter, Boolean>()
       {
         final Button EditButton = new Button("Ändern");
 
         @Override
-        public void updateItem(String item, boolean empty)
+        public void updateItem(Boolean item, boolean empty)
         {
           super.updateItem(item, empty);
           if (empty)
@@ -210,10 +210,10 @@ public class QualificationFightTableController implements Initializable, Observe
       {
         try
         {
-          if (qualificationFight.getQualificationGroup()== GroupNumber || qualificationFight.getLane() == LaneNumber)
+          if (qualificationFight.getQualificationGroup() == GroupNumber || qualificationFight.getLane() == LaneNumber)
           {
             MaxRound = Math.max(MaxRound, qualificationFight.getRound());
-            FightsTableView.getItems().add(new FightPresenter(qualificationFight));
+            FightsTableView.getItems().add(new FightPresenter(qualificationFight, Tournament));
           }
         } catch (SQLException | ObjectDeprecatedException ex)
         {

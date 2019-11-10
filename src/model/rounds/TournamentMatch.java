@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import model.DBConnection.DBEntity;
 import model.DBConnection.DBTournamentMatch;
 import model.EventPayload;
 import model.Fencer;
@@ -13,7 +14,6 @@ import model.ObjectExistException;
 import model.Tournament;
 import model.iFencer;
 import model.iTournament;
-import model.DBConnection.DBEntity;
 
 public class TournamentMatch extends Observable implements DBEntity, iMatch
 {
@@ -42,7 +42,6 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
   int ID;
   Tournament t;
 
-  Integer group = null;
   Integer round = null;
   Integer lane = null;
   Fencer fencer1 = null;
@@ -59,15 +58,14 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
   Integer blackFor2 = null;
 
   /**
-   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE
-   * PROGRAMM IF USED OTHERWISE.
+   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF USED OTHERWISE.
    */
   public TournamentMatch()
   {
   }
 
   ;
-    
+
     public TournamentMatch(Map<String, Object> set) throws ObjectExistException, SQLException
   {
     this.ID = (Integer) set.get("ID");
@@ -75,7 +73,6 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     //The DB returns all colum names in caps
     this.t = Tournament.getTournament((Integer) set.get("TurnierID".toUpperCase()));
 
-    this.group = (Integer) set.get("Gruppe".toUpperCase());
     this.round = (Integer) set.get("Runde".toUpperCase());
     this.lane = (Integer) set.get("Bahn".toUpperCase());
     this.fencer1 = Fencer.getFencer((Integer) set.get("Teilnehmer1".toUpperCase()));
@@ -90,8 +87,6 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     this.redFor2 = (Integer) set.get("RotVon2".toUpperCase());
     this.blackFor1 = (Integer) set.get("SchwarzVon1".toUpperCase());
     this.blackFor2 = (Integer) set.get("SchwarzVon2".toUpperCase());
-
-    //sync.observeThis(this);
   }
 
   public int getID()
@@ -99,15 +94,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     return ID;
   }
 
-  public int getGroup() throws ObjectDeprecatedException
-  {
-    if (!isValid)
-    {
-      throw new ObjectDeprecatedException();
-    }
-    return group;
-  }
-
+  @Override
   public int getRound() throws ObjectDeprecatedException
   {
     if (!isValid)
@@ -117,6 +104,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     return round;
   }
 
+  @Override
   public int getLane() throws ObjectDeprecatedException
   {
     if (!isValid)
@@ -126,6 +114,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     return lane;
   }
 
+  @Override
   public List<iFencer> getFencer() throws ObjectDeprecatedException
   {
     if (!isValid)
@@ -162,7 +151,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       throw new ObjectDeprecatedException();
     }
-    if (finished || !t.isPreparingPhase())
+    if (finished || !(t.isQualificationPhase() || t.isPreparingPhase()))
     {
 
       System.out.println("FALSCHE PHASE");
@@ -203,6 +192,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
+  @Override
   public void setPoints(iFencer f, int points) throws SQLException, ObjectDeprecatedException
   {
     if (!isValid)
@@ -448,11 +438,15 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
   }
 
   @Override
-  public boolean isFencer(iFencer f) throws ObjectDeprecatedException
+  public boolean isFencerInMatch(iFencer f) throws ObjectDeprecatedException
   {
     if (!isValid)
     {
       throw new ObjectDeprecatedException();
+    }
+    if (f == null)
+    {
+      return false;
     }
 
     if (fencer1.equals(f) || fencer2.equals(f))

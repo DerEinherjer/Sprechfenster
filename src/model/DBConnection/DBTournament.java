@@ -17,13 +17,13 @@ public class DBTournament extends DBBaseClass
             + "Gruppen int DEFAULT 2,"
             + "Finalrunden int DEFAULT 2,"
             + "Bahnen int DEFAULT 2,"
-            + "Status varchar(255) DEFAULT 0,"
+            + "Status int DEFAULT 0,"
             + "VorgruppenSeparieren boolean DEFAULT FALSE);";
   }
 
   public static void createTable() throws SQLException
   {
-    con.prepareStatement(getSQLString()).executeUpdate();
+    DBConnection.prepareStatement(getSQLString()).executeUpdate();
   }
 
   private static PreparedStatement ctStmt = null;
@@ -33,7 +33,7 @@ public class DBTournament extends DBBaseClass
     if (ctStmt == null || ctStmt.isClosed())
     {
       String sql = "INSERT INTO Turniere (Name) VALUES (?);";
-      ctStmt = con.prepareStatement(sql);
+      ctStmt = DBConnection.prepareStatement(sql);
     }
     ctStmt.setString(1, name);
     ctStmt.executeUpdate();
@@ -55,7 +55,7 @@ public class DBTournament extends DBBaseClass
     if (ltStmt == null || ltStmt.isClosed())
     {
       String sql = "SELECT * FROM Turniere;";
-      ltStmt = con.prepareStatement(sql);
+      ltStmt = DBConnection.prepareStatement(sql);
     }
 
     ResultSet rs = ltStmt.executeQuery();
@@ -79,7 +79,7 @@ public class DBTournament extends DBBaseClass
     if (snStmt == null || snStmt.isClosed())
     {
       String sql = "UPDATE Turniere SET Name = ? WHERE ID = ?;";
-      snStmt = con.prepareStatement(sql);
+      snStmt = DBConnection.prepareStatement(sql);
     }
     snStmt.setString(1, name);
     snStmt.setInt(2, id);
@@ -93,7 +93,7 @@ public class DBTournament extends DBBaseClass
     if (sdStmt == null || sdStmt.isClosed())
     {
       String sql = "UPDATE Turniere SET Datum = ? WHERE ID = ?;";
-      sdStmt = con.prepareStatement(sql);
+      sdStmt = DBConnection.prepareStatement(sql);
     }
     sdStmt.setString(1, date);
     sdStmt.setInt(2, id);
@@ -107,7 +107,7 @@ public class DBTournament extends DBBaseClass
     if (sgStmt == null || sgStmt.isClosed())
     {
       String sql = "UPDATE Turniere SET Gruppen = ? WHERE ID = ?;";
-      sgStmt = con.prepareStatement(sql);
+      sgStmt = DBConnection.prepareStatement(sql);
     }
     sgStmt.setInt(1, groups);
     sgStmt.setInt(2, id);
@@ -121,7 +121,7 @@ public class DBTournament extends DBBaseClass
     if (sfrStmt == null || sfrStmt.isClosed())
     {
       String sql = "UPDATE Turniere SET Finalrunden = ? WHERE ID = ?;";
-      sfrStmt = con.prepareStatement(sql);
+      sfrStmt = DBConnection.prepareStatement(sql);
     }
     sfrStmt.setInt(1, rounds);
     sfrStmt.setInt(2, id);
@@ -135,10 +135,24 @@ public class DBTournament extends DBBaseClass
     if (tslStmt == null || tslStmt.isClosed())
     {
       String sql = "UPDATE Turniere SET Bahnen = ? WHERE ID = ?;";
-      tslStmt = con.prepareStatement(sql);
+      tslStmt = DBConnection.prepareStatement(sql);
     }
     tslStmt.setInt(1, lanes);
     tslStmt.setInt(2, id);
     tslStmt.executeUpdate();
+  }
+
+  private static PreparedStatement setStatusStmt = null;
+
+  public static void setStatus(int id, int status) throws SQLException
+  {
+    if (setStatusStmt == null || setStatusStmt.isClosed())
+    {
+      String sql = "UPDATE Turniere SET Status = ? WHERE ID = ?;";
+      setStatusStmt = DBConnection.prepareStatement(sql);
+    }
+    setStatusStmt.setInt(1, status);
+    setStatusStmt.setInt(2, id);
+    setStatusStmt.executeUpdate();
   }
 }

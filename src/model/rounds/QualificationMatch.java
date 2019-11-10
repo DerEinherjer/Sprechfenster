@@ -107,7 +107,6 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     }
 
     this.ID = DBQualificationPhase.createQualificationPhase(t, f1, f2);
-
     qualificationMatches.put(ID, this);
 
     this.t = t;
@@ -115,7 +114,6 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     this.fencer1 = f1;
     this.fencer2 = f2;
 
-    this.group = -1;
     this.round = -1;
     this.lane = -1;
     this.pointsFor1 = 0;
@@ -162,6 +160,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     t.addQualificationMatchToScore(fencer2, this);
   }
 
+  @Override
   public int getQualificationGroup() throws SQLException
   {
     return t.getParticipantGroup(fencer1);

@@ -5,9 +5,6 @@
  */
 package sprechfenster;
 
-import model.ObjectDeprecatedException;
-import model.iFencer;
-import model.iTournament;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,6 +18,9 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import model.ObjectDeprecatedException;
+import model.iFencer;
+import model.iTournament;
 import model.rounds.iMatch;
 
 /**
@@ -157,7 +157,11 @@ public class EditFightDialogController implements Initializable
             }
             Fight.setPoints(firstFencer, firstFencerPoints);
             Fight.setPoints(secondFencer, secondFencerPoints);
-            Fight.setTime(round, lane);
+            boolean success = Fight.setTime(round, lane);
+            if (!success)
+            {
+              LoggingUtilities.LOGGER.log(Level.SEVERE, null, "Failed to schedule fight: " + Fight + " round: " + round + " lane: " + lane);
+            }
             Fight.setFinished(fightIsFinished);
           } catch (ObjectDeprecatedException ex)
           {

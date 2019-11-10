@@ -11,11 +11,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static model.DBConnection.DBBaseClass.con;
 import model.ObjectExistException;
 import model.Tournament;
 import model.rounds.FinalsMatch;
 import model.rounds.QualificationMatch;
+import static model.DBConnection.DBBaseClass.DBConnection;
 
 /**
  *
@@ -34,21 +34,21 @@ public class DBFinalsPhase extends DBBaseClass
 
   public static void createTable() throws SQLException
   {
-    con.prepareStatement(getSQLString()).executeUpdate();
+    DBConnection.prepareStatement(getSQLString()).executeUpdate();
   }
 
   private static PreparedStatement lfStmt1 = null;
   private static PreparedStatement lfStmt2 = null;
 
-  public static void loadFnialrounds() throws SQLException
+  public static void loadFinalrounds() throws SQLException
   {
     if (lfStmt1 == null)
     {
       String sql = "SELECT * FROM Vorrunden WHERE FinalStrucktur != -1;";
-      lfStmt1 = con.prepareStatement(sql);
+      lfStmt1 = DBConnection.prepareStatement(sql);
 
       sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
-      lfStmt2 = con.prepareStatement(sql);
+      lfStmt2 = DBConnection.prepareStatement(sql);
     }
 
     ResultSet rs = lfStmt1.executeQuery();

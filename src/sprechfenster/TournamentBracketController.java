@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -114,7 +113,11 @@ public class TournamentBracketController extends Observable implements Initializ
       }
       if (Fight.getLane() != lane)
       {
-        Fight.setTime(Fight.getRound(), lane);
+        boolean success = Fight.setTime(Fight.getRound(), lane);
+        if (!success)
+        {
+          LoggingUtilities.LOGGER.log(Level.SEVERE, null, "Failed to schedule fight " + Fight + " round: " + Fight.getRound() + " lane: " + lane);
+        }
       }
       if (Fight.isFinished() != fightIsFinished)
       {

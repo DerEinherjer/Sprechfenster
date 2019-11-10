@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import javafx.application.Application;
@@ -52,14 +51,13 @@ public class MainApplication extends Application
       LogManager.getLogManager().readConfiguration(configStream);
       LoggingUtilities.LOGGER.log(Level.INFO, "Logging configuration file loaded");
       System.out.println(System.getProperty("java.io.tmpdir"));
-      //rebind stdout/stderr to logger                                  
+      //rebind stdout/stderr to logger
       LoggingOutputStream los;
       los = new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDOUT);
       System.setOut(new PrintStream(los, true));
       los = new LoggingOutputStream(LoggingUtilities.LOGGER, StdOutErrLevel.STDERR);
       System.setErr(new PrintStream(los, true));
-      
-      
+
     } catch (IOException ex)
     {
       ex.printStackTrace();
@@ -67,6 +65,7 @@ public class MainApplication extends Application
       System.out.println("WARNING: Logging not configured (console output only)");
     }
     LoggingUtilities.LOGGER.log(Level.INFO, "Starting SprechFenster");
+    DBBaseClass.InitDatabase();
     launch(args);
   }
 

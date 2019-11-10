@@ -18,7 +18,7 @@ public class DBQualificationPhase extends DBBaseClass
     if (lpStmt == null)
     {
       String sql = "SELECT * FROM Vorrunden WHERE FinalStrucktur = -1;";//-1 means is not a finalround
-      lpStmt = con.prepareStatement(sql);
+      lpStmt = DBConnection.prepareStatement(sql);
     }
 
     ResultSet rs = lpStmt.executeQuery();
@@ -27,7 +27,8 @@ public class DBQualificationPhase extends DBBaseClass
     {
       try
       {
-        new QualificationMatch(rowToHash(rs));
+        //adds the qualification match to the global map as a side-effect
+        QualificationMatch match = new QualificationMatch(rowToHash(rs));
       } catch (ObjectExistException e)
       {
       }
@@ -43,7 +44,7 @@ public class DBQualificationPhase extends DBBaseClass
     if (cpStmt == null)
     {
       String sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
-      cpStmt = con.prepareStatement(sql);
+      cpStmt = DBConnection.prepareStatement(sql);
     }
 
     cpStmt.setInt(1, t.getID());

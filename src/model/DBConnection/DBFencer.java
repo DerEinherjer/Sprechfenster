@@ -31,7 +31,7 @@ public abstract class DBFencer extends DBBaseClass
 
   public static void createTable() throws SQLException
   {
-    con.prepareStatement(getSQLString()).executeUpdate();
+    DBConnection.prepareStatement(getSQLString()).executeUpdate();
   }
 
   private static PreparedStatement cfStmt = null;
@@ -46,7 +46,7 @@ public abstract class DBFencer extends DBBaseClass
     if (cfStmt == null || cfStmt.isClosed())
     {
       String sql = "INSERT INTO Fechter (Vorname, Nachname) VALUES (?, ?);";
-      cfStmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+      cfStmt = DBConnection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
     }
 
     cfStmt.setString(1, firstname);
@@ -70,7 +70,7 @@ public abstract class DBFencer extends DBBaseClass
     if (lfStmt == null || lfStmt.isClosed())
     {
       String sql = "SELECT * FROM Fechter;";
-      lfStmt = con.prepareStatement(sql);
+      lfStmt = DBConnection.prepareStatement(sql);
     }
 
     ResultSet rs = lfStmt.executeQuery();
@@ -78,7 +78,8 @@ public abstract class DBFencer extends DBBaseClass
     {
       try
       {
-        new Fencer(rowToHash(rs));
+        //adds the Fencer to the global set as a side effect
+        Fencer f = new Fencer(rowToHash(rs));
       } catch (ObjectExistException ex)
       {
       }//Can be ignored savely
@@ -94,7 +95,7 @@ public abstract class DBFencer extends DBBaseClass
     if (fsnStmt == null || fsnStmt.isClosed())
     {
       String sql = "UPDATE Fechter SET Vorname = ? WHERE ID = ?;";
-      fsnStmt = con.prepareStatement(sql);
+      fsnStmt = DBConnection.prepareStatement(sql);
     }
     fsnStmt.setString(1, name);
     fsnStmt.setInt(2, id);
@@ -108,7 +109,7 @@ public abstract class DBFencer extends DBBaseClass
     if (fsfnStmt == null || fsfnStmt.isClosed())
     {
       String sql = "UPDATE Fechter SET Nachname = ? WHERE ID = ?;";
-      fsfnStmt = con.prepareStatement(sql);
+      fsfnStmt = DBConnection.prepareStatement(sql);
     }
     fsfnStmt.setString(1, name);
     fsfnStmt.setInt(2, id);
@@ -122,7 +123,7 @@ public abstract class DBFencer extends DBBaseClass
     if (fsbStmt == null || fsbStmt.isClosed())
     {
       String sql = "UPDATE Fechter SET Geburtstag = ? WHERE ID = ?;";
-      fsbStmt = con.prepareStatement(sql);
+      fsbStmt = DBConnection.prepareStatement(sql);
     }
     fsbStmt.setString(1, date);
     fsbStmt.setInt(2, id);
@@ -136,7 +137,7 @@ public abstract class DBFencer extends DBBaseClass
     if (fsfsStmt == null || fsfsStmt.isClosed())
     {
       String sql = "UPDATE Fechter SET Fechtschule = ? WHERE ID = ?;";
-      fsfsStmt = con.prepareStatement(sql);
+      fsfsStmt = DBConnection.prepareStatement(sql);
     }
     fsfsStmt.setString(1, school);
     fsfsStmt.setInt(2, id);
@@ -150,7 +151,7 @@ public abstract class DBFencer extends DBBaseClass
     if (fsnatStmt == null || fsnatStmt.isClosed())
     {
       String sql = "UPDATE Fechter SET Nationalitaet = ? WHERE ID = ?;";
-      fsnatStmt = con.prepareStatement(sql);
+      fsnatStmt = DBConnection.prepareStatement(sql);
     }
     fsnatStmt.setString(1, nation);
     fsnatStmt.setInt(2, id);
@@ -164,7 +165,7 @@ public abstract class DBFencer extends DBBaseClass
     if (rfStmt == null || rfStmt.isClosed())
     {
       String sql = "DELETE FROM Fechter WHERE ID = ?;";
-      rfStmt = con.prepareStatement(sql);
+      rfStmt = DBConnection.prepareStatement(sql);
     }
 
     rfStmt.setInt(1, id);

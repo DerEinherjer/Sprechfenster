@@ -162,7 +162,7 @@ public interface iMatch
    * @return Returns true if fencer participates.
    * @throws ObjectDeprecatedException The preliminare got deleted.
    */
-  public boolean isFencer(iFencer f) throws ObjectDeprecatedException;
+  public boolean isFencerInMatch(iFencer f) throws ObjectDeprecatedException;
 
   /**
    * This function sets the number of yellow cards for a fencer in this fight.

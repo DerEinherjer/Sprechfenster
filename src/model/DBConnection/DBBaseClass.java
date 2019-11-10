@@ -16,59 +16,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.Fencer;
-import model.TournamentParticipation;
 import model.Tournament;
+import model.TournamentParticipation;
 import model.rounds.QualificationMatch;
 import model.rounds.TournamentMatch;
 
 /**
- * This class initiat the connection to the database and the database structure.
- * All DB*Representer classes inherit this class to communicate with the data-
- * base.
+ * This class initiat the connection to the database and the database structure. All DB*Representer classes inherit this class to communicate with the data- base.
  *
  * @author Asgard
  */
 public abstract class DBBaseClass
 {
 
-  static String databaseURL = "jdbc:h2:~/SprechfensterData";
-  static Connection con;
+  private static final String databaseURL = "jdbc:h2:~/SprechfensterData";
+  protected static Connection DBConnection;
 
-  private static List<DBEntity> dbEntities = new ArrayList<>();
+  private static final List<DBEntity> dbEntities = new ArrayList<>();
 
-  static
+  public static void InitDatabase()
   {
     //Add all classes with db representation so that they get automaticaly
     //initiated. They need the DBEntetyRepresenter interface.
-    
+
     //Order of entities is important since initialization in "init" needs to take interdependencies into account
+    dbEntities.add(new Fencer());
     dbEntities.add(new Tournament());
     dbEntities.add(new TournamentMatch());
     dbEntities.add(new QualificationMatch());
     dbEntities.add(new TournamentParticipation());
-    dbEntities.add(new Fencer());
-    
 
     try
     {
       Class.forName("org.h2.Driver");
 
-      con = DriverManager.getConnection(databaseURL, "", "");
+      DBConnection = DriverManager.getConnection(databaseURL, "", "");
 
       init();
-    } //TODO: should we crash if one of these exceptions is thrown? is better logging possible?
-    catch (ClassNotFoundException e)
+    } //TODO: should we crash if one of these exceptions is thrown? is better logging possible? //TODO: should we crash if one of these exceptions is thrown? is better logging possible?
+    catch (ClassNotFoundException | SQLException e)
     {
-      e.printStackTrace();
-    } catch (SQLException e)
-    {
-      e.printStackTrace();
     }
   }
 
   /**
-   * Helper function that converts a result object in an hash which has the
-   * colum names as keys and the values as values
+   * Helper function that converts a result object in an hash which has the colum names as keys and the values as values
    *
    * @param rs ResultSet object
    * @return Hash which has colum value pairs
@@ -123,7 +115,7 @@ public abstract class DBBaseClass
     if (dtdbStmt == null)
     {
       String sql = "DROP ALL OBJECTS;";
-      dtdbStmt = con.prepareStatement(sql);
+      dtdbStmt = DBConnection.prepareStatement(sql);
     }
 
     dtdbStmt.execute();

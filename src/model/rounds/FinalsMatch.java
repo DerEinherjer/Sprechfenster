@@ -28,7 +28,7 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   {
     //The SQL-Table is Created in Round because it is also used in Finalround
     DBFinalsPhase.createTable();
-    DBFinalsPhase.loadFnialrounds();
+    DBFinalsPhase.loadFinalrounds();
   }
 
   @Override

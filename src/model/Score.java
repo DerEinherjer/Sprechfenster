@@ -33,7 +33,7 @@ public class Score extends Observable implements iScore, Observer, Comparable
 
   public void addMatch(TournamentMatch r)
   {
-    if (!r.isFencer(fencer))
+    if (!r.isFencerInMatch(fencer))
     {
       return;
     }

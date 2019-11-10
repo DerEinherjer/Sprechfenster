@@ -121,7 +121,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     this.groups = (Integer) set.get("Gruppen".toUpperCase());
     this.numberFinalrounds = (Integer) set.get("Finalrunden".toUpperCase());
     this.lanes = (Integer) set.get("Bahnen".toUpperCase());
-    this.status = Status.valueOf(Integer.parseInt((String) set.get("Status".toUpperCase())));
+    this.status = Status.valueOf((Integer) set.get("Status".toUpperCase()));
     this.separateQualificationGroups = (Boolean) set.get("VorgruppenSeparieren".toUpperCase());//TODO: Include in Test-Case
 
     //TODO: set internal state accordung to status
@@ -413,13 +413,16 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    if (participants.get((Fencer) f) != null)
+    Fencer fencer = (Fencer) f;
+    if (fencer != null)
     {
-      return participants.get((Fencer) f).getGroup();
-    } else
-    {
-      return -1;
+      TournamentParticipation participation = participants.get(fencer.getID());
+      if (participation != null)
+      {
+        return participation.getGroup();
+      }
     }
+    return -1;
   }
 
   @Override
@@ -731,83 +734,100 @@ public class Tournament extends Observable implements DBEntity, iTournament
       throw new ObjectDeprecatedException();
     }
 
-    List<List<QualificationMatch>> prelims = new ArrayList<>();
+    List<List<QualificationMatch>> qualificationMatchesOfGroup = new ArrayList<>();
 
-    for (int g = 0; g < groups; g++)
+    for (int groupIndex = 0; groupIndex < groups; groupIndex++)
     {
-      prelims.add(new ArrayList<>());
-      List<iFencer> tmp = getParticipantsOfGroup(g);
-      for (int i = 0; i < tmp.size() - 1; i++)
+      qualificationMatchesOfGroup.add(new ArrayList<>());
+      List<iFencer> fencersOfGroup = getParticipantsOfGroup(groupIndex + 1);
+      for (int firstFencer = 0; firstFencer < fencersOfGroup.size() - 1; firstFencer++)
       {
-        for (int r = i + 1; r < tmp.size(); r++)
+        for (int secondFencer = firstFencer + 1; secondFencer < fencersOfGroup.size(); secondFencer++)
         {
-          prelims.get(g).add(new QualificationMatch(this, (Fencer) tmp.get(i), (Fencer) tmp.get(r)));
+          QualificationMatch match = new QualificationMatch(this, (Fencer) fencersOfGroup.get(firstFencer), (Fencer) fencersOfGroup.get(secondFencer));
+          qualificationMatchesOfGroup.get(groupIndex).add(match);
         }
       }
     }
 
-    //Should the preliminarys not be separated by groups shove them in the prelims[0] list
+    //Should the preliminarys not be separated by groups shove them all in the first group
     if (!separateQualificationGroups)
     {
-      for (int i = prelims.size() - 1; i > 0; i--)
+      for (int i = qualificationMatchesOfGroup.size() - 1; i > 0; i--)
       {
-        prelims.get(0).addAll(prelims.get(i));
-        prelims.remove(i);
+        qualificationMatchesOfGroup.get(0).addAll(qualificationMatchesOfGroup.get(i));
+        qualificationMatchesOfGroup.remove(i);
       }
     }
 
-    int time = 0;
-
-    //Iterate over the groups and do the matchmaking seperatly (except if the groups got merged in the loop above)
-    for (int i = 0; i < prelims.size(); i++)
+    int currentRound = 1;
+    //Iterate over the groups and do the matchmaking seperatly
+    for (int groupIndex = 0; groupIndex < qualificationMatchesOfGroup.size(); groupIndex++)
     {
-      List<QualificationMatch> prelim = prelims.get(i);
-      Map<iFencer, Integer> lastFights = new HashMap<>();
+      List<QualificationMatch> unscheduledMatchesOfGroup = qualificationMatchesOfGroup.get(groupIndex);
+      List<iFencer> fencersInGroup = getParticipantsOfGroup(groupIndex + 1);
+      Map<iFencer, Integer> fencerToLastFightRound = new HashMap<>();
 
-      for (iQualificationMatch p : prelim)
+      for (iFencer f : fencersInGroup)
       {
-        lastFights.put(p.getFencer().get(0), -1);
-        lastFights.put(p.getFencer().get(1), -1);
+        fencerToLastFightRound.put(f, 0);
       }
 
-      for (; !prelim.isEmpty(); time++)
+      for (; !unscheduledMatchesOfGroup.isEmpty(); currentRound++)
       {
-        for (int lane = 0; lane < this.lanes; lane++)
+        QualificationMatch nextMatchToSchedule = null;
+        int lane;
+        for (lane = 1; lane <= this.lanes; lane++)
         {
-          QualificationMatch next = null;
-          int lastFight = Integer.MAX_VALUE;
+          nextMatchToSchedule = null;
 
-          //Get match witch the fighter who waits the longest
-          for (QualificationMatch p : prelim)
+          //try to find the next match that gives the longest balanced wait time for the fencers.
+          //This means that the sum of the rounds the fencers of the match are waiting since the last match should be the maximum possible value.
+          unscheduledMatchesOfGroup.sort((a, b) ->
           {
-            int f1 = lastFights.get(p.getFencer().get(0));
-            int f2 = lastFights.get(p.getFencer().get(1));
-            //If one of the fighter already fight at this moment ignore the match
-            if (f1 != time && f2 != time)
+            int sumOfWaitTimeA = GetSumOfWaitTime(a, fencerToLastFightRound);
+            int sumOfWaitTimeB = GetSumOfWaitTime(b, fencerToLastFightRound);
+            return Integer.compare(sumOfWaitTimeA, sumOfWaitTimeB);
+          });
+
+          //Find scheduleable match
+          for (QualificationMatch canidateForNextMatch : unscheduledMatchesOfGroup)
+          {
+            //get the last round each fencer fought in
+            int lastRoundFencer1FoughtIn = fencerToLastFightRound.get(canidateForNextMatch.getFencer().get(0));
+            int lastRoundFencer2FoughtIn = fencerToLastFightRound.get(canidateForNextMatch.getFencer().get(1));
+            //If one of the fighter already has to fight in the current round ignore this match for this round
+            if (lastRoundFencer1FoughtIn != currentRound && lastRoundFencer2FoughtIn != currentRound)
             {
-              //Take the match whith the fencer who hasn't fought the longest
-              if (f1 < lastFight || f2 < lastFight)
-              {
-                lastFight = (f1 < f2) ? f1 : f2;
-                next = p;
-              }
+              //select this match
+              nextMatchToSchedule = canidateForNextMatch;
+              break;
             }
           }
-          if (next == null)
+          if (nextMatchToSchedule == null)
           {
-            break;//All not already places PrelimFights have a fighter who is already fighting at this point in time
+            //don't try to find a match for the remaining lanes, it is not possible
+            break;
+          } else
+          {
+            //schedule the match
+            unscheduledMatchesOfGroup.remove(nextMatchToSchedule);
+            nextMatchToSchedule.setTime(currentRound, lane);
+            fencerToLastFightRound.put(nextMatchToSchedule.getFencer().get(0), currentRound);
+            fencerToLastFightRound.put(nextMatchToSchedule.getFencer().get(1), currentRound);
+            //then try to schedule another match on the next lane
           }
-          //Delete the match from the
-          prelim.remove(next);
-          next.setTime(time, lane);
-          lastFights.put(next.getFencer().get(0), time);
-          lastFights.put(next.getFencer().get(1), time);
         }
+        //continue with the next round if any matches are remaining after we scheduled a match on each lane
       }
-
     }
-
     status = Status.QualificationPhase;
+    DBTournament.setStatus(ID, status.value);
+  }
+
+  private int GetSumOfWaitTime(iQualificationMatch match, Map<iFencer, Integer> fencerToLastFightRound)
+  {
+    return fencerToLastFightRound.get(match.getFencer().get(0)) + fencerToLastFightRound.get(match.getFencer().get(1));
   }
 
   @Override
@@ -819,6 +839,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     }
 
     status = Status.PreparingPhase;
+    DBTournament.setStatus(ID, status.value);
 
     QualificationMatch.deleteQualificationMatchOfTournament(this);
   }

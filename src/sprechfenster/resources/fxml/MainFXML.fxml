@@ -21,7 +21,8 @@
             <Menu mnemonicParsing="false" text="Hilfe" />
                   <Menu mnemonicParsing="false" text="Debug">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#handleUpdateAllAction" text="Update All" />
+                      <MenuItem mnemonicParsing="false" onAction="#handleUpdateAllAction" text="Alles updaten" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleInsertTestFencers" text="Insert Test Fencers" />
                     </items>
                   </Menu>
           </menus>

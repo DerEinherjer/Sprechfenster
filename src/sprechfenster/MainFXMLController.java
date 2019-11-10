@@ -14,6 +14,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -406,6 +407,27 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     if (EliminationPhaseController != null)
     {
       EliminationPhaseController.update(null, this);
+    }
+  }
+
+  @FXML
+  private void handleInsertTestFencers(ActionEvent event)
+  {
+    for (int i = 0; i < 16; i++)
+    {
+      String firstName = "Vorname" + i;
+      String familyName = "Nachname" + i;
+      String birthDay = "1986-03-14";
+      String nationality = "Deutsch";
+      String fencingSchool = "7 Schwerter";
+      try
+      {
+        //adds the fencer to the db as a side-effect
+        iFencer newFencer = new Fencer(firstName, familyName, birthDay, nationality, fencingSchool);
+      } catch (SQLException ex)
+      {
+        Logger.getLogger(MainFXMLController.class.getName()).log(Level.SEVERE, null, ex);
+      }
     }
   }
 

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import static model.DBConnection.DBBaseClass.rowToHash;
 import model.ObjectExistException;
 import model.TournamentParticipation;
-import org.h2.command.ddl.PrepareProcedure;
 
 public class DBTournamentParticipation extends DBBaseClass
 {
@@ -25,7 +24,7 @@ public class DBTournamentParticipation extends DBBaseClass
 
   public static void createTable() throws SQLException
   {
-    con.prepareStatement(getSQLString()).executeUpdate();
+    DBConnection.prepareStatement(getSQLString()).executeUpdate();
   }
 
   private static PreparedStatement cpStmt = null;
@@ -35,7 +34,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (cpStmt == null || cpStmt.isClosed())
     {
       String sql = "INSERT INTO Teilnahme (TurnierID, FechterID, Gruppe) VALUES (?, ?, ?);";
-      cpStmt = con.prepareStatement(sql);
+      cpStmt = DBConnection.prepareStatement(sql);
     }
 
     cpStmt.setInt(1, tournamentID);
@@ -60,7 +59,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (lpStmt == null || lpStmt.isClosed())
     {
       String sql = "SELECT * FROM Teilnahme;";
-      lpStmt = con.prepareStatement(sql);
+      lpStmt = DBConnection.prepareStatement(sql);
     }
 
     ResultSet rs = lpStmt.executeQuery();
@@ -69,7 +68,8 @@ public class DBTournamentParticipation extends DBBaseClass
     {
       try
       {
-        new TournamentParticipation(rowToHash(rs));
+        //adds the Participation to the global set as a side effect
+        TournamentParticipation tp = new TournamentParticipation(rowToHash(rs));
       } catch (ObjectExistException ex)
       {
       }//Can be ignored savely
@@ -86,7 +86,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (dpStmt == null || dpStmt.isClosed())
     {
       String sql = "DELETE FROM Teilnahme WHERE ID = ?;";
-      dpStmt = con.prepareStatement(sql);
+      dpStmt = DBConnection.prepareStatement(sql);
     }
 
     dpStmt.setInt(1, id);
@@ -100,7 +100,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (uecStmt == null || uecStmt.isClosed())
     {
       String sql = "UPDATE Teilnahme SET Ausruestungskontrolle = ? WHERE ID = ?;";
-      uecStmt = con.prepareStatement(sql);
+      uecStmt = DBConnection.prepareStatement(sql);
     }
 
     uecStmt.setBoolean(1, checked);
@@ -115,7 +115,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (uefStmt == null || uefStmt.isClosed())
     {
       String sql = "UPDATE Teilnahme SET Startgeld = ? WHERE ID = ?;";
-      uefStmt = con.prepareStatement(sql);
+      uefStmt = DBConnection.prepareStatement(sql);
     }
 
     uefStmt.setBoolean(1, paid);
@@ -130,7 +130,7 @@ public class DBTournamentParticipation extends DBBaseClass
     if (ucStmt == null || ucStmt.isClosed())
     {
       String sql = "UPDATE Teilnahme SET Kommentar = ? WHERE ID = ?;";
-      ucStmt = con.prepareStatement(sql);
+      ucStmt = DBConnection.prepareStatement(sql);
     }
 
     ucStmt.setString(1, comment);
