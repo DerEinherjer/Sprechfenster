@@ -18,7 +18,7 @@ public class DBTournament extends DBBaseClass
             + "Finalrunden int DEFAULT 2,"
             + "Bahnen int DEFAULT 2,"
             + "Status int DEFAULT 0,"
-            + "VorgruppenSeparieren boolean DEFAULT FALSE);";
+            + "VorgruppenSeparieren boolean DEFAULT TRUE);";
   }
 
   public static void createTable() throws SQLException

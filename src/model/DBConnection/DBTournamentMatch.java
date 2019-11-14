@@ -6,10 +6,13 @@ import java.sql.SQLException;
 import static model.DBConnection.DBBaseClass.DBConnection;
 import model.Fencer;
 import model.ObjectDeprecatedException;
+import model.iTournament;
 import model.rounds.TournamentMatch;
 
 public class DBTournamentMatch extends DBBaseClass
 {
+
+  public static String isFinalsMatch = "FinalMatch";
 
   private static String getSQLString()
   {
@@ -29,7 +32,9 @@ public class DBTournamentMatch extends DBBaseClass
             + "GelbVon2 int DEFAULT 0,"
             + "RotVon2 int DEFAULT 0,"
             + "SchwarzVon2 int DEFAULT 0,"
-            + "FinalStrucktur int DEFAULT -1);";
+            + "FinalGewinnerMatch int DEFAULT -1,"
+            + "FinalVerliererMatch int DEFAULT -1,"
+            + isFinalsMatch + " boolean DEFAULT false);";
   }
 
   public static void createTable() throws SQLException
@@ -50,12 +55,75 @@ public class DBTournamentMatch extends DBBaseClass
     {
       return false;
     }
+    if (!CheckTournamentLaneNumber(lane, p.getTournament()))
+    {
+      return false;
+    }
+    ResultSet rs = findRoundWithID(p.getID());
+    boolean roundExists = rs.next();
+    roundExists &= !rs.getBoolean(isFinalsMatch);
+    rs.close();
+    if (!roundExists)
+    {
+      return false;
+    }
+    return setRoundAndLane(round, lane, p.getID());
+  }
+
+  private static ResultSet findRoundWithID(int id) throws SQLException
+  {
+    if (findQualificationRound == null)
+    {
+      String sql = "SELECT * FROM Vorrunden WHERE ID = ?";
+      findQualificationRound = DBConnection.prepareStatement(sql);
+    }
+    findQualificationRound.setInt(1, id);
+    return findQualificationRound.executeQuery();
+  }
+
+  private static boolean setRoundAndLane(int round, int lane, int matchID) throws SQLException
+  {
+    if (updateQualificationRound == null)
+    {
+      String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
+      updateQualificationRound = DBConnection.prepareStatement(sql);
+    }
+    updateQualificationRound.setInt(1, round);
+    updateQualificationRound.setInt(2, lane);
+    updateQualificationRound.setInt(3, matchID);
+    updateQualificationRound.executeUpdate();
+    return true;
+  }
+
+  public static boolean setFinalsMatchTime(TournamentMatch p, int round, int lane) throws SQLException
+  {
+    if (round < 1 || lane < 1)
+    {
+      return false;
+    }
+    if (!CheckTournamentLaneNumber(lane, p.getTournament()))
+    {
+      return false;
+    }
+    ResultSet rs = findRoundWithID(p.getID());
+    boolean roundExists = rs.next();
+    roundExists &= rs.getBoolean(isFinalsMatch);
+    rs.close();
+    if (!roundExists)
+    {
+      return false;
+    }
+    return setRoundAndLane(round, lane, p.getID());
+  }
+
+  private static boolean CheckTournamentLaneNumber(int lane, iTournament t) throws SQLException
+  {
     if (getTournamentLanes == null)
     {
       String sql = "SELECT Bahnen FROM Turniere WHERE ID = ?";
       getTournamentLanes = DBConnection.prepareStatement(sql);
     }
-    getTournamentLanes.setInt(1, p.getTournament().getID());
+    getTournamentLanes.setInt(1, t.getID());
     ResultSet rs = getTournamentLanes.executeQuery();
     boolean hasResult = rs.next();
     boolean laneOk = false;
@@ -71,30 +139,6 @@ public class DBTournamentMatch extends DBBaseClass
         return false;
       }
     }
-
-    if (findQualificationRound == null)
-    {
-      String sql = "SELECT * FROM Vorrunden WHERE ID = ?";
-      findQualificationRound = DBConnection.prepareStatement(sql);
-    }
-    findQualificationRound.setInt(1, p.getID());
-    rs = findQualificationRound.executeQuery();
-    hasResult = rs.next();
-    rs.close();
-    if (!hasResult)
-    {
-      return false;
-    }
-
-    if (updateQualificationRound == null)
-    {
-      String sql = "UPDATE Vorrunden SET Runde = ?, Bahn = ? WHERE ID = ?;";
-      updateQualificationRound = DBConnection.prepareStatement(sql);
-    }
-    updateQualificationRound.setInt(1, round);
-    updateQualificationRound.setInt(2, lane);
-    updateQualificationRound.setInt(3, p.getID());
-    updateQualificationRound.executeUpdate();
     return true;
   }
 
@@ -108,9 +152,9 @@ public class DBTournamentMatch extends DBBaseClass
       spStmt = DBConnection.prepareStatement(sql);
     }
 
-    spStmt.setInt(1, prelimID);
-    spStmt.setInt(2, pointsFencer1);
-    spStmt.setInt(3, pointsFencer2);
+    spStmt.setInt(1, pointsFencer1);
+    spStmt.setInt(2, pointsFencer2);
+    spStmt.setInt(3, prelimID);
     spStmt.executeUpdate();
   }
 
@@ -275,6 +319,69 @@ public class DBTournamentMatch extends DBBaseClass
       sfStmt.setInt(2, r.getID());
 
       sfStmt.executeUpdate();
+    } catch (ObjectDeprecatedException e)
+    {
+    }
+  }
+
+  private static PreparedStatement setIsFinalsRound = null;
+
+  public static void setIsFinalsMatch(TournamentMatch r, boolean isFinalsMatch) throws SQLException
+  {
+    if (setIsFinalsRound == null)
+    {
+      String sql = "UPDATE Vorrunden SET " + isFinalsMatch + " = ? WHERE ID = ?;";
+      setIsFinalsRound = DBConnection.prepareStatement(sql);
+    }
+
+    try
+    {
+      setIsFinalsRound.setBoolean(1, isFinalsMatch);
+      setIsFinalsRound.setInt(2, r.getID());
+
+      setIsFinalsRound.executeUpdate();
+    } catch (ObjectDeprecatedException e)
+    {
+    }
+  }
+
+  private static PreparedStatement setWinnerMatch = null;
+
+  public static void setWinnerMatch(TournamentMatch r, int winnerMatchID) throws SQLException
+  {
+    if (setWinnerMatch == null)
+    {
+      String sql = "UPDATE Vorrunden SET FinalGewinnerMatch = ? WHERE ID = ?;";
+      setWinnerMatch = DBConnection.prepareStatement(sql);
+    }
+
+    try
+    {
+      setWinnerMatch.setInt(1, winnerMatchID);
+      setWinnerMatch.setInt(2, r.getID());
+
+      setWinnerMatch.executeUpdate();
+    } catch (ObjectDeprecatedException e)
+    {
+    }
+  }
+
+  private static PreparedStatement setLoserMatch = null;
+
+  public static void setLoserMatch(TournamentMatch r, int loserMatchID) throws SQLException
+  {
+    if (setLoserMatch == null)
+    {
+      String sql = "UPDATE Vorrunden SET FinalVerliererMatch = ? WHERE ID = ?;";
+      setLoserMatch = DBConnection.prepareStatement(sql);
+    }
+
+    try
+    {
+      setLoserMatch.setInt(1, loserMatchID);
+      setLoserMatch.setInt(2, r.getID());
+
+      setLoserMatch.executeUpdate();
     } catch (ObjectDeprecatedException e)
     {
     }

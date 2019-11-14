@@ -119,19 +119,19 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     SecondFencerPointsTableColumn.setCellFactory(TextFieldTableCell.forTableColumn(StringToPointsConverter));
     FinishedTableColumn.setCellFactory(CheckBoxTableCell.forTableColumn(FinishedTableColumn));
     FinishedTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
-    EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+    EditTableColumn.setCellValueFactory(new PropertyValueFactory<>("Finished"));
 
-    Callback<TableColumn<FightPresenter, String>, TableCell<FightPresenter, String>> editCellFactory
+    Callback<TableColumn<FightPresenter, Boolean>, TableCell<FightPresenter, Boolean>> editCellFactory
             = //
-            (final TableColumn<FightPresenter, String> param)
+            (final TableColumn<FightPresenter, Boolean> param)
             ->
     {
-      final TableCell<FightPresenter, String> cell = new TableCell<FightPresenter, String>()
+      final TableCell<FightPresenter, Boolean> cell = new TableCell<FightPresenter, Boolean>()
       {
         final Button EditButton = new Button("Ändern");
 
         @Override
-        public void updateItem(String item, boolean empty)
+        public void updateItem(Boolean item, boolean empty)
         {
           super.updateItem(item, empty);
           if (empty)
@@ -197,12 +197,12 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
 
   private void updateRounds()
   {
-    RoundToFights = new ArrayList<ArrayList<iFinalsMatch>>();
+    RoundToFights = new ArrayList<>();
     if (Tournament != null)
     {
       for (int i = 0; i < Tournament.getFinalRounds(); i++)
       {
-        ArrayList<iFinalsMatch> fightsForRound = new ArrayList<iFinalsMatch>();
+        ArrayList<iFinalsMatch> fightsForRound = new ArrayList<>();
         RoundToFights.add(fightsForRound);
       }
       for (iFinalsMatch round : Tournament.getAllFinalsMatches())
@@ -294,7 +294,7 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
         FencersPane.getChildren().add(preliminaryRoundScoreGroupTable);
 
         StringToLaneNumber.setMinAndMaxValues(Tournament.getLanes(), 1);
-        CreateEliminationRoundsButton.setDisable(Tournament.areAllQualificationMatchesFinished());
+        CreateEliminationRoundsButton.setDisable(!Tournament.areAllQualificationMatchesFinished());
         AbortEliminationRoundsButton.setDisable(Tournament.isFinalsPhase());
         int maxRound = 0;
         for (iFinalsMatch finalRound : Tournament.getAllFinalsMatches())

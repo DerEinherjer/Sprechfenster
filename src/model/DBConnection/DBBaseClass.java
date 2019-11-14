@@ -18,6 +18,7 @@ import java.util.Map;
 import model.Fencer;
 import model.Tournament;
 import model.TournamentParticipation;
+import model.rounds.FinalsMatch;
 import model.rounds.QualificationMatch;
 import model.rounds.TournamentMatch;
 
@@ -44,6 +45,7 @@ public abstract class DBBaseClass
     dbEntities.add(new Tournament());
     dbEntities.add(new TournamentMatch());
     dbEntities.add(new QualificationMatch());
+    dbEntities.add(new FinalsMatch());
     dbEntities.add(new TournamentParticipation());
 
     try

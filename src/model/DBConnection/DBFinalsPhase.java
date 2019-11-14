@@ -11,11 +11,11 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static model.DBConnection.DBBaseClass.DBConnection;
+import static model.DBConnection.DBTournamentMatch.isFinalsMatch;
 import model.ObjectExistException;
 import model.Tournament;
 import model.rounds.FinalsMatch;
-import model.rounds.QualificationMatch;
-import static model.DBConnection.DBBaseClass.DBConnection;
 
 /**
  *
@@ -24,47 +24,25 @@ import static model.DBConnection.DBBaseClass.DBConnection;
 public class DBFinalsPhase extends DBBaseClass
 {
 
-  private static String getSQLString()
-  {
-    return "CREATE TABLE IF NOT EXISTS Finalrunden (ID int NOT NULL AUTO_INCREMENT UNIQUE,"
-            + "GewinnerRunde int DEFAULT -1,"
-            + "VerliererRunde int DEFAULT -1,"
-            + "FinalRunde int DEFAULT -1);";
-  }
-
-  public static void createTable() throws SQLException
-  {
-    DBConnection.prepareStatement(getSQLString()).executeUpdate();
-  }
-
-  private static PreparedStatement lfStmt1 = null;
+  private static PreparedStatement loadFinalRounds = null;
   private static PreparedStatement lfStmt2 = null;
 
   public static void loadFinalrounds() throws SQLException
   {
-    if (lfStmt1 == null)
+    if (loadFinalRounds == null)
     {
-      String sql = "SELECT * FROM Vorrunden WHERE FinalStrucktur != -1;";
-      lfStmt1 = DBConnection.prepareStatement(sql);
-
-      sql = "SELECT * FROM Finalrunden WHERE ID = ?;";
-      lfStmt2 = DBConnection.prepareStatement(sql);
+      String sql = "SELECT * FROM Vorrunden WHERE " + DBTournamentMatch.isFinalsMatch + ";";
+      loadFinalRounds = DBConnection.prepareStatement(sql);
     }
 
-    ResultSet rs = lfStmt1.executeQuery();
+    ResultSet rs = loadFinalRounds.executeQuery();
 
     while (rs.next())
     {
       Map<String, Object> tmp = rowToHash(rs);
-
-      lfStmt2.setInt(1, rs.getInt("FinalStrucktur"));
-
-      ResultSet rs2 = lfStmt2.executeQuery();
-
-      tmp.putAll(rowToHash(rs2));
       try
       {
-        new FinalsMatch(tmp);
+        FinalsMatch match = new FinalsMatch(tmp);
       } catch (ObjectExistException ex)
       {
         Logger.getLogger(DBFinalsPhase.class.getName()).log(Level.SEVERE, null, ex);
@@ -75,8 +53,29 @@ public class DBFinalsPhase extends DBBaseClass
     rs.close();
   }
 
-  public static int createFinalround(Tournament t, int finalRound)
+  private static PreparedStatement createFinalRound = null;
+
+  public static int createFinalround(Tournament t, int finalRound) throws SQLException
   {
-    return -1;
+    if (createFinalRound == null)
+    {
+      String sql = "INSERT INTO Vorrunden (TurnierID, Runde, " + isFinalsMatch + ") VALUES (?, ?, ?);";
+      createFinalRound = DBConnection.prepareStatement(sql);
+    }
+
+    createFinalRound.setInt(1, t.getID());
+    createFinalRound.setInt(2, finalRound);
+    createFinalRound.setBoolean(3, true);
+
+    createFinalRound.executeUpdate();
+    ResultSet rs = createFinalRound.getGeneratedKeys();
+
+    if (rs.next())
+    {
+      return rs.getInt(1);
+    } else
+    {
+      throw new SQLException("Didn't return ID of the new final round.");
+    }
   }
 }

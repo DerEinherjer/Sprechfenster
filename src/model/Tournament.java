@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Observable;
 import model.DBConnection.DBEntity;
 import model.DBConnection.DBTournament;
-import static model.DBConnection.DBTournament.createTournament;
 import model.rounds.FinalsMatch;
 import model.rounds.QualificationMatch;
 import model.rounds.TournamentMatch;
@@ -82,7 +81,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
   private Integer lanes = null;
   private Status status = null;
   private Boolean separateQualificationGroups = null;
-  private Map<Integer, TournamentParticipation> participants = new HashMap<>();
+  private Map<Fencer, TournamentParticipation> fencerToParticipation = new HashMap<>();
   private Map<Fencer, Score> qualificationScore = new HashMap<>();
   private Map<Fencer, Score> finalsScore = new HashMap<>();
 
@@ -95,7 +94,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
 
   public Tournament(String name) throws SQLException
   {
-    this.ID = createTournament(name);
+    this.ID = DBTournament.createTournament(name);
     this.name = name;
     this.date = "1970-01-01";
     this.groups = 2;
@@ -104,6 +103,11 @@ public class Tournament extends Observable implements DBEntity, iTournament
     this.status = Status.PreparingPhase;
     this.separateQualificationGroups = true;
     tournaments.put(ID, this);
+    DBTournament.setDate(this.ID, date);
+    DBTournament.setFinalRounds(this.ID, this.numberFinalrounds);
+    DBTournament.setGroups(this.ID, this.groups);
+    DBTournament.setStatus(this.ID, status.value);
+
   }
 
   public Tournament(Map<String, Object> set) throws ObjectExistException, SQLException
@@ -123,15 +127,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
     this.lanes = (Integer) set.get("Bahnen".toUpperCase());
     this.status = Status.valueOf((Integer) set.get("Status".toUpperCase()));
     this.separateQualificationGroups = (Boolean) set.get("VorgruppenSeparieren".toUpperCase());//TODO: Include in Test-Case
-
-    //TODO: set internal state accordung to status
-    switch (status)
-    {
-      case Completed:
-      case FinalsPhase:
-      case QualificationPhase:
-      case PreparingPhase:
-    }
   }
 
   @Override
@@ -146,7 +141,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
   {
     for (Map.Entry<Integer, Tournament> entry : tournaments.entrySet())
     {
-      entry.getValue().updateParticipants();
+      entry.getValue().loadParticipantsAndScores();
     }
   }
 
@@ -338,7 +333,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     int group = -1;
     for (int i = 1; i <= groups; i++)
     {
-      int tmp = TournamentParticipation.getParticipantsFromGroup(this, i).size();
+      int tmp = getParticipantsOfGroup(i).size();
       if (tmp < min)
       {
         min = tmp;
@@ -360,7 +355,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    participants.put(((Fencer) f).getID(), new TournamentParticipation(this, (Fencer) f, group));
+    fencerToParticipation.put((Fencer) f, new TournamentParticipation(this, (Fencer) f, group));
 
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
@@ -373,7 +368,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
-    return participants.get(((Fencer) f).getID()) != null;
+    return fencerToParticipation.get((Fencer) f) != null;
   }
 
   @Override
@@ -384,9 +379,9 @@ public class Tournament extends Observable implements DBEntity, iTournament
       throw new ObjectDeprecatedException();
     }
     List<iFencer> ret = new ArrayList<>();
-    for (Map.Entry<Integer, TournamentParticipation> entry : participants.entrySet())
+    for (Fencer f : fencerToParticipation.keySet())
     {
-      ret.add(entry.getValue().getFencer());
+      ret.add(f);
     }
     return ret;
   }
@@ -399,9 +394,12 @@ public class Tournament extends Observable implements DBEntity, iTournament
       throw new ObjectDeprecatedException();
     }
     List<iFencer> ret = new ArrayList<>();
-    for (TournamentParticipation tmp : TournamentParticipation.getParticipantsFromGroup(this, group))
+    for (Map.Entry<Fencer,TournamentParticipation> fencerParticipations : fencerToParticipation.entrySet())
     {
-      ret.add(tmp.getFencer());
+      if(fencerParticipations.getValue().getGroup() == group)
+      {
+        ret.add(fencerParticipations.getKey());
+      }
     }
     return ret;
   }
@@ -416,7 +414,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     Fencer fencer = (Fencer) f;
     if (fencer != null)
     {
-      TournamentParticipation participation = participants.get(fencer.getID());
+      TournamentParticipation participation = fencerToParticipation.get(fencer);
       if (participation != null)
       {
         return participation.getGroup();
@@ -437,9 +435,8 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    TournamentParticipation tmp = participants.get(f.getID());
-    participants.remove(f.getID());
-
+    TournamentParticipation tmp = fencerToParticipation.get((Fencer)f);
+    fencerToParticipation.remove((Fencer)f);
     tmp.delete();
   }
 
@@ -469,7 +466,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    participants.get(((Fencer) f).getID()).setEntryFee(paid);
+    fencerToParticipation.get((Fencer) f).setEntryFee(paid);
 
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
@@ -491,7 +488,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    participants.get(((Fencer) f).getID()).setEquipmentCheck(checked);
+    fencerToParticipation.get((Fencer) f).setEquipmentCheck(checked);
 
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
@@ -509,7 +506,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return false;
     }
 
-    return participants.get(((Fencer) f).getID()).getEntryFee();
+    return fencerToParticipation.get((Fencer) f).getEntryFee();
   }
 
   @Override
@@ -524,7 +521,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return false;
     }
 
-    return participants.get(((Fencer) f).getID()).getEquipmentCheck();
+    return fencerToParticipation.get((Fencer) f).getEquipmentCheck();
   }
 
   @Override
@@ -695,7 +692,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return "";
     }
 
-    return participants.get(((Fencer) f).getID()).getComment();
+    return fencerToParticipation.get((Fencer) f).getComment();
   }
 
   @Override
@@ -710,7 +707,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    participants.get(((Fencer) f).getID()).setComment(comment);
+    fencerToParticipation.get((Fencer) f).setComment(comment);
 
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
@@ -733,6 +730,9 @@ public class Tournament extends Observable implements DBEntity, iTournament
     {
       throw new ObjectDeprecatedException();
     }
+
+    status = Status.QualificationPhase;
+    DBTournament.setStatus(ID, status.value);
 
     List<List<QualificationMatch>> qualificationMatchesOfGroup = new ArrayList<>();
 
@@ -821,8 +821,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
         //continue with the next round if any matches are remaining after we scheduled a match on each lane
       }
     }
-    status = Status.QualificationPhase;
-    DBTournament.setStatus(ID, status.value);
   }
 
   private int GetSumOfWaitTime(iQualificationMatch match, Map<iFencer, Integer> fencerToLastFightRound)
@@ -857,25 +855,74 @@ public class Tournament extends Observable implements DBEntity, iTournament
       return;
     }
 
-    //Number of fencer entering the final
-    int finalFencers = (int) Math.pow(this.numberFinalrounds, 2);
+    status = Status.FinalsPhase;
+    DBTournament.setStatus(this.ID, status.value);
 
+    //match for first place aka "the final match"
+    FinalsMatch theFinal = new FinalsMatch(this, this.numberFinalrounds);
+    theFinal.setTime(this.numberFinalrounds, 1);
+
+    List<FinalsMatch> unpopulatedFinalsMatches = new ArrayList<>();
+    unpopulatedFinalsMatches.add(theFinal);
+
+    int laneLimit = this.lanes;
+    int currentLane = 1;
+
+    //build tree of the finals matches starting from the top:
+    //
+    //       1 <- final match, round == this.numberFinalrounds
+    //     2   2 <- matches of round this.numberFinalrounds-1
+    //    3 3 3 3 <- matches of round this.numberFinalrounds-2
+    for (int i = 0; i < this.numberFinalrounds - 1; i++)
+    {
+      int currentRound = this.numberFinalrounds - 1 -i;
+      //ancestor matches are the matches which decide which fencer fences in the match.
+      //Every match has two ancestor matches, except the matches in the first round, which are populated by the best fencers in the qualification round
+      //the winners of the ancestor matches populate the connected match in the next round of the finals
+      List<FinalsMatch> ancestorMatches = new ArrayList<>();
+      for (FinalsMatch existingFinalsRound : unpopulatedFinalsMatches)
+      {
+        //create 2 ancestor matches for each match
+        for(int j = 0; j < 2; j++)
+        {
+          FinalsMatch ancestorMatch = new FinalsMatch(this, currentRound);
+          ancestorMatch.setTime(currentRound, currentLane);
+          ancestorMatch.addWinningRound(existingFinalsRound);
+          ancestorMatches.add(ancestorMatch);
+
+          currentLane++;
+          if(currentLane > this.lanes)
+          {
+            //wrap around if exceeding max lane
+            currentLane = 1;
+          }
+        }
+      }
+      //now all "unpopulated" matches have two ancestor matches which will populate them.
+      //but the ancestor matches need to be populated themselves.
+      unpopulatedFinalsMatches = ancestorMatches;
+    }
+
+    //Number of fencer entering the final
+    int finalFencers = (int) Math.pow(2, this.numberFinalrounds - 1) * 2;
+
+    //this many fencers from each group are guaranteed a place in the finals
     int finalFencerPerGroup = (int) (finalFencers / groups);
 
-    List<Score> scoresOfFencersInFinals = new ArrayList<>();
+    List<Score> qualificationScoresOfFencersInFinals = new ArrayList<>();
     List<Score> wildcards = new ArrayList<>();
 
     //Get the first X fencers from every group and put all other fencers in
     //the wildcard pot
     for (int i = 0; i < groups; i++)
     {
-      List<Score> tmp = getScoreFromGroup();
-      Collections.sort(tmp);//Collection.reverse()
+      List<Score> tmp = getScoreFromQualificationGroup();
+      Collections.sort(tmp);
       for (int r = 0; r < tmp.size(); r++)
       {
         if (r < finalFencerPerGroup)
         {
-          scoresOfFencersInFinals.add(tmp.get(r));
+          qualificationScoresOfFencersInFinals.add(tmp.get(r));
         } else
         {
           wildcards.add(tmp.get(r));
@@ -885,42 +932,20 @@ public class Tournament extends Observable implements DBEntity, iTournament
 
     //Fill up the empty final with the best fencers from the wildcard pot
     Collections.sort(wildcards);
-    for (int i = 0; i < (finalFencers - scoresOfFencersInFinals.size()); i++)
+    for (int i = 0; i < (finalFencers - qualificationScoresOfFencersInFinals.size()); i++)
     {
-      scoresOfFencersInFinals.add(wildcards.get(i));
+      qualificationScoresOfFencersInFinals.add(wildcards.get(i));
     }
 
-    Collections.sort(scoresOfFencersInFinals);
+    Collections.sort(qualificationScoresOfFencersInFinals);
 
-    FinalsMatch theFinal = new FinalsMatch(this.numberFinalrounds - 1);
-
-    List<FinalsMatch> tmp = new ArrayList<>();
-    tmp.add(theFinal);
-
-    for (int i = 0; i < this.numberFinalrounds - 1; i++)
-    {
-      List<FinalsMatch> tmp2 = new ArrayList<>();
-      for (FinalsMatch around : tmp)
-      {
-        FinalsMatch tmp3 = new FinalsMatch(this.numberFinalrounds - 2 - i);
-        tmp3.addWinningRound(around);
-        tmp2.add(tmp3);
-
-        tmp3 = new FinalsMatch(this.numberFinalrounds - 2 - i);
-        tmp3.addWinningRound(around);
-        tmp2.add(tmp3);
-      }
-
-      tmp = tmp2;
-    }
-
+    //populate matches of the first round of the finals with the best scoring fencers from the qualification round
     for (int i = 0; i < finalFencers / 2; i++)
     {
-      tmp.get(i).addParticipant(scoresOfFencersInFinals.get(i).getFencer());
-      tmp.get(i).addParticipant(scoresOfFencersInFinals.get(scoresOfFencersInFinals.size() - 1 - i).getFencer());
+      unpopulatedFinalsMatches.get(i).addParticipant(qualificationScoresOfFencersInFinals.get(i).getFencer());
+      unpopulatedFinalsMatches.get(i).addParticipant(qualificationScoresOfFencersInFinals.get(qualificationScoresOfFencersInFinals.size() - 1 - i).getFencer());
     }
 
-    //TODO: Event werfen
   }
 
   @Override
@@ -993,21 +1018,40 @@ public class Tournament extends Observable implements DBEntity, iTournament
     return status == Status.Completed;
   }
 
-  public void addQualificationMatchToScore(Fencer f, TournamentMatch r)
+  public void addQualificationMatchToScore(Fencer f, QualificationMatch match)
   {
-    if (!qualificationScore.containsKey(f))
-    {
-      qualificationScore.put(f, new Score(f));
-    }
-
-    qualificationScore.get(f).addMatch(r);
+    addMatchToScore(f, match, qualificationScore);
   }
 
-  public void removeQualificationMatchFromScore(Fencer f, TournamentMatch r)
+  public void removeQualificationMatchFromScore(Fencer f, QualificationMatch match)
   {
-    if (qualificationScore.containsKey(f))
+    removeMatchFromScore(f, match, qualificationScore);
+  }
+
+  public void addFinalsMatchToScore(Fencer f, FinalsMatch match)
+  {
+    addMatchToScore(f, match, finalsScore);
+  }
+
+  public void removeFinalsMatchFromScore(Fencer f, FinalsMatch match)
+  {
+    removeMatchFromScore(f, match, finalsScore);
+  }
+
+  private void addMatchToScore(Fencer fencerToAddScoreTo, TournamentMatch matchToAdd, Map<Fencer,Score> scoreMap)
+  {
+     if(!scoreMap.containsKey(fencerToAddScoreTo))
     {
-      qualificationScore.get(f).removeMatch(r);
+      scoreMap.put(fencerToAddScoreTo, new Score(fencerToAddScoreTo));
+    }
+    scoreMap.get(fencerToAddScoreTo).addMatch(matchToAdd);
+  }
+
+  private void removeMatchFromScore(Fencer fencerToRemoveMatchFrom, TournamentMatch matchToRemove, Map<Fencer,Score> scoreMap)
+  {
+    if (scoreMap.containsKey(fencerToRemoveMatchFrom))
+    {
+      scoreMap.get(fencerToRemoveMatchFrom).removeMatch(matchToRemove);
     }
   }
 
@@ -1017,7 +1061,7 @@ public class Tournament extends Observable implements DBEntity, iTournament
     isValid = false;
   }
 
-  private List<Score> getScoreFromGroup() throws SQLException
+  private List<Score> getScoreFromQualificationGroup() throws SQLException
   {
     List<Score> ret = new ArrayList<>();
     for (int g = 0; g < groups; g++)
@@ -1034,14 +1078,17 @@ public class Tournament extends Observable implements DBEntity, iTournament
     return ret;
   }
 
-  private void updateParticipants()
+  private void loadParticipantsAndScores()
   {
     if (!isValid)
     {
       throw new ObjectDeprecatedException();
     }
 
-    participants = TournamentParticipation.getAllParticipantsForTournament(this);
+    for(Map.Entry<Integer, TournamentParticipation> entry : TournamentParticipation.getAllParticipantsForTournament(this).entrySet())
+    {
+      fencerToParticipation.put(Fencer.getFencer(entry.getKey()), entry.getValue());
+    }
   }
 
   @Override

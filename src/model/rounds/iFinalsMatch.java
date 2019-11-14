@@ -1,7 +1,7 @@
 package model.rounds;
 
-import model.ObjectDeprecatedException;
 import java.util.List;
+import model.ObjectDeprecatedException;
 
 public interface iFinalsMatch extends iMatch
 {
@@ -13,8 +13,7 @@ public interface iFinalsMatch extends iMatch
   public List<iFinalsMatch> getPreviousMatches() throws ObjectDeprecatedException;
 
   /**
-   * This function returns the final round the match is part of (quarterfinal;
-   * semifinal; final) If it is the match for the 3. place it will return -1.
+   * This function returns the final round the match is part of (quarterfinal; semifinal; final) If it is the match for the 3. place it will return -1.
    *
    * @return the number of the round
    */

@@ -151,14 +151,13 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       throw new ObjectDeprecatedException();
     }
-    if (finished || !(t.isQualificationPhase() || t.isPreparingPhase()))
+    if (finished || t.isPreparingPhase())
     {
-
-      System.out.println("FALSCHE PHASE");
+      //wrong tournament phase
       return false;
     }
-
-    if (DBTournamentMatch.setQualificationMatchTime(this, round, lane))
+    boolean derivedSuccess = doDerivedSetTime(round, lane);
+    if (derivedSuccess)
     {
       this.round = round;
       this.lane = lane;
@@ -167,7 +166,13 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
       notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
     }
-    return false;
+    return derivedSuccess;
+  }
+
+  protected boolean doDerivedSetTime(int round, int lane) throws SQLException
+  {
+    //does nothing in this class but enabled derived classes to do custom steps
+    return true;
   }
 
   /*
@@ -176,10 +181,6 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
   @Override
   public void setFinished(boolean finish) throws SQLException, ObjectDeprecatedException
   {
-    if (!t.isQualificationPhase())
-    {
-      return;
-    }
     if (this.finished == finish)
     {
       return;
@@ -199,10 +200,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       throw new ObjectDeprecatedException();
     }
-    if (finished)
-    {
-      return;
-    }
+
     if (fencer1.equals(f))
     {
 
@@ -216,6 +214,7 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }
 
+  @Override
   public int getPoints(iFencer f) throws ObjectDeprecatedException
   {
     if (!isValid)
@@ -330,31 +329,29 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       return false;
     }
-
-    if (fencer1.equals(f))
+    if (fencer1 == f || fencer2 == f)
     {
+      doDerivedAddParticipant(f);
       DBTournamentMatch.removeParticipant(this, (Fencer) f);
-      fencer1 = null;
-
-      t.removeQualificationMatchFromScore((Fencer) f, this);
-
+      if (fencer1.equals(f))
+      {
+        fencer1 = null;
+      }
+      if (fencer2.equals(f))
+      {
+        fencer2 = null;
+      }
       setChanged();
       notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
       return true;
-    }
 
-    if (fencer2.equals(f))
-    {
-      DBTournamentMatch.removeParticipant(this, (Fencer) f);
-      fencer2 = null;
-
-      t.removeQualificationMatchFromScore((Fencer) f, this);
-
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
     }
     return false;
+  }
+
+  protected void doDerivedRemoveParticipant(iFencer f)
+  {
+    //does nothing in base class but derived classes use it
   }
 
   @Override
@@ -372,29 +369,24 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
 
     if (fencer1 == null)
     {
-      DBTournamentMatch.addParticipant(this, (Fencer) f);
       fencer1 = (Fencer) f;
-
-      t.addQualificationMatchToScore((Fencer) f, this);
-
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-
-    if (fencer2 == null)
+    } else if (fencer2 == null)
     {
-      DBTournamentMatch.addParticipant(this, (Fencer) f);
       fencer2 = (Fencer) f;
-
-      t.addQualificationMatchToScore((Fencer) f, this);
-
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
+    } else
+    {
+      return false;
     }
+    doDerivedAddParticipant(f);
+    DBTournamentMatch.addParticipant(this, (Fencer) f);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+    return true;
+  }
 
-    return false;
+  protected void doDerivedAddParticipant(iFencer f)
+  {
+    //empty in this class but adds a possiblity for derived classes to add custom steps
   }
 
   @Override
@@ -409,32 +401,33 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
     {
       return false;
     }
-
-    if (fencer1.equals(out))
+    if (fencer1 == out || fencer2 == out)
     {
-      DBTournamentMatch.switchParticipants(this, (Fencer) out, (Fencer) in);
-      fencer1 = (Fencer) in;
-
-      t.removeQualificationMatchFromScore((Fencer) out, this);
-      t.addQualificationMatchToScore((Fencer) in, this);
-
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
-      return true;
-    }
-    if (fencer2.equals(out))
-    {
-      DBTournamentMatch.switchParticipants(this, (Fencer) out, (Fencer) in);
-      fencer2 = (Fencer) in;
-
-      t.removeQualificationMatchFromScore((Fencer) out, this);
-      t.addQualificationMatchToScore((Fencer) in, this);
-
-      setChanged();
-      notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+      switchFencerOut(out, in);
+      if (fencer1.equals(out))
+      {
+        fencer1 = (Fencer) in;
+      }
+      if (fencer2.equals(out))
+      {
+        fencer2 = (Fencer) in;
+      }
       return true;
     }
     return false;
+  }
+
+  private void switchFencerOut(iFencer out, iFencer in) throws SQLException
+  {
+    doDerivedSwitchParticipantOut(out, in);
+    DBTournamentMatch.switchParticipants(this, (Fencer) out, (Fencer) in);
+    setChanged();
+    notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+  }
+
+  protected void doDerivedSwitchParticipantOut(iFencer out, iFencer in)
+  {
+    //does nothing in base class, but inherited classes use it
   }
 
   @Override
@@ -618,9 +611,13 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
   @Override
   public void delete() throws SQLException, ObjectDeprecatedException
   {
-    t.removeQualificationMatchFromScore(fencer1, this);
-    t.removeQualificationMatchFromScore(fencer2, this);
-
+    doDerivedDelete();
+    //TODO: actually delete match from database
     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  }
+
+  protected void doDerivedDelete()
+  {
+
   }
 }

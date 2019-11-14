@@ -171,7 +171,7 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
         CreateQualificationRoundsButton1.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
         CreateQualificationRoundsButton2.setDisable(GUIUtilities.IsTournamentStarted(Tournament));
 
-        if (Tournament.isQualificationPhase())
+        if (!Tournament.isPreparingPhase())
         {
           List<iQualificationMatch> qualificationFights = Tournament.getAllQualificationMatches();
           if (qualificationFights != null)
@@ -248,6 +248,11 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
               }
             }
           }
+        }
+        if (Tournament.isFinalsPhase())
+        {
+          FightsPerGroupBox.setDisable(true);
+          FightsPerLaneBox.setDisable(true);
         }
       } catch (SQLException ex)
       {

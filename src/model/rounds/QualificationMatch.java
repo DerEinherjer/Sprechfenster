@@ -9,10 +9,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.DBConnection.DBEntity;
 import model.DBConnection.DBQualificationPhase;
+import model.DBConnection.DBTournamentMatch;
 import model.Fencer;
 import model.ObjectDeprecatedException;
 import model.ObjectExistException;
 import model.Tournament;
+import model.iFencer;
 
 public class QualificationMatch extends TournamentMatch implements DBEntity, iQualificationMatch
 {
@@ -31,7 +33,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   {
     for (Map.Entry<Integer, QualificationMatch> entry : qualificationMatches.entrySet())
     {
-      entry.getValue().initPhase2();
+      entry.getValue().addMatchToScore();
     }
   }
 
@@ -95,10 +97,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   public QualificationMatch(Map<String, Object> set) throws ObjectExistException, SQLException
   {
     super(set);
-
     qualificationMatches.put(ID, this);
-    t.addQualificationMatchToScore(fencer1, this);
-    t.addQualificationMatchToScore(fencer2, this);
   }
 
   public QualificationMatch(Tournament t, Fencer f1, Fencer f2) throws SQLException
@@ -131,8 +130,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     this.redFor2 = 0;
     this.blackFor2 = 0;
 
-    t.addQualificationMatchToScore(fencer1, this);
-    t.addQualificationMatchToScore(fencer2, this);
+    addMatchToScore();
   }
 
   /**
@@ -142,9 +140,36 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   {
   }
 
-  ;
+  @Override
+  protected void doDerivedAddParticipant(iFencer f)
+  {
+    t.addQualificationMatchToScore((Fencer) f, this);
+  }
 
-    @Override
+  @Override
+  protected void doDerivedRemoveParticipant(iFencer f)
+  {
+    t.removeQualificationMatchFromScore((Fencer) f, this);
+  }
+
+  @Override
+  protected void doDerivedSwitchParticipantOut(iFencer out, iFencer in)
+  {
+    t.removeQualificationMatchFromScore((Fencer) out, this);
+    t.addQualificationMatchToScore((Fencer) in, this);
+  }
+
+  @Override
+  protected boolean doDerivedSetTime(int round, int lane) throws SQLException
+  {
+    if (!t.isQualificationPhase())
+    {
+      return false;
+    }
+    return DBTournamentMatch.setQualificationMatchTime(this, round, lane);
+  }
+
+  @Override
   public void delete() throws SQLException, ObjectDeprecatedException
   {
     if (!isValid)
@@ -156,7 +181,7 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
     qualificationMatches.remove(this);
   }
 
-  protected void initPhase2()
+  private void addMatchToScore()
   {
     t.addQualificationMatchToScore(fencer1, this);
     t.addQualificationMatchToScore(fencer2, this);
@@ -166,5 +191,12 @@ public class QualificationMatch extends TournamentMatch implements DBEntity, iQu
   public int getQualificationGroup() throws SQLException
   {
     return t.getParticipantGroup(fencer1);
+  }
+
+  @Override
+  protected void doDerivedDelete()
+  {
+    t.removeQualificationMatchFromScore(fencer1, this);
+    t.removeQualificationMatchFromScore(fencer2, this);
   }
 }

@@ -3,6 +3,7 @@ package model.DBConnection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static model.DBConnection.DBTournamentMatch.isFinalsMatch;
 import model.Fencer;
 import model.ObjectExistException;
 import model.Tournament;
@@ -17,7 +18,7 @@ public class DBQualificationPhase extends DBBaseClass
   {
     if (lpStmt == null)
     {
-      String sql = "SELECT * FROM Vorrunden WHERE FinalStrucktur = -1;";//-1 means is not a finalround
+      String sql = "SELECT * FROM Vorrunden WHERE NOT " + DBTournamentMatch.isFinalsMatch + ";";
       lpStmt = DBConnection.prepareStatement(sql);
     }
 
@@ -43,7 +44,7 @@ public class DBQualificationPhase extends DBBaseClass
   {
     if (cpStmt == null)
     {
-      String sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2) VALUES (?, ?, ?, ?);";
+      String sql = "INSERT INTO Vorrunden (TurnierID, Gruppe, Teilnehmer1, Teilnehmer2, " + isFinalsMatch + ") VALUES (?, ?, ?, ?, ?);";
       cpStmt = DBConnection.prepareStatement(sql);
     }
 
@@ -51,6 +52,7 @@ public class DBQualificationPhase extends DBBaseClass
     cpStmt.setInt(2, t.getParticipantGroup(f1));
     cpStmt.setInt(3, f1.getID());
     cpStmt.setInt(4, f2.getID());
+    cpStmt.setBoolean(5, false);
 
     cpStmt.executeUpdate();
     ResultSet rs = cpStmt.getGeneratedKeys();

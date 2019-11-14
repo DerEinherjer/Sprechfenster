@@ -1,6 +1,12 @@
 package model;
 
 import java.util.List;
+import model.Fencer;
+import model.ObjectDeprecatedException;
+import model.Tournament;
+import model.iFencer;
+import model.iScore;
+import model.iTournament;
 import model.rounds.iFinalsMatch;
 import model.rounds.iQualificationMatch;
 

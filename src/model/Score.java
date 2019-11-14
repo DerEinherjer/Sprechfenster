@@ -33,11 +33,10 @@ public class Score extends Observable implements iScore, Observer, Comparable
 
   public void addMatch(TournamentMatch r)
   {
-    if (!r.isFencerInMatch(fencer))
+    if (!r.isFencerInMatch(fencer) || matches.contains(r))
     {
       return;
     }
-
     matches.add(r);
     r.addObserver(this);
     update(null, EventPayload.Type.valueChanged);
@@ -45,9 +44,12 @@ public class Score extends Observable implements iScore, Observer, Comparable
 
   public void removeMatch(TournamentMatch r)
   {
-    matches.remove(r);
-    r.deleteObserver(this);
-    update(null, EventPayload.Type.valueChanged);
+    if (matches.contains(r))
+    {
+      matches.remove(r);
+      r.deleteObserver(this);
+      update(null, EventPayload.Type.valueChanged);
+    }
   }
 
   public int getWins()
@@ -98,7 +100,6 @@ public class Score extends Observable implements iScore, Observer, Comparable
         matches.remove(r);
       }
     }
-
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
   }

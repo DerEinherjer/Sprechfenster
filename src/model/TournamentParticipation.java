@@ -1,9 +1,7 @@
 package model;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import model.DBConnection.DBEntity;
 import model.DBConnection.DBTournamentParticipation;
@@ -47,22 +45,10 @@ public class TournamentParticipation implements DBEntity
     Map<Integer, TournamentParticipation> ret = new HashMap<>();
     for (Map.Entry<Integer, TournamentParticipation> entry : participations.entrySet())
     {
-      if (entry.getValue().tournamentID == t.getID())
+      TournamentParticipation value = entry.getValue();
+      if (value.tournamentID == t.getID())
       {
-        ret.put(entry.getValue().fencerID, entry.getValue());
-      }
-    }
-    return ret;
-  }
-
-  public static List<TournamentParticipation> getParticipantsFromGroup(Tournament t, int group)
-  {
-    List<TournamentParticipation> ret = new ArrayList<>();
-    for (Map.Entry<Integer, TournamentParticipation> entry : participations.entrySet())
-    {
-      if (entry.getValue().group == group)
-      {
-        ret.add(entry.getValue());
+        ret.put(value.fencerID, value);
       }
     }
     return ret;

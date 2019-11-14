@@ -12,9 +12,12 @@ import java.util.List;
 import java.util.Map;
 import model.DBConnection.DBEntity;
 import model.DBConnection.DBFinalsPhase;
+import model.DBConnection.DBTournamentMatch;
+import model.Fencer;
 import model.ObjectDeprecatedException;
 import model.ObjectExistException;
 import model.Tournament;
+import model.iFencer;
 
 /**
  *
@@ -26,8 +29,6 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   @Override
   public void init() throws SQLException
   {
-    //The SQL-Table is Created in Round because it is also used in Finalround
-    DBFinalsPhase.createTable();
     DBFinalsPhase.loadFinalrounds();
   }
 
@@ -36,7 +37,7 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   {
     for (Map.Entry<Integer, FinalsMatch> entry : finalsMatches.entrySet())
     {
-      entry.getValue().initPhase2();
+      entry.getValue().connectRoundsAndAddToScore();
     }
   }
 
@@ -73,8 +74,6 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   }
 
   //#########################################################################
-  private Integer finalRound = null;
-
   //Thos variables carry the roundIDs from Init Phase 1 to Phase 2 in which
   //the ID can be dereferenced
   private Integer winnerRoundID = null;
@@ -86,28 +85,22 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   public FinalsMatch(Map<String, Object> set) throws ObjectExistException, SQLException
   {
     super(set);
-
-    this.finalRound = (Integer) set.get("FinalRunde".toUpperCase());
-
-    this.winnerRoundID = (Integer) set.get("GewinnerRunde".toUpperCase());
-    this.loserRoundID = (Integer) set.get("VerliererRunde".toUpperCase());
+    this.winnerRoundID = (Integer) set.get("FinalGewinnerMatch".toUpperCase());
+    this.loserRoundID = (Integer) set.get("FinalVerliererMatch".toUpperCase());
 
     finalsMatches.put(ID, this);
   }
 
-  public FinalsMatch(int finalRound)
+  public FinalsMatch(Tournament t, int finalRound) throws SQLException
   {
     this.ID = DBFinalsPhase.createFinalround(t, finalRound);
-
-    finalsMatches.put(ID, this);
-
     this.t = t;
+    finalsMatches.put(ID, this);
 
     this.fencer1 = null;
     this.fencer2 = null;
 
-    this.finalRound = finalRound;
-    this.round = -1;
+    this.round = finalRound;
     this.lane = -1;
     this.pointsFor1 = 0;
     this.pointsFor2 = 0;
@@ -121,28 +114,74 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
     this.yellowFor2 = 0;
     this.redFor2 = 0;
     this.blackFor2 = 0;
+    addMatchToScore();
   }
 
-  protected void initPhase2()
+  /**
+   * DON'T USE THIS! IT IS FOR THE USE OF THE INTERFACE ONLY AND WILL CRASH THE PROGRAMM IF USED OTHERWISE.
+   */
+  public FinalsMatch()
+  {
+  }
+
+  private void addMatchToScore()
+  {
+    t.addFinalsMatchToScore(fencer1, this);
+    t.addFinalsMatchToScore(fencer2, this);
+  }
+
+  private void connectRoundsAndAddToScore()
   {
     this.winnerRound = getFinalround(winnerRoundID);
     this.loserRound = getFinalround(loserRoundID);
+    addMatchToScore();
   }
 
-  public void addWinningRound(FinalsMatch winningRound)
+  public void addWinningRound(FinalsMatch winningRound) throws SQLException
   {
     if (winnerRound == null)
     {
       winnerRound = winningRound;
+      DBTournamentMatch.setWinnerMatch(this, winnerRound.getID());
     }
   }
 
-  public void addLoosingRound(FinalsMatch loosingRound)
+  public void addLoosingRound(FinalsMatch loosingRound) throws SQLException
   {
     if (winnerRound == null)
     {
       loserRound = loosingRound;
+      DBTournamentMatch.setLoserMatch(this, loosingRound.getID());
     }
+  }
+
+  @Override
+  protected void doDerivedAddParticipant(iFencer f)
+  {
+    t.addFinalsMatchToScore((Fencer) f, this);
+  }
+
+  @Override
+  protected void doDerivedRemoveParticipant(iFencer f)
+  {
+    t.removeFinalsMatchFromScore((Fencer) f, this);
+  }
+
+  @Override
+  protected boolean doDerivedSetTime(int round, int lane) throws SQLException
+  {
+    if (!t.isFinalsPhase())
+    {
+      return false;
+    }
+    return DBTournamentMatch.setFinalsMatchTime(this, round, lane);
+  }
+
+  @Override
+  protected void doDerivedSwitchParticipantOut(iFencer out, iFencer in)
+  {
+    t.removeFinalsMatchFromScore((Fencer) out, this);
+    t.addFinalsMatchToScore((Fencer) in, this);
   }
 
   @Override
@@ -166,11 +205,18 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   @Override
   public int getFinalRound()
   {
-    return finalRound;
+    return round;
   }
 
   private void invalidate()
   {
     this.ID = -1;
+  }
+
+  @Override
+  protected void doDerivedDelete()
+  {
+    t.removeFinalsMatchFromScore(fencer1, this);
+    t.removeFinalsMatchFromScore(fencer2, this);
   }
 }
