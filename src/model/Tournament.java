@@ -916,15 +916,18 @@ public class Tournament extends Observable implements DBEntity, iTournament
     //the wildcard pot
     for (int i = 0; i < groups; i++)
     {
-      List<Score> tmp = getScoreFromQualificationGroup();
+      List<Score> tmp = getScoreFromQualificationGroup(i+1);
       Collections.sort(tmp);
+      Collections.reverse(tmp); //best scoring fencer now is at the beginning of the list
       for (int r = 0; r < tmp.size(); r++)
       {
         if (r < finalFencerPerGroup)
         {
+          //add fencer directly into the finals
           qualificationScoresOfFencersInFinals.add(tmp.get(r));
         } else
         {
+          //add fencer to remaining fencers which do not advance to the finals directly
           wildcards.add(tmp.get(r));
         }
       }
@@ -932,18 +935,25 @@ public class Tournament extends Observable implements DBEntity, iTournament
 
     //Fill up the empty final with the best fencers from the wildcard pot
     Collections.sort(wildcards);
+    Collections.reverse(wildcards);
     for (int i = 0; i < (finalFencers - qualificationScoresOfFencersInFinals.size()); i++)
     {
       qualificationScoresOfFencersInFinals.add(wildcards.get(i));
     }
 
     Collections.sort(qualificationScoresOfFencersInFinals);
+    Collections.reverse(qualificationScoresOfFencersInFinals);
 
-    //populate matches of the first round of the finals with the best scoring fencers from the qualification round
+    //populate matches of the first round of the finals with the best scoring fencers from the qualification round.
+    //The higher scoring fencer fences against the worst scoring fencer, the second best against the second worst, etc.
+    int worstScoringFencerIndex = qualificationScoresOfFencersInFinals.size()-1;
     for (int i = 0; i < finalFencers / 2; i++)
     {
-      unpopulatedFinalsMatches.get(i).addParticipant(qualificationScoresOfFencersInFinals.get(i).getFencer());
-      unpopulatedFinalsMatches.get(i).addParticipant(qualificationScoresOfFencersInFinals.get(qualificationScoresOfFencersInFinals.size() - 1 - i).getFencer());
+      iFencer higherScoreFencer = qualificationScoresOfFencersInFinals.get(i).getFencer();
+      iFencer lowerScoringFencer = qualificationScoresOfFencersInFinals.get(worstScoringFencerIndex - i).getFencer();
+      FinalsMatch matchToPopulate = unpopulatedFinalsMatches.get(i);
+      matchToPopulate.addParticipant(higherScoreFencer);
+      matchToPopulate.addParticipant(lowerScoringFencer);
     }
 
   }
@@ -1061,18 +1071,15 @@ public class Tournament extends Observable implements DBEntity, iTournament
     isValid = false;
   }
 
-  private List<Score> getScoreFromQualificationGroup() throws SQLException
+  private List<Score> getScoreFromQualificationGroup(int group) throws SQLException
   {
     List<Score> ret = new ArrayList<>();
-    for (int g = 0; g < groups; g++)
+    for (iFencer f : getParticipantsOfGroup(group))
     {
-      for (iFencer f : getParticipantsOfGroup(g))
+      Fencer fencerFromGroup = (Fencer) f;
+      if(qualificationScore.containsKey(fencerFromGroup))
       {
-        if (!qualificationScore.containsKey(f))
-        {
-          qualificationScore.put((Fencer) f, new Score((Fencer) f));
-        }
-        ret.add((Score) qualificationScore.get(f));
+        ret.add(qualificationScore.get(fencerFromGroup));
       }
     }
     return ret;
