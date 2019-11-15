@@ -49,7 +49,7 @@
           <content>
             <ScrollPane fx:id="BracketTabScrollPane">
               <content>
-                <HBox fx:id="BracketViewHBox" prefHeight="100.0" prefWidth="200.0" />
+                <HBox fx:id="BracketViewHBox"/>
               </content>
             </ScrollPane>
           </content>

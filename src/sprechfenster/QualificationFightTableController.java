@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -128,11 +127,8 @@ public class QualificationFightTableController implements Initializable, Observe
               try
               {
                 FightPresenter fight = getTableView().getItems().get(getIndex());
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                        "sprechfenster/resources/fxml/EditFightDialog.fxml"
-                ));
-                Parent dialog = loader.<Parent>load();
-                sprechfenster.EditFightDialogController controller = loader.getController();
+                Parent dialog = GUIUtilities.LoadAsParent(this.getClass(), "EditFightDialog.fxml");
+                sprechfenster.EditFightDialogController controller = GUIUtilities.GetLoader().<EditFightDialogController>getController();
                 controller.SetData(fight.getFight(), Tournament, FencerNames);
                 Stage stage = new Stage();
                 stage.setTitle("Gefecht bearbeiten");

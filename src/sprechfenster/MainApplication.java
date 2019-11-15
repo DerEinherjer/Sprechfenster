@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -28,7 +27,7 @@ public class MainApplication extends Application
   @Override
   public void start(Stage stage) throws Exception
   {
-    Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/MainFXML.fxml"));
+    Parent root = GUIUtilities.LoadAsParent(this.getClass(), "Main.fxml");
     Scene scene = new Scene(root);
     stage.setTitle("Sprechfenster");
     stage.setScene(scene);

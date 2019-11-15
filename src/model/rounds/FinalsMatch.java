@@ -139,18 +139,30 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
 
   public void addWinningRound(FinalsMatch winningRound) throws SQLException
   {
+    if (winningRound == null)
+    {
+      throw new IllegalArgumentException("winningRound must not be null");
+    }
+
     if (winnerRound == null)
     {
       winnerRound = winningRound;
+      winnerRoundID = winningRound.getID();
       DBTournamentMatch.setWinnerMatch(this, winnerRound.getID());
     }
   }
 
   public void addLoosingRound(FinalsMatch loosingRound) throws SQLException
   {
-    if (winnerRound == null)
+    if (loosingRound == null)
+    {
+      throw new IllegalArgumentException("loosingRound must not be null");
+    }
+
+    if (loserRound == null)
     {
       loserRound = loosingRound;
+      loserRoundID = loosingRound.getID();
       DBTournamentMatch.setLoserMatch(this, loosingRound.getID());
     }
   }
@@ -191,15 +203,25 @@ public class FinalsMatch extends TournamentMatch implements DBEntity, iFinalsMat
   }
 
   @Override
-  public iFinalsMatch getLoserMatch() throws ObjectDeprecatedException
+  protected void DoDerivedSetFinished(boolean finish) throws SQLException
   {
-    return loserRound;
+    if (finish)
+    {
+      if (winnerRound != null)
+      {
+        winnerRound.addParticipant(getWinner());
+      }
+      if (loserRound != null)
+      {
+        loserRound.addParticipant(getLoser());
+      }
+    }
   }
 
   @Override
-  public List<iFinalsMatch> getPreviousMatches() throws ObjectDeprecatedException
+  public iFinalsMatch getLoserMatch() throws ObjectDeprecatedException
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return loserRound;
   }
 
   @Override

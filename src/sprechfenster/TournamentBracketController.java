@@ -17,7 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import model.ObjectDeprecatedException;
 import model.iFencer;
 import model.iTournament;
@@ -32,7 +32,7 @@ public class TournamentBracketController extends Observable implements Initializ
 {
 
   @FXML
-  private AnchorPane BracketAnchorPane;
+  private GridPane BracketGridPane;
   @FXML
   private ComboBox<String> FirstFencerComboBox;
   @FXML
@@ -116,7 +116,7 @@ public class TournamentBracketController extends Observable implements Initializ
         boolean success = Fight.setTime(Fight.getRound(), lane);
         if (!success)
         {
-          LoggingUtilities.LOGGER.log(Level.SEVERE, null, "Failed to schedule fight " + Fight + " round: " + Fight.getRound() + " lane: " + lane);
+          LoggingUtilities.LOGGER.log(Level.SEVERE, "Failed to schedule fight " + Fight + " round: " + Fight.getRound() + " lane: " + lane);
         }
       }
       if (Fight.isFinished() != fightIsFinished)

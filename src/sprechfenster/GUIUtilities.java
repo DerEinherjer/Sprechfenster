@@ -5,11 +5,16 @@
  */
 package sprechfenster;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -22,6 +27,28 @@ import model.iTournament;
  */
 public class GUIUtilities
 {
+
+  static FXMLLoader lastLoader;
+  static String resourcePath = "/sprechfenster/resources/fxml/";
+
+  public static Parent LoadAsParent(Class clazz, String relativeUrl) throws MalformedURLException, IOException
+  {
+    FXMLLoader loader = new FXMLLoader(clazz.getResource(resourcePath + relativeUrl));
+    lastLoader = loader;
+    return loader.load();
+  }
+
+  public static Node LoadAsNode(Class clazz, String relativeUrl) throws MalformedURLException, IOException
+  {
+    FXMLLoader loader = new FXMLLoader(clazz.getResource(resourcePath + relativeUrl));
+    lastLoader = loader;
+    return loader.load();
+  }
+
+  public static FXMLLoader GetLoader()
+  {
+    return lastLoader;
+  }
 
   public static boolean IsTournamentStarted(iTournament tournament) throws SQLException
   {

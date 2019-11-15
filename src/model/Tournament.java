@@ -898,6 +898,15 @@ public class Tournament extends Observable implements DBEntity, iTournament
           }
         }
       }
+      if(i == 0)
+      {
+        //the loosers of the semi-finals fence a special match for the third place
+        FinalsMatch matchForThirdPlace = new FinalsMatch(this, -1 /*magic number identifying the third place match*/);
+        matchForThirdPlace.setTime(matchForThirdPlace.getRound(), theFinal.getLane());
+        ancestorMatches.get(0).addLoosingRound(matchForThirdPlace);
+        ancestorMatches.get(1).addLoosingRound(matchForThirdPlace);
+        //match for third place is now fully populated, and has no descendants, so no further handling needed
+      }
       //now all "unpopulated" matches have two ancestor matches which will populate them.
       //but the ancestor matches need to be populated themselves.
       unpopulatedFinalsMatches = ancestorMatches;
@@ -955,7 +964,6 @@ public class Tournament extends Observable implements DBEntity, iTournament
       matchToPopulate.addParticipant(higherScoreFencer);
       matchToPopulate.addParticipant(lowerScoringFencer);
     }
-
   }
 
   @Override

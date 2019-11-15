@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -135,7 +134,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     Parent root;
     try
     {
-      root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/NewTournamentDialog.fxml"));
+      root = GUIUtilities.LoadAsParent(this.getClass(), "NewTournamentDialog.fxml");
       Stage stage = new Stage();
       stage.setTitle("Neues Turnier");
       stage.setScene(new Scene(root));
@@ -223,9 +222,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
         ContentAnchorPane.getChildren().add(ContentSplitPane);
         LeftContentAnchorPane.getChildren().clear();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentParticipants.fxml"));
-        Node tournamentPlanningView = loader.load();
-        ParticipantsController = loader.<TournamentParticipantsController>getController();
+        Node tournamentPlanningView = GUIUtilities.LoadAsNode(this.getClass(), "TournamentParticipants.fxml");
+        ParticipantsController = GUIUtilities.GetLoader().<TournamentParticipantsController>getController();
         ParticipantsController.setFencerSelectionInterface(this);
         ParticipantsController.setTournament(tournament);
         LeftContentAnchorPane.getChildren().add(tournamentPlanningView);
@@ -246,10 +244,9 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
       try
       {
         ContentAnchorPane.getChildren().clear();
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationPhase.fxml"));
-        Node tournamentQualificationPhaseView = loader.load();
+        Node tournamentQualificationPhaseView = GUIUtilities.LoadAsNode(this.getClass(), "QualificationPhase.fxml");
         ContentAnchorPane.getChildren().add(tournamentQualificationPhaseView);
-        QualificationPhaseController = loader.<TournamentQualificationPhaseController>getController();
+        QualificationPhaseController = GUIUtilities.GetLoader().<TournamentQualificationPhaseController>getController();
         QualificationPhaseController.SetTournament(tournament);
         SetupToolbarForActiveTournament();
       } catch (IOException ex)
@@ -266,10 +263,9 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
       try
       {
         ContentAnchorPane.getChildren().clear();
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/EliminiationPhase.fxml"));
-        Node tournamentFinalEliminationPhaseView = loader.load();
+        Node tournamentFinalEliminationPhaseView = GUIUtilities.LoadAsNode(this.getClass(), "EliminiationPhase.fxml");
         ContentAnchorPane.getChildren().add(tournamentFinalEliminationPhaseView);
-        EliminationPhaseController = loader.<TournamentEliminationPhaseController>getController();
+        EliminationPhaseController = GUIUtilities.GetLoader().<TournamentEliminationPhaseController>getController();
         EliminationPhaseController.SetTournament(tournament);
         SetupToolbarForActiveTournament();
       } catch (IOException ex)
@@ -297,7 +293,7 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     Parent root;
     try
     {
-      root = FXMLLoader.load(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/NewFencerDialog.fxml"));
+      root = GUIUtilities.LoadAsParent(this.getClass(), "NewFencerDialog.fxml");
       Stage stage = new Stage();
       stage.setTitle("Neuer Fechter");
       stage.setScene(new Scene(root));
@@ -317,9 +313,8 @@ public class MainFXMLController implements Initializable, iFencerSelection, Obse
     Parent root;
     try
     {
-      FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/DropOutFencerDialog.fxml"));
-      root = loader.load();
-      DropOutFencerDialogController controller = loader.<DropOutFencerDialogController>getController();
+      root = GUIUtilities.LoadAsParent(this.getClass(), "DropOutFencerDialog.fxml");
+      DropOutFencerDialogController controller = GUIUtilities.GetLoader().<DropOutFencerDialogController>getController();
       controller.setTournament(ActiveTournament);
       Stage stage = new Stage();
       stage.setTitle("Fechter ausscheiden");

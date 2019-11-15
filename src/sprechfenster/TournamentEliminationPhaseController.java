@@ -17,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -146,11 +145,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
               try
               {
                 FightPresenter fight = getTableView().getItems().get(getIndex());
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(
-                        "sprechfenster/resources/fxml/EditFightDialog.fxml"
-                ));
-                Parent dialog = loader.<Parent>load();
-                EditFightDialogController controller = loader.getController();
+                Parent dialog = GUIUtilities.LoadAsParent(this.getClass(), "EditFightDialog.fxml");
+                EditFightDialogController controller = GUIUtilities.GetLoader().<EditFightDialogController>getController();
                 controller.SetData(fight.getFight(), Tournament, FencerNames);
                 Stage stage = new Stage();
                 stage.setTitle("Gefecht bearbeiten");
@@ -276,17 +272,15 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
     {
       try
       {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-        Node finalRoundScoreGroupTable = loader.load();
-        GroupTableController finalRoundsScoreController = loader.getController();
+        Node finalRoundScoreGroupTable = GUIUtilities.LoadAsNode(this.getClass(), "GroupTable.fxml");
+        GroupTableController finalRoundsScoreController = GUIUtilities.GetLoader().<GroupTableController>getController();
         finalRoundsScoreController.SetGroupName("Finalrundenergebnisse");
         finalRoundsScoreController.SetTournament(Tournament);
         finalRoundsScoreController.SetPhase(GroupTableController.TournamentPhase.FinalPhase);
         FencersPane.getChildren().add(finalRoundScoreGroupTable);
         finalRoundsScoreController.AddFencers(Tournament.getAllParticipants());
-        loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-        Node preliminaryRoundScoreGroupTable = loader.load();
-        GroupTableController preliminaryRoundsScoreController = loader.getController();
+        Node preliminaryRoundScoreGroupTable = GUIUtilities.LoadAsNode(this.getClass(), "GroupTable.fxml");
+        GroupTableController preliminaryRoundsScoreController = GUIUtilities.GetLoader().<GroupTableController>getController();
         preliminaryRoundsScoreController.SetGroupName("Vorrundenergebnisse");
         preliminaryRoundsScoreController.SetTournament(Tournament);
         preliminaryRoundsScoreController.SetPhase(GroupTableController.TournamentPhase.QualificationPhase);
@@ -428,9 +422,8 @@ public class TournamentEliminationPhaseController implements Initializable, Obse
   private TournamentBracketController addBracketForFight(iFinalsMatch fight, VBox matchesBox) throws IOException
   {
     //load the control for the next match and display it
-    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/TournamentBracket.fxml"));
-    Node bracket = loader.load();
-    TournamentBracketController bracketController = loader.getController();
+    Node bracket = GUIUtilities.LoadAsNode(this.getClass(), "TournamentBracket.fxml");
+    TournamentBracketController bracketController = GUIUtilities.GetLoader().<TournamentBracketController>getController();
     bracketController.SetData(fight, Tournament, FencerNames);
     matchesBox.getChildren().add(bracket);
     return bracketController;

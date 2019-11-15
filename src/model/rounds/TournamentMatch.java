@@ -188,9 +188,14 @@ public class TournamentMatch extends Observable implements DBEntity, iMatch
 
     DBTournamentMatch.setFinished(this, finish);
     this.finished = finish;
-
+    DoDerivedSetFinished(finish);
     setChanged();
     notifyObservers(new EventPayload(this, EventPayload.Type.valueChanged));
+  }
+
+  protected void DoDerivedSetFinished(boolean finish) throws SQLException
+  {
+    //Does nothing in base class, but derived classes can use it
   }
 
   @Override

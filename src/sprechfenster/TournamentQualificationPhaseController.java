@@ -18,7 +18,6 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
@@ -181,9 +180,8 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
               for (int groupNumber = 1; groupNumber <= Tournament.getGroups(); groupNumber++)
               {
 
-                FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/GroupTable.fxml"));
-                Node groupTable = loader.load();
-                GroupTableController groupController = loader.getController();
+                Node groupTable = GUIUtilities.LoadAsNode(this.getClass(), "GroupTable.fxml");
+                GroupTableController groupController = GUIUtilities.GetLoader().<GroupTableController>getController();
                 groupController.SetGroupName("Gruppe " + Integer.toString(groupNumber));
                 groupController.SetTournament(Tournament);
                 groupController.SetPhase(GroupTableController.TournamentPhase.QualificationPhase);
@@ -263,11 +261,10 @@ public class TournamentQualificationPhaseController implements Initializable, Ob
 
   private QualificationFightTableController CreateFightTable(VBox parent)
   {
-    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("sprechfenster/resources/fxml/QualificationFightTable.fxml"));
     try
     {
-      Node fightTable = loader.load();
-      QualificationFightTableController fightController = loader.getController();
+      Node fightTable = GUIUtilities.LoadAsNode(this.getClass(), "QualificationFightTable.fxml");
+      QualificationFightTableController fightController = GUIUtilities.GetLoader().<QualificationFightTableController>getController();
       fightController.SetTournament(Tournament);
       parent.getChildren().add(fightTable);
       return fightController;
